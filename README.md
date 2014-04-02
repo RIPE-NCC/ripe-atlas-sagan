@@ -59,7 +59,7 @@ string, the parser will return a `DNSResult` object, which contains a list of
 `Response`s, each with an `abuf` property, as well as all of the information in
 that abuf: header, question, answer, etc.
 
-```
+```python
 my_dns_result = DnsResult("<result string from a RIPE Atlas DNS measurement>")
 my_dns_result.abuf  # The entire string
 my_dns_result.responses[0].header.arcount  # Decoded from the abuf
