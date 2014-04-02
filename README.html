@@ -1,0 +1,65 @@
+<h1>Sagan</h1>
+<p>The RIPE Atlas results parser</p>
+<h2>Why this exists</h2>
+<p>RIPE Atlas generates a <strong>lot</strong> of data, and the format of that data changes over
+time.  Often you want to do something simple like fetch the median RTT for each
+measurement result between date <code>X</code> and date <code>Y</code>.  Unfortunately, there are are
+dozens of edge cases to account for while parsing the JSON, like the format of
+errors and firmware upgrades that changed the format entirely.</p>
+<p>To make this easier for our users (and for ourselves), we wrote an easy to use
+parser that's smart enough to figure out the best course of action for each
+result, and return to you a useful, native Python object.</p>
+<h2>How to use it</h2>
+<p>You can parse a result in a few ways.  You can just pass the JSON-encoded
+string:</p>
+<p><code>python
+my_result = PingResult("&lt;result string from RIPE Atlas ping measurement&gt;")
+print(my_result.rtt_median)
+123.456
+print(my_result.af)
+6</code></p>
+<p>You can do the JSON-decoding yourself:</p>
+<p><code>python
+my_result = PingResult(
+    json.dumps("&lt;result string from RIPE Atlas ping measurement&gt;")
+)
+print(my_result.rtt_median)
+123.456
+print(my_result.af)
+6</code></p>
+<p>And you can let the parser guess the right type for you:</p>
+<p><code>python
+my_result = Result.get("&lt;result string from RIPE Atlas ping measurement&gt;")
+print(my_result.rtt_median)
+123.456
+print(my_result.af)
+6</code></p>
+<h2>What does it support</h2>
+<p>Essentially, we tried to support everything.  If you pass in a DNS result
+string, the parser will return a <code>DNSResult</code> object, which contains a list of
+<code>Response</code>s, each with an <code>abuf</code> property, as well as all of the information in
+that abuf: header, question, answer, etc.</p>
+<p><code>my_dns_result = DnsResult("&lt;result string from a RIPE Atlas DNS measurement&gt;")
+my_dns_result.abuf  # The entire string
+my_dns_result.responses[0].header.arcount  # Decoded from the abuf</code></p>
+<p>We do the same sort of thing for SSL measurements, traceroutes, everything.  We
+try to save you the effort of sorting through whatever is in the result.</p>
+<h2>What it requires</h2>
+<p>As you might have guessed, with all of this magic going on under the hood, there
+are a few dependencies:</p>
+<ul>
+<li>arrow</li>
+<li>dnspython</li>
+<li>pyOpenSSL</li>
+<li>python-dateutil</li>
+<li>pytz</li>
+</ul>
+<p>Additionally, we recommend that you also install <code>ujson</code> as it will speed up the
+JSON-decoding step considerably.</p>
+<h2>How to install</h2>
+<p><code>bash
+$ pip install ripe.atlas.sagan</code></p>
+<h2>Colophon</h2>
+<p>But why <em>Sagan</em>?  The RIPE Atlas team decided to name all of its modules after
+explorers, and what better name for a parser than that of the man who spent
+decades reaching out to the public about the wonders of the cosmos?</p>
