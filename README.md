@@ -130,7 +130,7 @@ JSON-decoding step considerably.
 ## How to install
 
 ```bash
-$ pip install ripe.atlas.sagan
+$ python setup.py install
 ```
 
 
