@@ -1,5 +1,5 @@
-from ..base import Result, ResultParseError
-from ..http import HttpResult
+from ripe.atlas.sagan import Result, ResultParseError
+from ripe.atlas.sagan.http import HttpResult
 
 def test_http_0():
     data = '{"fw":0,"msm_id":12023,"prb_id":1,"src_addr":"GET4 193.0.6.139 0.042268 200 263 1406","timestamp":1319704299,"type":"http"}'

@@ -1,6 +1,5 @@
-from ..base import Result
-from ..ping import PingResult
-from ..ping import Packet as PingPacket
+from ripe.atlas.sagan import Result
+from ripe.atlas.sagan.ping import PingResult, Packet
 
 def test_ping_0():
     result = Result.get('{"avg":"58.042","dst_addr":"62.2.16.12","dup":"0","fw":0,"max":"58.272","min":"57.876","msm_id":1000192,"prb_id":677,"rcvd":"3","sent":"3","src_addr":"78.128.9.202","timestamp":1328019792,"type":"ping"}')
@@ -358,9 +357,9 @@ def test_ping_4610():
     result = Result.get('{"af":4,"avg":57.140666666666668,"dst_addr":"62.2.16.24","dst_name":"hsi.cablecom.ch","dup":0,"from":"188.195.181.120","fw":4610,"group_id":1000192,"lts":93,"max":63.213000000000001,"min":47.941000000000003,"msm_id":1000192,"msm_name":"Ping","prb_id":270,"proto":"ICMP","rcvd":3,"result":[{"rtt":63.213000000000001},{"rtt":47.941000000000003,"ttl":51},{"rtt":60.268000000000001,"ttl":50}],"sent":3,"size":12,"src_addr":"192.168.178.21","step":360,"timestamp":1395416383,"ttl":50,"type":"ping"}')
     assert(isinstance(result, Result))
     assert(isinstance(result, PingResult))
-    assert(isinstance(result.packets[0], PingPacket))
-    assert(isinstance(result.packets[1], PingPacket))
-    assert(isinstance(result.packets[2], PingPacket))
+    assert(isinstance(result.packets[0], Packet))
+    assert(isinstance(result.packets[1], Packet))
+    assert(isinstance(result.packets[2], Packet))
     assert(result.af == 4)
     assert(result.rtt_average == 57.141)
     assert(result.rtt_median == 60.268)
