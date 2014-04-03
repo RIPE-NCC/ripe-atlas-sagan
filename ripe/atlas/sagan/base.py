@@ -76,8 +76,15 @@ class Result(ValidationMixin, object):
         self.is_error       = False
 
         # Handle the weird case where fw=0 and we don't know what to expect
-        if self.firmware == 0 or "dnserr" in self.raw_data:
-            self._handle_error("Unknown firmware: {fw}".format(fw=self.firmware))
+        if self.firmware == 0:
+            self._handle_error("Unknown firmware: {fw}".format(
+                fw=self.firmware)
+            )
+
+        if "dnserr" in self.raw_data:
+            self._handle_error("Error found: {err}".format(
+                err=self.raw_data["dnserr"]
+            ))
 
     def __repr__(self):
         return "Measurement #{measurement}, Probe #{probe}".format(
