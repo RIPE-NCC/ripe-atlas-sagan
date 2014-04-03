@@ -68,6 +68,12 @@ class Result(ValidationMixin, object):
         if isinstance(data, basestring):
             self.raw_data = json.loads(data)
 
+        for key in ("timestamp", "msm_id", "prb_id", "fw", "from"):
+            if key not in self.raw_data:
+                raise ResultParseError(
+                    "This does not look like a RIPE Atlas "
+                    "measurement: {raw_data}".format(raw_data=self.raw_data))
+
         self.created        = arrow.get(self.raw_data["timestamp"])
         self.measurement_id = self.raw_data["msm_id"]
         self.probe_id       = self.raw_data["prb_id"]
