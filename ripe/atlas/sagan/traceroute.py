@@ -1,3 +1,5 @@
+import logging
+
 from .base import Result
 
 class Packet(object):
@@ -91,8 +93,10 @@ class TracerouteResult(Result):
 
         try:
             hops = self.raw_data["result"]
-        except KeyError:
-            raise NotImplementedError("Legacy formats not supported")
+            assert(isinstance(hops, list))
+        except (KeyError, AssertionError):
+            logging.warning("Legacy formats not supported")
+            return
 
         for hop in hops:
 
