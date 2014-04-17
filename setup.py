@@ -10,7 +10,7 @@ install_requires = [
     "python-dateutil>=2.2",
     "pytz>=2014.2",
 ]
-if sys.version_info.major < 3:
+if sys.version_info < (3, 0):
     install_requires.append("dnspython>=1.11.1")
 else:
     install_requires.append("dnspython3>=1.11.1")
