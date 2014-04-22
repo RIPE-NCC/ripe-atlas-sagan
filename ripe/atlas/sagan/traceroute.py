@@ -1,8 +1,8 @@
 import logging
 
-from .base import Result
+from .base import Result, ValidationMixin
 
-class Packet(object):
+class Packet(ValidationMixin):
     """
     origin: The `from` value, if any
     rtt:    Return trip time
@@ -41,7 +41,7 @@ class Packet(object):
         return self.origin
 
 
-class Hop(object):
+class Hop(ValidationMixin):
     """
     index:   The hop number
     packets: A list of packet objects

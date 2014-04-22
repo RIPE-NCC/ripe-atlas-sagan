@@ -1,6 +1,6 @@
-from .base import Result, ResultParseError
+from .base import Result, ResultParseError, ValidationMixin
 
-class Packet(object):
+class Packet(ValidationMixin):
 
     def __init__(self, data, default_ttl, default_source_address):
 

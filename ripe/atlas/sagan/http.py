@@ -1,6 +1,6 @@
 from .base import Result, ValidationMixin
 
-class Response(ValidationMixin, object):
+class Response(ValidationMixin):
 
     def __init__(self, data):
 

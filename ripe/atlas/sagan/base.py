@@ -2,6 +2,10 @@ import arrow
 import logging
 
 try:
+    logging.warning(
+        "Use of the default json module is discouraged.  Instead, consider"
+        "using ujson, a much faster parser."
+    )
     import ujson as json
 except ImportError:
     import json
@@ -10,7 +14,38 @@ class ResultParseError(Exception):
     pass
 
 
-class ValidationMixin(object):
+class DictionaryLikeMixin(object):
+    """
+    Python 2.x and 3.x handle the creation of dictionary-like objects
+    differently.  If we write it this way, it works for both.
+    """
+
+    def __len__(self):
+        return len(self.keys())
+
+    def __iter__(self):
+        for key in self.keys():
+            yield getattr(self, key)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, item):
+        setattr(self, key, item)
+
+    def keys(self):
+        return [p for p in dir(self) if self._is_property_name(p)]
+
+    @staticmethod
+    def _is_property_name(p):
+        if not p.startswith("_"):
+            if p not in ("keys",):
+                if not p.upper() == p:
+                    return True
+        return False
+
+
+class ValidationMixin(DictionaryLikeMixin):
     """
     A handy container for methods we use for validation in the various result
     classes.
@@ -49,7 +84,7 @@ class ValidationMixin(object):
                 )
 
 
-class Result(ValidationMixin, object):
+class Result(ValidationMixin):
     """
     The parent class for all measurement result classes.  Subclass this to
     handle parsing a new measurement type, or use .get() to let this class

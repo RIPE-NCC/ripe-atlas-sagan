@@ -5,9 +5,9 @@ import OpenSSL
 import pytz
 import re
 
-from .base import Result, ResultParseError
+from .base import Result, ResultParseError, ValidationMixin
 
-class Certificate(object):
+class Certificate(ValidationMixin):
 
     TIME_FORMAT = "%Y%m%d%H%M%SZ"
     TIME_REGEX = re.compile(

@@ -10,7 +10,7 @@ from dns.rdatatype import to_text as type_to_text
 
 from .base import Result, ValidationMixin
 
-class Header(ValidationMixin, object):
+class Header(ValidationMixin):
 
     def __init__(self, data):
 
@@ -28,6 +28,9 @@ class Header(ValidationMixin, object):
         self.ra          = self.ensure("RA",         bool)
         self.z           = self.ensure("Z",          int)
         self.id          = self.ensure("ID",         int)
+
+    def __str__(self):
+        return "Header: " + self.return_code
 
 
 class Question(ValidationMixin, object):
@@ -389,13 +392,13 @@ class DnsResult(Result):
 
     def __init__(self, data, parse_abuf=True, **kwargs):
         """
-        Set `parse_abuf=False` if you don't wan the `responses` values to
+        Set `parse_abuf=False` if you don't want the `responses` values to
         include all of the parsed abuf data.  This is faster, but will leave a
         lot of fields empty.
 
         Note that we're not setting `self.af` here, but rather we have it as a
-        property of `Response` as it's apparently possible that one result can
-        contain multiple responses, each with either af=4 or af=6.
+        property of `Response` as it's possible that one result can contain
+        multiple responses, each with either af=4 or af=6.
         """
 
         Result.__init__(self, data, **kwargs)
@@ -419,12 +422,12 @@ class DnsResult(Result):
             try:
                 self.responses_total = int(self.raw_data["result"]["submax"])
             except (KeyError, ValueError):
-                pass
+                pass  # The value wasn't there, not much we can do about it
 
         try:
             responses += self.raw_data["resultset"]
         except KeyError:
-            pass  # self.responses remains empty
+            pass  # self.responses remains the same
 
         for response in responses:
             self.responses.append(Response(
