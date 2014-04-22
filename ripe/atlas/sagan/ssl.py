@@ -28,14 +28,14 @@ class Certificate(ValidationMixin):
         self.checksum    = None
 
         # Clean up the certificate data and use OpenSSL to parse it
-        self._x509 = OpenSSL.crypto.load_certificate(
+        x509 = OpenSSL.crypto.load_certificate(
             OpenSSL.crypto.FILETYPE_PEM,
             data.replace("\\/", "/").replace("\n\n", "\n")
         )
-        subject = dict(self._x509.get_subject().get_components())
-        issuer  = dict(self._x509.get_issuer().get_components())
+        subject = dict(x509.get_subject().get_components())
+        issuer  = dict(x509.get_issuer().get_components())
 
-        if self._x509 and subject and issuer:
+        if x509 and subject and issuer:
 
             self.subject_cn  = subject.get("CN")
             self.subject_o   = subject.get("O")
@@ -43,12 +43,12 @@ class Certificate(ValidationMixin):
             self.issuer_cn   = issuer.get("CN")
             self.issuer_o    = issuer.get("O")
             self.issuer_c    = issuer.get("C")
-            self.checksum    = self._x509.digest("sha256")
-            self.has_expired = bool(self._x509.has_expired())
+            self.checksum    = x509.digest("sha256")
+            self.has_expired = bool(x509.has_expired())
 
             self.valid_from  = None
             self.valid_until = None
-            self._process_validation_times()
+            self._process_validation_times(x509)
 
         self._checksums = {}  # Cache for get_checksum
 
@@ -88,15 +88,15 @@ class Certificate(ValidationMixin):
             self._checksums[algorithm] = self._x509.digest(algorithm)
             return self.get_checksum(algorithm)
 
-    def _process_validation_times(self):
+    def _process_validation_times(self, x509):
         """
         PyOpenSSL uses a kooky date format that *usually* parses out quite
         easily but on the off chance that it's not in UTC, a lot of work needs
         to be done.
         """
 
-        valid_from  = self._x509.get_notBefore()
-        valid_until = self._x509.get_notAfter()
+        valid_from  = x509.get_notBefore()
+        valid_until = x509.get_notAfter()
 
         try:
             self.valid_from = pytz.UTC.localize(datetime.strptime(
