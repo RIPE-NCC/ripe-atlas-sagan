@@ -1,12 +1,19 @@
 from __future__ import absolute_import
 
 import base64
+import logging
 import struct
 
-from dns.opcode import to_text as opcode_to_text
-from dns.rdataclass import to_text as class_to_text
-from dns.rcode import to_text as rcode_to_text
-from dns.rdatatype import to_text as type_to_text
+try:
+    from dns.opcode import to_text as opcode_to_text
+    from dns.rdataclass import to_text as class_to_text
+    from dns.rcode import to_text as rcode_to_text
+    from dns.rdatatype import to_text as type_to_text
+except ImportError:
+    logging.warning(
+        "dnsython isn't installed, without it you cannot parse DNS measurement "
+        "results"
+    )
 
 from .base import Result, ValidationMixin
 

@@ -1,9 +1,17 @@
+import logging
+import pytz
+import re
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-import OpenSSL
-import pytz
-import re
+try:
+    import OpenSSL
+except ImportError:
+    logging.warning(
+        "pyOpenSSL is not installed, without it you cannot parse SSL "
+        "certificate measurement results"
+    )
 
 from .base import Result, ResultParseError, ValidationMixin
 

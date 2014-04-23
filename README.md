@@ -133,6 +133,26 @@ JSON-decoding step considerably.
 $ python setup.py install
 ```
 
+### Troubleshooting
+
+Some setups (like MacOS) have trouble with some of the dependencies we're
+using, so if they explode during the installation, you can still make use of
+*some* of the parsers by deliberately excluding them at install time.
+
+For example, if you want to skip the installation of `pyOpenSSL` (required for
+parsing SSL certificate results), you can do this:
+
+```bash
+$ SAGAN_WITHOUT_SSL=1 python setup install
+```
+
+Similarly, you can skip the installation of `dnspython` and forego any DNS
+result parsing:
+
+```bash
+$ SAGAN_WITHOUT_DNS=1 python setup install
+```
+
 
 ## Colophon
 

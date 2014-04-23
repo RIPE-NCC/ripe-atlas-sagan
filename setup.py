@@ -3,17 +3,23 @@ import sys
 from setuptools import setup
 
 name = "ripe.atlas.sagan"
-version = "0.2a"
+version = "0.3a"
 install_requires = [
     "arrow>=0.4.2",
-    "pyOpenSSL==0.13",
     "python-dateutil>=2.2",
     "pytz>=2014.2",
 ]
-if sys.version_info < (3, 0):
-    install_requires.append("dnspython>=1.11.1")
-else:
-    install_requires.append("dnspython3>=1.11.1")
+
+# pyOpenSSL support is flakey on some systems (I'm looking at you Apple)
+if "SAGAN_WITHOUT_SSL" not in os.environ:
+    install_requires.append("pyOpenSSL==0.13")
+
+# Like pyOpenSSL, dnspython might be problematic for some
+if "SAGAN_WITHOUT_DNS" not in os.environ:
+    if sys.version_info < (3, 0):
+        install_requires.append("dnspython>=1.11.1")
+    else:
+        install_requires.append("dnspython3>=1.11.1")
 
 # Allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
