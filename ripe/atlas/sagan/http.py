@@ -14,11 +14,17 @@ class Response(ValidationMixin):
         self.response_time = self.ensure("rt",     float)
         self.version       = self.ensure("ver",      str)
 
+        self.is_error      = False
+        self.error_string  = self.ensure("err",      str)
+
         if not self.destination:
             self.destination = self.ensure("addr", str, self.destination)
 
         if not self.source:
             self.source = self.ensure("srcaddr", str, self.source)
+
+        if not self.code or self.error_string:
+            self.is_error = True
 
 
 class HttpResult(Result):

@@ -3,10 +3,10 @@ import sys
 from setuptools import setup
 
 name = "ripe.atlas.sagan"
-version = "0.1a"
+version = "0.2a"
 install_requires = [
     "arrow>=0.4.2",
-    "pyOpenSSL>=0.14",
+    "pyOpenSSL==0.13",
     "python-dateutil>=2.2",
     "pytz>=2014.2",
 ]

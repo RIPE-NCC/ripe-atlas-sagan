@@ -8,3 +8,12 @@ from .ssl import SslResult
 from .traceroute import TracerouteResult
 
 __version__ = "0.1a"
+
+__all__ = (
+    "Result",
+    "PingResult",
+    "TracerouteResult",
+    "DnsResult",
+    "SslResult",
+    "HttpResult"
+)
