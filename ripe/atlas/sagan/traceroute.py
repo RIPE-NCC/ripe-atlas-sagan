@@ -92,6 +92,9 @@ class TracerouteResult(Result):
         if self.hops and self.hops[-1].index == self.total_hops:
             self.target_responded = True
 
+    @property
+    def end_time_timestamp(self):
+        return self.end_time.timestamp
 
     def _parse_hops(self):
 

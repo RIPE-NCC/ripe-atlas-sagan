@@ -233,6 +233,7 @@ def test_traceroute_responding_target():
     assert(result.destination_address == "220.226.205.30")
     assert(result.destination_name    == "220.226.205.30")
     assert(result.end_time.isoformat() == "2014-04-24T10:15:54+00:00")
+    assert(result.end_time_timestamp == 1398334554)
     assert(result.origin == "75.75.127.227")
     assert(result.firmware == 4610)
     assert(result.measurement_id == 1000158)
