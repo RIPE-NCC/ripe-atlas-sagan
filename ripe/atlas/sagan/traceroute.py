@@ -88,6 +88,10 @@ class TracerouteResult(Result):
         self.last_rtt   = None
         self._parse_hops()  # Sets hops, last_rtt, and total_hops
 
+        self.target_responded = False
+        if self.hops and self.hops[-1].index == self.total_hops:
+            self.target_responded = True
+
 
     def _parse_hops(self):
 

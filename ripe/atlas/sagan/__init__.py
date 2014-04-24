@@ -7,7 +7,7 @@ from .ping import PingResult
 from .ssl import SslResult
 from .traceroute import TracerouteResult
 
-__version__ = "0.2a"
+__version__ = "0.4a"
 
 __all__ = (
     "Result",
