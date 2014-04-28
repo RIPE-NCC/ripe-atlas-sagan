@@ -137,7 +137,8 @@ $ python setup.py install
 
 Some setups (like MacOS) have trouble with some of the dependencies we're
 using, so if they explode during the installation, you can still make use of
-*some* of the parsers by deliberately excluding them at install time.
+*some* of the parsers by deliberately excluding the problematic ones at
+install time.
 
 For example, if you want to skip the installation of `pyOpenSSL` (required for
 parsing SSL certificate results), you can do this:
