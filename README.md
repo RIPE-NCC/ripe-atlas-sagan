@@ -1,6 +1,6 @@
-# Sagan
+# RIPE Atlas Sagan
 
-A parsing for RIPE Atlas measurement results
+A parsing library for RIPE Atlas measurement results
 
 
 ## Why this exists
