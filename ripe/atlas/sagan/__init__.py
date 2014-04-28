@@ -8,7 +8,7 @@ from .ssl import SslResult
 from .traceroute import TracerouteResult
 
 def get_version():
-    with open("version.txt") as f:
+    with open("version") as f:
         return f.read()
 
 
