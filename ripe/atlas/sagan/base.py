@@ -139,7 +139,7 @@ class Result(ValidationMixin):
 
 
     @classmethod
-    def get(cls, json_string, **kwargs):
+    def get(cls, data, **kwargs):
         """
         Call this when you have a JSON result and just want to turn it into the
         appropriate Result subclass.  This is less performant than calling
@@ -147,7 +147,10 @@ class Result(ValidationMixin):
         first to find the type.
         """
 
-        raw_data = json.loads(json_string)
+        raw_data = data
+        if isinstance(data, basestring):
+            raw_data = json.loads(data)
+
         try:
             kind = raw_data["type"].lower()
         except KeyError:
