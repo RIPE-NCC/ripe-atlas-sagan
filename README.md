@@ -79,10 +79,41 @@ Specifically, these attributes exist on all `*Result` objects:
 
 Additionally, each of the result types have their own properties, like
 `packet_size`, `responses`, `certificates`, etc.  You can take a look at the
-classes themselves, or just look at the tests if you're curious.
+classes themselves, or just look at the tests if you're curious.  But to get you
+started, here are some examples:
+
+```python
+# Ping
+ping_result.packets      # Int
+ping_result.rtt_median   # Float, rounded to 3 decimal places
+ping_result.rtt_average  # Float, rounded to 3 decimal places
+
+# Traceroute
+traceroute_result.af                  # 4 or 6
+traceroute_result.packets             # Int
+traceroute_result.desination_address  # An IP address string
+
+# DNS
+dns_result.abuf                # The raw, unparsed abuf string
+dns_result.headers             # A list of Header objects
+dns_result.headers[0].nscount  # The NSCOUNT value for the first header
+dns_result.questions           # A list of Question objects
+dns_result.questions[0].type   # The TYPE value for the first question
+
+# SSL Certificates
+ssl_result.af                        # 4 or 6
+ssl_result.certificates              # A list of Certificate objects
+ssl_result.certificates[0].checksum  # The checksum for the first certificate
+
+# HTTP
+http_result.af                      # 4 or 6
+http_result.uri                     # A URL string
+http_result.responses               # A list of Response objects
+http_result.responses[0].body_size  # The size of the body of the first response
+```
 
 
-### I'd rather my code explode when there's an error
+### "But... I'd rather my code explode when there's an error"
 
 If you'd like Sagan to be less forgiving, you only need to pass
 `on_error=Result.ERROR_FAIL` when you're instantiating your object.  To use one
