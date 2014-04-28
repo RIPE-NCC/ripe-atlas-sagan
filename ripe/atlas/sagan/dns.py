@@ -39,6 +39,47 @@ class Header(ValidationMixin):
     def __str__(self):
         return "Header: " + self.return_code
 
+    @property
+    def is_authoritative(self):
+        return self.aa
+
+    @property
+    def is_query(self):
+        if self.qr is None:
+            return None
+        return not self.qr
+
+    @property
+    def nameserver_count(self):
+        return self.nscount
+
+    @property
+    def question_count(self):
+        return self.qdcount
+
+    @property
+    def answer_count(self):
+        return self.ancount
+
+    @property
+    def is_truncated(self):
+        return self.tc
+
+    @property
+    def recursion_desired(self):
+        return self.rd
+
+    @property
+    def additional_count(self):
+        return self.arcount
+
+    @property
+    def recursion_available(self):
+        return self.ra
+
+    @property
+    def zero(self):
+        return self.z
 
 class Question(ValidationMixin, object):
 
@@ -62,6 +103,10 @@ class Answer(ValidationMixin, object):
         self.klass     = self.ensure("Class",    str)
         self.rd_length = self.ensure("RDlength", int)
 
+    @property
+    def resource_data_length(self):
+        return self.rd_length
+
 
 class Authority(ValidationMixin, object):
 
@@ -75,6 +120,10 @@ class Authority(ValidationMixin, object):
         self.target    = self.ensure("Target", str)
         self.type      = self.ensure("Type", str)
 
+    @property
+    def resource_data_length(self):
+        return self.rd_length
+
 
 class Additional(ValidationMixin, object):
 
@@ -87,6 +136,10 @@ class Additional(ValidationMixin, object):
         self.rd_length = self.ensure("RDlength", int)
         self.ttl       = self.ensure("TTL", int)
         self.type      = self.ensure("Type", str)
+
+    @property
+    def resource_data_length(self):
+        return self.rd_length
 
 
 class Response(ValidationMixin, object):
