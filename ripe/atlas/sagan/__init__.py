@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import os
+
 from .base import Result, ResultParseError
 from .dns import DnsResult
 from .http import HttpResult
@@ -8,7 +10,11 @@ from .ssl import SslResult
 from .traceroute import TracerouteResult
 
 def get_version():
-    with open("version") as f:
+    version_file = os.path.join(
+        os.path.dirname(__file__),
+        "version"
+    )
+    with open(version_file) as f:
         return f.read()
 
 
@@ -20,5 +26,7 @@ __all__ = (
     "TracerouteResult",
     "DnsResult",
     "SslResult",
-    "HttpResult"
+    "HttpResult",
+    "version",
 )
+
