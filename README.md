@@ -25,8 +25,10 @@ string:
 from ripe.atlas.sagan import PingResult
 
 my_result = PingResult("<result string from RIPE Atlas ping measurement>")
+
 print(my_result.rtt_median)
 123.456
+
 print(my_result.af)
 6
 ```
@@ -39,36 +41,41 @@ from ripe.atlas.sagan import PingResult
 my_result = PingResult(
     json.dumps("<result string from RIPE Atlas ping measurement>")
 )
+
 print(my_result.rtt_median)
 123.456
+
 print(my_result.af)
 6
 ```
 
-And you can let the parser guess the right type for you:
+You can let the parser guess the right type for you, though this incurrs a
+small performance penalty:
 
 ```python
 from ripe.atlas.sagan import Result
 
 my_result = Result.get("<result string from RIPE Atlas ping measurement>")
+
 print(my_result.rtt_median)
 123.456
+
 print(my_result.af)
 6
 ```
 
 ### Which attributes are supported?
 
-Every result type has it's own properties, with a few common between all types.
+Every result type has its own properties, with a few common between all types.
 
 Specifically, these attributes exist on all `*Result` objects:
 
-* created  **An arrow object (like datetime, but better) of the `timestamp` field**
-* measurement_id
-* probe_id
-* firmware **An integer representing the firmware version**
-* origin  **The `from` attribute in the result**
-* is_error **Set to `True` if an error was found**
+* `created`  **An arrow object (like datetime, but better) of the `timestamp` field**
+* `measurement_id`
+* `probe_id`
+* `firmware` **An integer representing the firmware version**
+* `origin`  **The `from` attribute in the result**
+* `is_error` **Set to `True` if an error was found**
 
 Additionally, each of the result types have their own properties, like
 `packet_size`, `responses`, `certificates`, etc.  You can take a look at the
@@ -129,9 +136,12 @@ JSON-decoding step considerably.
 
 ## How to install
 
+The stable version should always be in PyPi, so you can install it with `pip`:
+
 ```bash
-$ python setup.py install
+$ pip install ripe.atlas.sagan
 ```
+
 
 ### Troubleshooting
 
