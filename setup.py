@@ -2,10 +2,8 @@ import os
 import sys
 from setuptools import setup
 
-from ripe.atlas.sagan.variables import VERSION
-
 name = "ripe.atlas.sagan"
-version = VERSION
+version = open(os.path.join("ripe", "atlas", "sagan", "version")).read().strip()
 install_requires = [
     "arrow>=0.4.2",
     "python-dateutil>=2.2",
@@ -35,8 +33,8 @@ setup(
     license="GPLv3",
     description="A parser for RIPE Atlas measurement results",
     long_description=open(os.path.join(os.path.dirname(__file__), "README.md")).read(),
-    url="https://github.com/RIPE-NCC/sagan",
-    download_url="https://github.com/RIPE-NCC/sagan",
+    url="https://github.com/RIPE-NCC/ripe.atlas.sagan",
+    download_url="https://github.com/RIPE-NCC/ripe.atlas.sagan",
     author="Daniel Quinn",
     author_email="dquinn@ripe.net",
     maintainer="Daniel Quinn",

@@ -7,7 +7,12 @@ from .ping import PingResult
 from .ssl import SslResult
 from .traceroute import TracerouteResult
 
-from .variables import VERSION
+def get_version():
+    with open("version.txt") as f:
+        return f.read()
+
+
+version = get_version()
 
 __all__ = (
     "Result",
