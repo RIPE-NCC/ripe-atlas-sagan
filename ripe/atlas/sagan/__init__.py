@@ -15,7 +15,7 @@ def get_version():
         "version"
     )
     with open(version_file) as f:
-        return f.read()
+        return f.read().strip()
 
 
 version = get_version()
