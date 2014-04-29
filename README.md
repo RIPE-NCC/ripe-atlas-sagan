@@ -49,7 +49,7 @@ print(my_result.af)
 6
 ```
 
-You can let the parser guess the right type for you, though this incurrs a
+You can let the parser guess the right type for you, though this incurs a
 small performance penalty:
 
 ```python
