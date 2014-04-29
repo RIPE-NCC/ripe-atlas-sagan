@@ -36,10 +36,10 @@ def test_http_1():
     assert(result.responses[0].af is None)
     assert(result.responses[0].body_size == 1406)
     assert(result.responses[0].head_size == 263)
-    assert(result.responses[0].destination == "193.0.6.139")
+    assert(result.responses[0].destination_address == "193.0.6.139")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 30.229)
-    assert(result.responses[0].source is None)
+    assert(result.responses[0].source_address is None)
     assert(result.responses[0].version is None)
 
 def test_http_4430():
@@ -57,10 +57,10 @@ def test_http_4430():
     assert(result.responses[0].af is None)
     assert(result.responses[0].body_size == 1406)
     assert(result.responses[0].head_size == 263)
-    assert(result.responses[0].destination == "193.0.6.139")
+    assert(result.responses[0].destination_address == "193.0.6.139")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 27.276)
-    assert(result.responses[0].source == "192.168.99.183")
+    assert(result.responses[0].source_address == "192.168.99.183")
     assert(result.responses[0].version == "1.1")
 
 def test_http_4460():
@@ -78,10 +78,10 @@ def test_http_4460():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 22383)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 71.146)
-    assert(result.responses[0].source == result.origin)
+    assert(result.responses[0].source_address == result.origin)
     assert(result.responses[0].version == "1.1")
 
 
@@ -100,10 +100,10 @@ def test_http_4470():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 22243)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 765.254)
-    assert(result.responses[0].source == result.origin)
+    assert(result.responses[0].source_address == result.origin)
     assert(result.responses[0].version == "1.1")
 
 
@@ -122,10 +122,10 @@ def test_http_4480():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 39777)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 660.41)
-    assert(result.responses[0].source == "2a02:6c80:5:0:220:4aff:fee0:2774")
+    assert(result.responses[0].source_address == "2a02:6c80:5:0:220:4aff:fee0:2774")
     assert(result.responses[0].version == "1.1")
 
 
@@ -144,10 +144,10 @@ def test_http_4500():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 40103)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 234.048)
-    assert(result.responses[0].source == result.origin)
+    assert(result.responses[0].source_address == result.origin)
     assert(result.responses[0].version == "1.1")
 
 
@@ -166,10 +166,10 @@ def test_http_4520():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 40567)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 102.825)
-    assert(result.responses[0].source == result.origin)
+    assert(result.responses[0].source_address == result.origin)
     assert(result.responses[0].version == "1.1")
 
 
@@ -188,10 +188,10 @@ def test_http_4540():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 40485)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 158.994)
-    assert(result.responses[0].source == "2001:980:36af:1:220:4aff:fec8:226d")
+    assert(result.responses[0].source_address == "2001:980:36af:1:220:4aff:fec8:226d")
     assert(result.responses[0].version == "1.1")
 
 
@@ -210,10 +210,10 @@ def test_http_4550():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 40118)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 2092.447)
-    assert(result.responses[0].source == "2001:4538:100:0:220:4aff:fec8:232b")
+    assert(result.responses[0].source_address == "2001:4538:100:0:220:4aff:fec8:232b")
     assert(result.responses[0].version == "1.1")
 
 
@@ -232,10 +232,10 @@ def test_http_4560():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 39340)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 739.27)
-    assert(result.responses[0].source == "2620:0:2ed0:aaaa::210")
+    assert(result.responses[0].source_address == "2620:0:2ed0:aaaa::210")
     assert(result.responses[0].version == "1.1")
 
 
@@ -254,10 +254,10 @@ def test_http_4570():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 41021)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 187.022)
-    assert(result.responses[0].source == "2001:8b0:34f:5b8:220:4aff:fee0:21fc")
+    assert(result.responses[0].source_address == "2001:8b0:34f:5b8:220:4aff:fee0:21fc")
     assert(result.responses[0].version == "1.1")
 
 
@@ -276,10 +276,10 @@ def test_http_4600():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 41020)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 195.844)
-    assert(result.responses[0].source == "2a01:6a8:0:f:220:4aff:fec5:5b5a")
+    assert(result.responses[0].source_address == "2a01:6a8:0:f:220:4aff:fec5:5b5a")
     assert(result.responses[0].version == "1.1")
 
 
@@ -298,10 +298,10 @@ def test_http_4610():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size == 41020)
     assert(result.responses[0].head_size == 279)
-    assert(result.responses[0].destination == "2001:67c:2e8:22::c100:68b")
+    assert(result.responses[0].destination_address == "2001:67c:2e8:22::c100:68b")
     assert(result.responses[0].code == 200)
     assert(result.responses[0].response_time == 154.755)
-    assert(result.responses[0].source == "2a01:9e00:a217:d00:220:4aff:fec6:cb5b")
+    assert(result.responses[0].source_address == "2a01:9e00:a217:d00:220:4aff:fec6:cb5b")
     assert(result.responses[0].version == "1.1")
 
 
@@ -320,10 +320,10 @@ def test_http_4610_fail():
     assert(result.responses[0].af == 6)
     assert(result.responses[0].body_size is None)
     assert(result.responses[0].head_size is None)
-    assert(result.responses[0].destination == "2001:42d0:0:200::6")
+    assert(result.responses[0].destination_address == "2001:42d0:0:200::6")
     assert(result.responses[0].code is None)
     assert(result.responses[0].response_time is None)
-    assert(result.responses[0].source == "2001:630:301:1080:220:4aff:fee0:20a0")
+    assert(result.responses[0].source_address == "2001:630:301:1080:220:4aff:fee0:20a0")
     assert(result.responses[0].version is None)
     assert(result.responses[0].is_error is True)
     assert(result.responses[0].error_string == "timeout reading chunk")
