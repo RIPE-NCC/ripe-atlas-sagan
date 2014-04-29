@@ -53,7 +53,7 @@ class PingResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af                    = self.ensure("af", int)
+        self.af                    = self.ensure("af",       int)
         self.duplicates            = self.ensure("dup",      int)
         self.rtt_average           = self.ensure("avg",      float)
         self.rtt_median            = None  # Redefined in self._set_median()
