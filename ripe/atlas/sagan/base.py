@@ -51,9 +51,9 @@ class ValidationMixin(DictionaryLikeMixin):
     classes.
     """
 
-    PROTOCOL_ICMP = 1
-    PROTOCOL_UDP  = 2
-    PROTOCOL_TCP  = 3
+    PROTOCOL_ICMP = "ICMP"
+    PROTOCOL_UDP  = "UDP"
+    PROTOCOL_TCP  = "TCP"
     PROTOCOL_MAP = {
         "ICMP": PROTOCOL_ICMP,
         "UDP":  PROTOCOL_UDP,
