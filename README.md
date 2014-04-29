@@ -94,11 +94,13 @@ traceroute_result.packets             # Int
 traceroute_result.desination_address  # An IP address string
 
 # DNS
-dns_result.abuf                # The raw, unparsed abuf string
-dns_result.headers             # A list of Header objects
-dns_result.headers[0].nscount  # The NSCOUNT value for the first header
-dns_result.questions           # A list of Question objects
-dns_result.questions[0].type   # The TYPE value for the first question
+dns_result.responses                        # A list of Response objects
+dns_result.responses[0].response_time       # Float, rounded to 3 decimal places
+dns_result.responses[0].headers             # A list of Header objects
+dns_result.responses[0].headers[0].nscount  # The NSCOUNT value for the first header
+dns_result.responses[0].questions           # A list of Question objects
+dns_result.responses[0].questions[0].type   # The TYPE value for the first question
+dns_result.responses[0].abuf                # The raw, unparsed abuf string
 
 # SSL Certificates
 ssl_result.af                        # 4 or 6
@@ -142,7 +144,7 @@ that abuf: header, question, answer, etc.
 from ripe.atlas.sagan import DnsResult
 
 my_dns_result = DnsResult("<result string from a RIPE Atlas DNS measurement>")
-my_dns_result.abuf  # The entire string
+my_dns_result.responses[0].abuf  # The entire string
 my_dns_result.responses[0].header.arcount  # Decoded from the abuf
 ```
 
@@ -185,14 +187,14 @@ For example, if you want to skip the installation of `pyOpenSSL` (required for
 parsing SSL certificate results), you can do this:
 
 ```bash
-$ SAGAN_WITHOUT_SSL=1 python setup install
+$ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
 ```
 
 Similarly, you can skip the installation of `dnspython` and forego any DNS
 result parsing:
 
 ```bash
-$ SAGAN_WITHOUT_DNS=1 python setup install
+$ SAGAN_WITHOUT_DNS=1 pip install ripe.atlas.sagan
 ```
 
 
