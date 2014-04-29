@@ -4,24 +4,24 @@ class Response(ValidationMixin):
 
     def __init__(self, data):
 
-        self.raw_data      = data
-        self.af            = self.ensure("af",       int)
-        self.body_size     = self.ensure("bsize",    int)
-        self.head_size     = self.ensure("hsize",    int)
-        self.destination   = self.ensure("dst_addr", str)
-        self.source        = self.ensure("src_addr", str)
-        self.code          = self.ensure("res",      int)
-        self.response_time = self.ensure("rt",     float)
-        self.version       = self.ensure("ver",      str)
+        self.raw_data            = data
+        self.af                  = self.ensure("af",       int)
+        self.body_size           = self.ensure("bsize",    int)
+        self.head_size           = self.ensure("hsize",    int)
+        self.destination_address = self.ensure("dst_addr", str)
+        self.source_address      = self.ensure("src_addr", str)
+        self.code                = self.ensure("res",      int)
+        self.response_time       = self.ensure("rt",     float)
+        self.version             = self.ensure("ver",      str)
 
-        self.is_error      = False
-        self.error_string  = self.ensure("err",      str)
+        self.is_error     = False
+        self.error_string = self.ensure("err",      str)
 
-        if not self.destination:
-            self.destination = self.ensure("addr", str, self.destination)
+        if not self.destination_address:
+            self.destination_address = self.ensure("addr", str, self.destination_address)
 
-        if not self.source:
-            self.source = self.ensure("srcaddr", str, self.source)
+        if not self.source_address:
+            self.source_address = self.ensure("srcaddr", str, self.source_address)
 
         if not self.code or self.error_string:
             self.is_error = True

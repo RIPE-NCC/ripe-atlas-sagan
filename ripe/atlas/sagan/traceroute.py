@@ -74,7 +74,6 @@ class TracerouteResult(Result):
         self.destination_name    = self.ensure("dst_name", str)
         self.source_address      = self.ensure("src_addr", str)
         self.end_time            = self.ensure("endtime",  "datetime")
-        self.origin              = self.ensure("from",     str)
         self.paris_id            = self.ensure("paris_id", int)
         self.size                = self.ensure("size",     int)
 

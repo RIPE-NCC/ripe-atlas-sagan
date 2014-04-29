@@ -113,12 +113,12 @@ class Authority(ValidationMixin, object):
     def __init__(self, data):
 
         self.raw_data  = data
-        self.klass     = self.ensure("Class", int)
-        self.name      = self.ensure("Name", str)
+        self.klass     = self.ensure("Class",    int)
+        self.name      = self.ensure("Name",     str)
         self.rd_length = self.ensure("RDlength", int)
-        self.ttl       = self.ensure("TTL", int)
-        self.target    = self.ensure("Target", str)
-        self.type      = self.ensure("Type", str)
+        self.ttl       = self.ensure("TTL",      int)
+        self.target    = self.ensure("Target",   str)
+        self.type      = self.ensure("Type",     str)
 
     @property
     def resource_data_length(self):
@@ -130,12 +130,12 @@ class Additional(ValidationMixin, object):
     def __init__(self, data):
 
         self.raw_data  = data
-        self.address   = self.ensure("Address", str)
-        self.klass     = self.ensure("Class", str)
-        self.name      = self.ensure("Name", str)
+        self.address   = self.ensure("Address",  str)
+        self.klass     = self.ensure("Class",    str)
+        self.name      = self.ensure("Name",     str)
         self.rd_length = self.ensure("RDlength", int)
-        self.ttl       = self.ensure("TTL", int)
-        self.type      = self.ensure("Type", str)
+        self.ttl       = self.ensure("TTL",      int)
+        self.type      = self.ensure("Type",     str)
 
     @property
     def resource_data_length(self):

@@ -64,7 +64,7 @@ class PingResult(Result):
         self.packet_size           = self.ensure("size",     int)
         self.destination_name      = self.ensure("dst_name", str)
         self.destination_address   = self.ensure("dst_addr", str)
-        self.last_time_syncronised = self.ensure("lts",      int)
+        self.seconds_since_sync = self.ensure("lts",      int)
         self.step                  = self.ensure("step",     int)
         self.packets = []
 
@@ -76,9 +76,9 @@ class PingResult(Result):
 
         self.protocol = self.clean_protocol(self.ensure("proto", str))
 
-        if self.last_time_syncronised is not None:
-            if self.last_time_syncronised < 0:
-                self.last_time_syncronised = None
+        if self.seconds_since_sync is not None:
+            if self.seconds_since_sync < 0:
+                self.seconds_since_sync = None
 
         if 0 < self.firmware < 4460:
             self.destination_address = self.ensure("addr", str)
