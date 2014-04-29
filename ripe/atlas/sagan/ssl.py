@@ -34,6 +34,7 @@ class Certificate(ValidationMixin):
         self.valid_from  = None
         self.valid_until = None
         self.checksum    = None
+        self.has_expired = None
 
         # Clean up the certificate data and use OpenSSL to parse it
         x509 = OpenSSL.crypto.load_certificate(
@@ -58,8 +59,6 @@ class Certificate(ValidationMixin):
             self.valid_until = None
             self._process_validation_times(x509)
 
-        self._checksums = {}  # Cache for get_checksum
-
     @property
     def cn(self):
         return self.subject_cn
@@ -83,18 +82,6 @@ class Certificate(ValidationMixin):
     @property
     def country(self):
         return self.c
-
-    def get_checksum(self, algorithm):
-        """
-        Returns a digest checksum for the algorithm specified.  Presently "md5",
-        "sha1", and "sha256" have been tested, for everything else you're on
-        your own.
-        """
-        try:
-            return self._checksums[algorithm]
-        except KeyError:
-            self._checksums[algorithm] = self._x509.digest(algorithm)
-            return self.get_checksum(algorithm)
 
     def _process_validation_times(self, x509):
         """
@@ -160,16 +147,15 @@ class SslResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af               = self.ensure("af",       int)
-        self.destination      = self.ensure("dst_addr", str)
-        self.destination_name = self.ensure("dst_name", str)
-        self.source           = self.ensure("src_addr", str)
-        self.port             = self.ensure("dst_port", int)
-        self.origin           = self.ensure("from",     str)
-        self.method           = self.ensure("method",   str)
-        self.version          = self.ensure("ver",      str)
-        self.response_time    = self.ensure("rt",       float)
-        self.time_to_connect  = self.ensure("ttc",      float)
+        self.af                  = self.ensure("af",       int)
+        self.destination_address = self.ensure("dst_addr", str)
+        self.destination_name    = self.ensure("dst_name", str)
+        self.source_address      = self.ensure("src_addr", str)
+        self.port                = self.ensure("dst_port", int)
+        self.method              = self.ensure("method",   str)
+        self.version             = self.ensure("ver",      str)
+        self.response_time       = self.ensure("rt",       float)
+        self.time_to_connect     = self.ensure("ttc",      float)
 
         self.certificates = []
         self.is_self_signed = False
@@ -189,6 +175,9 @@ class SslResult(Result):
                     self.is_self_signed = True
 
     def get_checksum_chain(self):
+        """
+        Returns a list of checksums joined with "::".
+        """
 
         checksums = []
         for certificate in self.certificates:
