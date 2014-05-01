@@ -40,6 +40,9 @@ setup(
     maintainer="Daniel Quinn",
     maintainer_email="dquinn@ripe.net",
     install_requires=install_requires,
+    scripts=[
+        "scripts/parse_abuf"
+    ],
     classifiers=[
         "Operating System :: POSIX",
         "Operating System :: Unix",
@@ -49,4 +52,3 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
     ],
 )
-

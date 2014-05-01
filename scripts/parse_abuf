@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+
+import argparse
+import base64
+import json
+import string
+import struct
+import sys
+
+from dns.opcode import to_text as opcode_to_text
+from dns.rdataclass import to_text as class_to_text
+from dns.rcode import to_text as rcode_to_text
+from dns.rdatatype import to_text as type_to_text
+
+from ripe.atlas.sagan.dns import Response
+
+def main(args):
+
+    options = args.__dict__
+
+    result = {
+        'line_count': 0,
+        'decodedabufs_with_ERROR': 0,
+        'abufdecode_failures': 0,
+        'b64decode_failures': 0
+    }
+
+    line = sys.stdin.readline()
+
+    if args.verbosity >2:
+        print "#inputline:\n#", line, "#end inputline-----"
+
+    if line[:1] == "{" and line[-2:-1] == "}":
+
+        # json encoded data (RIPE Atlas measurment)
+        while line:
+
+            if args.verbosity >1:
+                print "#json line:\n# ", line, "#end json line-----"
+
+            result['line_count'] += 1
+            result['errorFindingDecodingabuf'] = 0
+            data = None
+
+            try:
+
+                data = json.loads(line)
+                if data.has_key('result'):
+                    if data['result'].has_key('abuf'):
+                        babuf = None
+                        if args.verbosity >1:
+                             print "#b64buf:\n#",data['result']['abuf'],"\n#end b64buf------"
+                        try:
+                            babuf = base64.b64decode(data['result']['abuf'])
+                        except Exception:
+                            result['b64decode_failures'] += 1;
+
+                        if babuf:
+                            adata  = Response.decode_abuf(babuf, options) #, result)
+                            if adata:
+                                if data.has_key('ERROR'):
+                                    result['decodedabufs_with_ERROR'] += 1
+                                data['DnsReply']= adata
+
+            except Exception:
+
+                line = sys.stdin.readline()
+                continue
+                error = []
+                e = ("Error finding/decoding abuf")
+                error.append(e)
+                print "error:", error
+                data['ERROR'] = error
+                result['errorFindingDecodingabuf'] += 1
+
+            if args.formattedJSON:
+                print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+            else:
+                print json.dumps(data)
+
+            line = sys.stdin.readline()
+
+    else:  # plain b64 encoced abuf
+
+        while line:
+            if args.verbosity >1:
+                print "#b64 encoded abuf line:\n#", line, "#end b64 encoded abuf line-----"
+            result['line_count'] += 1
+
+            try:
+                babuf = base64.b64decode(line)
+            except Exception:
+                result['b64decode_failures'] += 1;
+                line = sys.stdin.readline()
+                continue
+
+            data  = Response.decode_abuf(babuf, options)
+
+            if data:
+                if data.has_key('ERROR'):
+                    result['decodedabufs_with_ERROR'] += 1
+                if args.formattedJSON:
+                    print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+                else:
+                    print json.dumps(data)
+                    #print "data", data
+            else:
+                result['abufdecode_failures'] += 1
+
+            line = sys.stdin.readline()
+
+    if args.verbosity:
+        print "#======== results:\n#",
+        lines = json.dumps(result, sort_keys=True, indent=4, separators=(',', ': '))
+        print string.replace(lines, "\n", "\n#") # we want this to be comments lines on stdout
+
+    sys.stdout.flush()
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v',    '--verbosity',     default=0,    action="count")
+    parser.add_argument('-fj',   '--formattedJSON', default=0,    action="count")
+    parser.add_argument('-dh',   '--DO_Header',     default=0,    action="count")
+    parser.add_argument('-dq',   '--DO_Question',   default=0,    action="count")
+    parser.add_argument('-dan',  '--DO_Answer',     default=0,    action="count")
+    parser.add_argument('-dad',  '--DO_Additional', default=0,    action="count")
+    parser.add_argument('-dau',  '--DO_Authority',  default=0,    action="count")
+    parser.add_argument('-do',   '--DO_Options',    default=0,    action="count")
+    parser.add_argument('-dall', '--DO_All',        default=0,    action="count")
+    args = parser.parse_args()
+
+    if args.DO_All:
+        args.DO_Header     = 1
+        args.DO_Question   = 1
+        args.DO_Answer     = 1
+        args.DO_Additional = 1
+        args.DO_Authority  = 1
+        args.DO_Options    = 1
+
+    sys.exit(main(args))
