@@ -84,14 +84,14 @@ started, here are some examples:
 
 ```python
 # Ping
-ping_result.packets      # Int
-ping_result.rtt_median   # Float, rounded to 3 decimal places
-ping_result.rtt_average  # Float, rounded to 3 decimal places
+ping_result.packets_sent  # Int
+ping_result.rtt_median    # Float, rounded to 3 decimal places
+ping_result.rtt_average   # Float, rounded to 3 decimal places
 
 # Traceroute
-traceroute_result.af                  # 4 or 6
-traceroute_result.packets             # Int
-traceroute_result.desination_address  # An IP address string
+traceroute_result.af                   # 4 or 6
+traceroute_result.total_hops           # Int
+traceroute_result.destination_address  # An IP address string
 
 # DNS
 dns_result.responses                        # A list of Response objects
@@ -157,14 +157,16 @@ try to save you the effort of sorting through whatever is in the result.
 As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
-* arrow
-* dnspython
-* pyOpenSSL
-* python-dateutil
-* pytz
+* [arrow](https://pypi.python.org/pypi/arrow)
+* dnspython [v2](https://pypi.python.org/pypi/dnspython) or [v3](https://pypi.python.org/pypi/dnspython3)
+* [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL)
+* [python-dateutil](https://pypi.python.org/pypi/python-dateutil)
+* [pytz](https://pypi.python.org/pypi/pytz)
 
-Additionally, we recommend that you also install `ujson` as it will speed up the
-JSON-decoding step considerably.
+Additionally, we recommend that you also install
+[ujson](https://pypi.python.org/pypi/ujson) as it will speed up the
+JSON-decoding step considerably, and [sphinx](https://pypi.python.org/pypi/Sphinx) if you intend to build the
+documentation files for offline use.
 
 
 ## How to install
@@ -196,6 +198,14 @@ result parsing:
 ```bash
 $ SAGAN_WITHOUT_DNS=1 pip install ripe.atlas.sagan
 ```
+
+
+## Further Documentation
+
+Complete documentation can always be found on
+[the RIPE Atlas project page](https://atlas.ripe.net/docs/sagan/), and if you're
+not online, the project itself contains a `docs` directory -- everything you
+should need is in there.
 
 
 ## Colophon
