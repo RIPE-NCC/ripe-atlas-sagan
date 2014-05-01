@@ -27,7 +27,7 @@ def main(args):
 
     line = sys.stdin.readline()
 
-    if args.verbosity >2:
+    if args.verbosity > 2:
         print "#inputline:\n#", line, "#end inputline-----"
 
     if line[:1] == "{" and line[-2:-1] == "}":
@@ -74,16 +74,21 @@ def main(args):
                 result['errorFindingDecodingabuf'] += 1
 
             if args.formattedJSON:
-                print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+                print json.dumps(
+                    data,
+                    sort_keys=True,
+                    indent=4,
+                    separators=(',', ': ')
+                )
             else:
                 print json.dumps(data)
 
             line = sys.stdin.readline()
 
-    else:  # plain b64 encoced abuf
+    else:  # Plain b64 encoced abuf
 
         while line:
-            if args.verbosity >1:
+            if args.verbosity > 1:
                 print "#b64 encoded abuf line:\n#", line, "#end b64 encoded abuf line-----"
             result['line_count'] += 1
 
@@ -100,10 +105,14 @@ def main(args):
                 if data.has_key('ERROR'):
                     result['decodedabufs_with_ERROR'] += 1
                 if args.formattedJSON:
-                    print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+                    print json.dumps(
+                        data,
+                        sort_keys=True,
+                        indent=4,
+                        separators=(',', ': ')
+                    )
                 else:
                     print json.dumps(data)
-                    #print "data", data
             else:
                 result['abufdecode_failures'] += 1
 
@@ -111,8 +120,13 @@ def main(args):
 
     if args.verbosity:
         print "#======== results:\n#",
-        lines = json.dumps(result, sort_keys=True, indent=4, separators=(',', ': '))
-        print string.replace(lines, "\n", "\n#") # we want this to be comments lines on stdout
+        lines = json.dumps(
+            result,
+            sort_keys=True,
+            indent=4,
+            separators=(',', ': ')
+        )
+        print string.replace(lines, "\n", "\n#")  # We want this to be comments lines on stdout
 
     sys.stdout.flush()
 
@@ -120,15 +134,15 @@ def main(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v',    '--verbosity',     default=0,    action="count")
-    parser.add_argument('-fj',   '--formattedJSON', default=0,    action="count")
-    parser.add_argument('-dh',   '--DO_Header',     default=0,    action="count")
-    parser.add_argument('-dq',   '--DO_Question',   default=0,    action="count")
-    parser.add_argument('-dan',  '--DO_Answer',     default=0,    action="count")
-    parser.add_argument('-dad',  '--DO_Additional', default=0,    action="count")
-    parser.add_argument('-dau',  '--DO_Authority',  default=0,    action="count")
-    parser.add_argument('-do',   '--DO_Options',    default=0,    action="count")
-    parser.add_argument('-dall', '--DO_All',        default=0,    action="count")
+    parser.add_argument('-v',    '--verbosity',     default=0, action="count")
+    parser.add_argument('-fj',   '--formattedJSON', default=0, action="count")
+    parser.add_argument('-dh',   '--DO_Header',     default=0, action="count")
+    parser.add_argument('-dq',   '--DO_Question',   default=0, action="count")
+    parser.add_argument('-dan',  '--DO_Answer',     default=0, action="count")
+    parser.add_argument('-dad',  '--DO_Additional', default=0, action="count")
+    parser.add_argument('-dau',  '--DO_Authority',  default=0, action="count")
+    parser.add_argument('-do',   '--DO_Options',    default=0, action="count")
+    parser.add_argument('-dall', '--DO_All',        default=0, action="count")
     args = parser.parse_args()
 
     if args.DO_All:
