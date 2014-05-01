@@ -171,10 +171,11 @@ abuf                   str       The raw, unparsed abuf string
 response_time          float     Time, in seconds until response was received
 response_id            int       The sequence number of this result within a group of results, available if the resolution was done by the probe's local resolver
 header                 Header    See :ref:`dns-header` below
+edns0                  Edns0     See :ref:`dns-edns0` below, if any
 questions              list      a list of :ref:`dns-question` objects
 answers                list      a list of :ref:`dns-answer` objects
 authorities            list      a list of :ref:`dns-authority` objects
-additionals            list      a list of :ref:`dns-additional` objects
+additionals            list      a list of :ref:`dns-additional` objects, if any
 =====================  ========  ===================================================================================
 
 
@@ -191,7 +192,7 @@ them here.
 =====================  ========  ===================================================================================
 Property               Type      Explanation
 =====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents the header
+raw_data               dict      The portion of the parsed abuf that represents this section
 aa                     bool
 qr                     bool
 nscount                int
@@ -213,10 +214,17 @@ id                     int
 Question
 --------
 
+The question section of the response.
+
+  **NOTE**: In keeping with Python conventions, we use the propertyname
+  ``klass`` here instead of the more intuitive (and illegal in Python)
+  ``class``.  It may be confusing for non-Python programmers, but unfortunately
+  it's a limitation of the language.
+
 =====================  ========  ===================================================================================
 Property               Type      Explanation
 =====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents the header
+raw_data               dict      The portion of the parsed abuf that represents this section
 klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
 type                   str
 name                   str
@@ -228,10 +236,17 @@ name                   str
 Answer
 ------
 
+The answer section of the response.
+
+  **NOTE**: In keeping with Python conventions, we use the propertyname
+  ``klass`` here instead of the more intuitive (and illegal in Python)
+  ``class``.  It may be confusing for non-Python programmers, but unfortunately
+  it's a limitation of the language.
+
 =====================  ========  ===================================================================================
 Property               Type      Explanation
 =====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents the header
+raw_data               dict      The portion of the parsed abuf that represents this section
 klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
 type                   str
 name                   str
@@ -246,10 +261,17 @@ rd_length              int
 Authority
 ---------
 
+The authority section of the response.
+
+  **NOTE**: In keeping with Python conventions, we use the propertyname
+  ``klass`` here instead of the more intuitive (and illegal in Python)
+  ``class``.  It may be confusing for non-Python programmers, but unfortunately
+  it's a limitation of the language.
+
 =====================  ========  ===================================================================================
 Property               Type      Explanation
 =====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents the header
+raw_data               dict      The portion of the parsed abuf that represents this section
 klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
 type                   str
 name                   str
@@ -264,16 +286,60 @@ rd_length              int
 Additional
 ----------
 
+The optional additional section of the response.
+
+  **NOTE**: In keeping with Python conventions, we use the propertyname
+  ``klass`` here instead of the more intuitive (and illegal in Python)
+  ``class``.  It may be confusing for non-Python programmers, but unfortunately
+  it's a limitation of the language.
+
 =====================  ========  ===================================================================================
 Property               Type      Explanation
 =====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents the header
+raw_data               dict      The portion of the parsed abuf that represents this section
 klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
 type                   str
 name                   str
 ttl                    int
 address                str       An IP address
 rd_length              int
+=====================  ========  ===================================================================================
+
+
+.. _dns-edns0:
+
+EDNS0
+-----
+
+The optional EDNS0 section of the response.
+
+=====================  ========  ===================================================================================
+Property               Type      Explanation
+=====================  ========  ===================================================================================
+raw_data               dict      The portion of the parsed abuf that represents this section
+extended_return_code   int
+name                   str
+type                   str
+udp_size               int
+version                int
+z                      int
+options                list      A list of :ref:`dns-edns0-option` objects
+=====================  ========  ===================================================================================
+
+
+.. _dns-edns0-option:
+
+Option
+------
+
+=====================  ========  ===================================================================================
+Property               Type      Explanation
+=====================  ========  ===================================================================================
+raw_data               dict      The portion of the EDNS0 section that represents this option
+nsid                   str
+code                   int
+length                 int
+name                   str
 =====================  ========  ===================================================================================
 
 
