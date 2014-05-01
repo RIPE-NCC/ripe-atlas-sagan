@@ -12,7 +12,7 @@ from dns.rdataclass import to_text as class_to_text
 from dns.rcode import to_text as rcode_to_text
 from dns.rdatatype import to_text as type_to_text
 
-from ripe.atlas.sagan.dns import Response
+from ripe.atlas.sagan.helpers.abuf import AbufParser
 
 def main(args):
 
@@ -56,7 +56,7 @@ def main(args):
                             result['b64decode_failures'] += 1;
 
                         if babuf:
-                            adata  = Response.decode_abuf(babuf, options) #, result)
+                            adata  = AbufParser.parse(babuf, options) #, result)
                             if adata:
                                 if data.has_key('ERROR'):
                                     result['decodedabufs_with_ERROR'] += 1
@@ -99,7 +99,7 @@ def main(args):
                 line = sys.stdin.readline()
                 continue
 
-            data  = Response.decode_abuf(babuf, options)
+            data  = AbufParser.parse(babuf, options)
 
             if data:
                 if data.has_key('ERROR'):
