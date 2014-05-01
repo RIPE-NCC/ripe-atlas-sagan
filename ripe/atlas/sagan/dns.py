@@ -122,7 +122,7 @@ class Question(ValidationMixin):
         self.name     = self.ensure("Qname",  str)
 
 
-class Answer(ValidationMixin, object):
+class Answer(ValidationMixin):
 
     def __init__(self, data):
 
@@ -139,7 +139,7 @@ class Answer(ValidationMixin, object):
         return self.rd_length
 
 
-class Authority(ValidationMixin, object):
+class Authority(ValidationMixin):
 
     def __init__(self, data):
 
@@ -156,7 +156,7 @@ class Authority(ValidationMixin, object):
         return self.rd_length
 
 
-class Additional(ValidationMixin, object):
+class Additional(ValidationMixin):
 
     def __init__(self, data):
 
@@ -173,7 +173,7 @@ class Additional(ValidationMixin, object):
         return self.rd_length
 
 
-class Response(ValidationMixin, object):
+class Response(ValidationMixin):
 
     def __init__(self, data, af=None, destination=None, source=None,
                  protocol=None, part_of_set=True, parse_abuf=True):
@@ -238,7 +238,8 @@ class Response(ValidationMixin, object):
             for additional in parsed_abuf.get("AdditionalSection", []):
                 self.additionals.append(Additional(additional))
 
-    def decode_abuf(self, buf, options=None):
+    @classmethod
+    def decode_abuf(cls, buf, options=None):
         """
         According to Philip, an abuf is like a TARDIS: it's bigger on the inside
         """
@@ -267,32 +268,32 @@ class Response(ValidationMixin, object):
 
         dnsres = {}
         offset = 0
-        offset, hdr = self._parse_header(buf, offset)
+        offset, hdr = cls._parse_header(buf, offset)
         if do_header:
             dnsres['HEADER'] = hdr
         for i in range(hdr['QDCOUNT']):
-            offset, qry = self.do_query(buf, offset)
+            offset, qry = cls.do_query(buf, offset)
             if do_question:
                 if i == 0:
                     dnsres['QuestionSection'] = [qry]
                 else:
                     dnsres['QuestionSection'].append(qry)
         for i in range(hdr['ANCOUNT']):
-            offset, rr = self.do_rr(buf, offset)
+            offset, rr = cls.do_rr(buf, offset)
             if do_answer:
                 if i == 0:
                     dnsres['AnswerSection'] = [rr]
                 else:
                     dnsres['AnswerSection'].append(rr)
         for i in range(hdr['NSCOUNT']):
-            offset, rr = self.do_rr(buf, offset)
+            offset, rr = cls.do_rr(buf, offset)
             if do_authority:
                 if i == 0:
                     dnsres['AuthoritySection'] = [rr]
                 else:
                     dnsres['AuthoritySection'].append(rr)
         for i in range(hdr['ARCOUNT']):
-            res = self.do_rr(buf, offset)
+            res = cls.do_rr(buf, offset)
             if res is None:
                 e = ('additional', offset, ('do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -318,8 +319,8 @@ class Response(ValidationMixin, object):
 
         return dnsres
 
-    @staticmethod
-    def _parse_header(buf, offset):
+    @classmethod
+    def _parse_header(cls, buf, offset):
 
         fmt = "!HHHHHH"
         reqlen = struct.calcsize(fmt)
@@ -356,9 +357,10 @@ class Response(ValidationMixin, object):
 
         return offset + reqlen, hdr
 
-    def do_query(self, buf, offset):
+    @classmethod
+    def do_query(cls, buf, offset):
         qry           = {}
-        offset, name  = self.do_name(buf, offset)
+        offset, name  = cls.do_name(buf, offset)
         qry['Qname']  = name
 
         fmt           = "!HH"
@@ -370,11 +372,12 @@ class Response(ValidationMixin, object):
 
         return offset + reqlen, qry
 
-    def do_rr(self, buf, offset):
+    @classmethod
+    def do_rr(cls, buf, offset):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
         error          = []
         rr             = {}
-        res = self.do_name(buf, offset)
+        res = cls.do_name(buf, offset)
         if res is None:
             e = ("do_rr", offset, "do_name failed")
             error.append(e)
@@ -440,12 +443,13 @@ class Response(ValidationMixin, object):
             rr['Address'] = str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d)
 
         if rr['Type'] == 'NS' and rr['Class'] == "IN":  # this is per type_to_text function
-            doffset, name = self.do_name(buf, rdata_offset)
+            doffset, name = cls.do_name(buf, rdata_offset)
             rr['Target'] = name
 
         return offset, rr
 
-    def do_name(self, buf, offset):
+    @classmethod
+    def do_name(cls, buf, offset):
         name  = ''
         error = []
         while True:
@@ -473,7 +477,7 @@ class Response(ValidationMixin, object):
                 strng   = buf[offset:offset + reqlen]
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
-                poffset, pname = self.do_name(buf, poffset)
+                poffset, pname = cls.do_name(buf, poffset)
                 offset  += reqlen
                 name    = name + pname
                 break
