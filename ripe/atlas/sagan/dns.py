@@ -81,7 +81,38 @@ class Header(ValidationMixin):
     def zero(self):
         return self.z
 
-class Question(ValidationMixin, object):
+
+class Option(ValidationMixin):
+
+    def __init__(self, data):
+
+        self.raw_data = data
+        self.nsid   = self.ensure("NSID",         str)
+        self.code   = self.ensure("OptionCode",   int)
+        self.length = self.ensure("OptionLength", int)
+        self.name   = self.ensure("OptionName",   str)
+
+
+class Edns0(ValidationMixin):
+
+    def __init__(self, data):
+
+        self.raw_data = data
+        self.extended_return_code = self.ensure("ExtendedReturnCode", int)
+        self.name                 = self.ensure("Name",               str)
+        self.type                 = self.ensure("Type",               str)
+        self.udp_size             = self.ensure("UDPsize",            int)
+        self.version              = self.ensure("Version",            int)
+        self.z                    = self.ensure("Z",                  int)
+
+        self.options = []
+        if "Option" in self.raw_data:
+            if isinstance(self.raw_data["Option"], list):
+                for option in self.raw_data["Option"]:
+                    self.options.append(Option(option))
+
+
+class Question(ValidationMixin):
 
     def __init__(self, data):
 
@@ -149,6 +180,7 @@ class Response(ValidationMixin, object):
 
         self.raw_data    = data
         self.header      = None
+        self.edns0       = None
         self.questions   = []
         self.answers     = []
         self.authorities = []
@@ -189,7 +221,10 @@ class Response(ValidationMixin, object):
 
             parsed_abuf = self.decode_abuf(base64.decodestring(self.abuf))
 
-            self.header   = Header(parsed_abuf["HEADER"])
+            self.header = Header(parsed_abuf["HEADER"])
+
+            if "EDNS0" in parsed_abuf:
+                self.edns0 = Edns0(parsed_abuf["EDNS0"])
 
             for question in parsed_abuf.get("QuestionSection", []):
                 self.questions.append(Question(question))

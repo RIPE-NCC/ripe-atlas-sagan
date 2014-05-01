@@ -1,5 +1,5 @@
 from ripe.atlas.sagan import Result
-from ripe.atlas.sagan.dns import DnsResult
+from ripe.atlas.sagan.dns import DnsResult, Edns0
 
 def test_dns_4460():
     result = Result.get('{"af":4,"dst_addr":"193.227.234.53","from":"217.172.81.146","fw":4460,"msm_id":1004041,"prb_id":184,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":0,"ID":39825,"NSCOUNT":0,"QDCOUNT":1,"abuf":"m5GEAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaoZA==","answers":[{"RDLENGTH":4,"TYPE":1}],"rt":45.305,"size":43},"timestamp":1347765990,"type":"dns"}')
@@ -319,3 +319,21 @@ def test_resultset():
     assert(result.responses[0].additionals[3].rd_length == 4)
     assert(result.responses[0].additionals[4].ttl == 5780)
     assert(result.responses[0].additionals[3].type == "A")
+
+def test_edns0():
+    result = Result.get('{"from":"2001:d98:6004:1:6666:b3ff:feb0:ec1e","msm_id":1004048,"timestamp":1398939936,"fw":4610,"proto":"UDP","af":6,"result-rdata":null,"dst_addr":"2001:7fd::1","prb_id":14184,"result":{"abuf":"ACuEAAABAAEADQAYAAAGAAEAAAYAAQABUYAAQAFhDHJvb3Qtc2VydmVycwNuZXQABW5zdGxkDHZlcmlzaWduLWdycwNjb20AeAv3NAAABwgAAAOEAAk6gAABUYAAAAIAAQAH6QAAAsAcAAACAAEAB+kAAAQBYsAeAAACAAEAB+kAAAQBY8AeAAACAAEAB+kAAAQBZMAeAAACAAEAB+kAAAQBZcAeAAACAAEAB+kAAAQBZsAeAAACAAEAB+kAAAQBZ8AeAAACAAEAB+kAAAQBaMAeAAACAAEAB+kAAAQBacAeAAACAAEAB+kAAAQBasAeAAACAAEAB+kAAAQBa8AeAAACAAEAB+kAAAQBbMAeAAACAAEAB+kAAAQBbcAewBwAAQABAAfpAAAExikABMB0AAEAAQAH6QAABMDkT8nAgwABAAEAB+kAAATAIQQMwJIAAQABAAfpAAAExwdbDcChAAEAAQAH6QAABMDL5grAsAABAAEAB+kAAATABQXxwL8AAQABAAfpAAAEwHAkBMDOAAEAAQAH6QAABIA\/AjXA3QABAAEAB+kAAATAJJQRwOwAAQABAAfpAAAEwDqAHsD7AAEAAQAH6QAABMEADoHBCgABAAEAB+kAAATHB1MqwRkAAQABAAfpAAAEygwbIcAcABwAAQAH6QAAECABBQO6PgAAAAAAAAACADDAgwAcAAEAB+kAABAgAQUAAAIAAAAAAAAAAAAMwJIAHAABAAfpAAAQIAEFAAAtAAAAAAAAAAAADcCwABwAAQAH6QAAECABBQAALwAAAAAAAAAAAA\/AzgAcAAEAB+kAABAgAQUAAAEAAAAAAACAPwI1wN0AHAABAAfpAAAQIAEH\/gAAAAAAAAAAAAAAU8DsABwAAQAH6QAAECABBQMMJwAAAAAAAAACADDA+wAcAAEAB+kAABAgAQf9AAAAAAAAAAAAAAABwQoAHAABAAfpAAAQIAEFAAADAAAAAAAAAAAAQsEZABwAAQAH6QAAECABDcMAAAAAAAAAAAAAADUAACkQAAAAAAAAGAADABRrMy5hbXMtaXguay5yaXBlLm5ldA==","rt":219.205,"NSCOUNT":13,"QDCOUNT":1,"answers":[{"RNAME":"nstld.verisign-grs.com.","NAME":".","MNAME":"a.root-servers.net.","TTL":86400,"SERIAL":2014050100,"TYPE":"SOA"}],"ID":43,"ARCOUNT":24,"ANCOUNT":1,"size":808},"type":"dns","result-rname":"nstld.verisign-grs.com.","src_addr":"2001:d98:6004:1:6666:b3ff:feb0:ec1e","result-rt":219.205,"result-serial":2014050100,"msm_name":"Tdig"}')
+    assert(isinstance(result, DnsResult))
+    assert(isinstance(result.responses, list))
+    assert(isinstance(result.responses[0].edns0, Edns0))
+    assert(result.responses[0].edns0.extended_return_code == 0)
+    assert(result.responses[0].edns0.name == ".")
+    assert(result.responses[0].edns0.type == "OPT")
+    assert(result.responses[0].edns0.udp_size == 4096)
+    assert(result.responses[0].edns0.version == 0)
+    assert(result.responses[0].edns0.z == 0)
+    assert(isinstance(result.responses[0].edns0.options, list))
+    assert(len(result.responses[0].edns0.options) == 1)
+    assert(result.responses[0].edns0.options[0].nsid == "k3.ams-ix.k.ripe.net")
+    assert(result.responses[0].edns0.options[0].code == 3)
+    assert(result.responses[0].edns0.options[0].length == 20)
+    assert(result.responses[0].edns0.options[0].name == "NSID")
