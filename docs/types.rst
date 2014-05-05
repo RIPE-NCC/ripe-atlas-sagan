@@ -53,7 +53,7 @@ packets_received       int
 packet_size            int
 destination_name       str    The string initially given as the target.  It can be an IP address or a domain name
 destination_address    str    An IP address represented as a string
-seconds_sinc_sync      int    The number of seconds since the probe last syncronised its clock
+seconds_since_sync     int    The number of seconds since the probe last syncronised its clock
 step                   int    The number of seconds between ping requests (interval)
 packets                list   A list of ping :ref:`ping-packet` objects
 =====================  =====  ===================================================================================
