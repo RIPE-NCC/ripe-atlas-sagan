@@ -64,7 +64,7 @@ class PingResult(Result):
         self.packet_size           = self.ensure("size",     int)
         self.destination_name      = self.ensure("dst_name", str)
         self.destination_address   = self.ensure("dst_addr", str)
-        self.seconds_since_sync = self.ensure("lts",      int)
+        self.seconds_since_sync    = self.ensure("lts",      int)
         self.step                  = self.ensure("step",     int)
         self.packets = []
 
