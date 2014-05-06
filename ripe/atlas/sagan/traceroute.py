@@ -10,32 +10,29 @@ class Packet(ValidationMixin):
     ttl:    Time to live
     """
 
+    ERROR_CONDITIONS = {
+        "N": "Network unreachable",
+        "H": "Destination unreachable",
+        "A": "Administratively prohibited",
+        "P": "Protocol unreachable",
+        "p": "Port unreachable",
+    }
+
     def __init__(self, data):
 
-        self.origin = None
-        self.rtt    = None
-        self.size   = None
-        self.ttl    = None
+        self.raw_data = data
 
-        try:
-            self.origin = data["from"]
-        except KeyError:
-            pass
+        self.origin = self.ensure("from", str)
+        self.rtt    = self.ensure("rtt",  float)
+        self.size   = self.ensure("size", int)
+        self.ttl    = self.ensure("ttl",  int)
+        self.error  = self.ensure("err",  str)
 
-        try:
-            self.rtt = round(float(data["rtt"]), 3)
-        except (KeyError, ValueError):
-            pass
+        if self.rtt:
+            self.rtt = round(self.rtt, 3)
 
-        try:
-            self.size = int(data["size"])
-        except KeyError:
-            pass
-
-        try:
-            self.ttl = int(data["ttl"])
-        except KeyError:
-            pass
+        if self.error in self.ERROR_CONDITIONS.keys():
+            self.error = self.ERROR_CONDITIONS[self.error]
 
     def __str__(self):
         return self.origin
@@ -49,15 +46,15 @@ class Hop(ValidationMixin):
 
     def __init__(self, data):
 
-        self.index = None
-        try:
-            self.index = data["hop"]
-        except KeyError:
-            pass
+        self.raw_data = data
+
+        self.index = self.ensure("hop", int)
+        self.error = self.ensure("error", str)
 
         self.packets = []
-        for packet in data["result"]:
-            self.packets.append(Packet(packet))
+        if "result" in self.raw_data:
+            for packet in self.raw_data["result"]:
+                self.packets.append(Packet(packet))
 
     def __str__(self):
         return self.index
