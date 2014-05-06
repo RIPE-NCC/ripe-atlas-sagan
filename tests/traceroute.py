@@ -249,3 +249,18 @@ def test_traceroute_responding_target():
     assert(result.hops[19].packets[1].size == 68)
     assert(result.hops[19].packets[2].ttl == 45)
     assert(result.hops[-1].index == 20)
+
+def test_traceroute_error():
+    result = Result.get('{"af":6,"dst_addr":"2001:6b0:e:3::1","dst_name":"2001:6b0:e:3:0:0:0:1","endtime":1399388948,"from":"","fw":4610,"group_id":1018508,"lts":107,"msm_id":1019825,"msm_name":"Traceroute","paris_id":5,"prb_id":82,"proto":"ICMP","result":[{"hop":1,"result":[{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2014.845,"size":88,"ttl":64},{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2995.839,"size":88,"ttl":64},{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2998.491,"size":88,"ttl":64}]}],"size":40,"src_addr":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","timestamp":1399388940,"type":"traceroute"}')
+    assert(result.total_hops == 1)
+    assert(result.hops[0].index == 1)
+    assert(result.hops[0].packets[0].error == Packet.ERROR_CONDITIONS["H"])
+    assert(result.hops[0].packets[1].error == Packet.ERROR_CONDITIONS["H"])
+    assert(result.hops[0].packets[2].error == Packet.ERROR_CONDITIONS["H"])
+
+def test_traceroute_error_unreachable():
+    result = Result.get('{"af":6,"dst_addr":"2001:6b0:e:3::1","dst_name":"2001:6b0:e:3:0:0:0:1","endtime":1398180530,"from":"","fw":4610,"group_id":1018508,"lts":10065,"msm_id":1019825,"msm_name":"Traceroute","paris_id":14,"prb_id":82,"proto":"ICMP","result":[{"error":"connect failed: Network is unreachable","hop":1}],"size":40,"src_addr":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","timestamp":1398180530,"type":"traceroute"}')
+    assert(result.total_hops == 1)
+    assert(result.hops[0].index == 1)
+    assert(result.hops[0].error == "connect failed: Network is unreachable")
+    assert(len(result.hops[0].packets) == 0)
