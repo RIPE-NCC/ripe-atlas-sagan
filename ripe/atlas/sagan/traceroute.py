@@ -49,14 +49,12 @@ class Hop(ValidationMixin):
         self.raw_data = data
 
         self.index = self.ensure("hop", int)
+        self.error = self.ensure("error", str)
 
         self.packets = []
         if "result" in self.raw_data:
             for packet in self.raw_data["result"]:
                 self.packets.append(Packet(packet))
-
-        if "error" in self.raw_data:
-            self.error = self.raw_data["error"]
 
     def __str__(self):
         return self.index
