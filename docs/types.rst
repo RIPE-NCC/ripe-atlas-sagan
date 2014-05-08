@@ -425,7 +425,7 @@ Property               Type      Explanation
 =====================  ========  ===================================================================================
 uri                    str
 method                 str       The HTTP method
-responses              list      A list of :ref:`http-response`
+responses              list      A list of :ref:`http-response` objects
 =====================  ========  ===================================================================================
 
 
@@ -451,3 +451,4 @@ version                str       The HTTP version
 is_error               bool      If an error message is supplied, this will be ``True``
 error_string           str       An error message, if any
 =====================  ========  ===================================================================================
+
