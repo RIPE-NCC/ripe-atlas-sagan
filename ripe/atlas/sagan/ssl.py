@@ -34,6 +34,7 @@ class Certificate(ValidationMixin):
         self.valid_from  = None
         self.valid_until = None
         self.checksum    = None
+        self.sha1        = None
         self.has_expired = None
 
         # Clean up the certificate data and use OpenSSL to parse it
@@ -53,6 +54,7 @@ class Certificate(ValidationMixin):
             self.issuer_o    = issuer.get("O")
             self.issuer_c    = issuer.get("C")
             self.checksum    = x509.digest("sha256")
+            self.sha1        = x509.digest("sha1")
             self.has_expired = bool(x509.has_expired())
 
             self.valid_from  = None
