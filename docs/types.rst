@@ -407,7 +407,9 @@ issuer_o               str       The issuer's organisation
 issuer_c               str       The issuer's country
 valid_from             datetime
 valid_until            datetime
-checksum               str       The sha256 checksum
+checksum_md5           str       The md5 checksum
+checksum_sha1          str       The sha1 checksum
+checksum_sha256        str       The sha256 checksum
 has_expired            bool      Set to ``True`` if the certificate is no longer valid
 =====================  ========  ===================================================================================
 
@@ -425,7 +427,7 @@ Property               Type      Explanation
 =====================  ========  ===================================================================================
 uri                    str
 method                 str       The HTTP method
-responses              list      A list of :ref:`http-response`
+responses              list      A list of :ref:`http-response` objects
 =====================  ========  ===================================================================================
 
 
@@ -451,3 +453,4 @@ version                str       The HTTP version
 is_error               bool      If an error message is supplied, this will be ``True``
 error_string           str       An error message, if any
 =====================  ========  ===================================================================================
+
