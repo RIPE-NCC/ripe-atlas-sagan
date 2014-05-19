@@ -2,13 +2,28 @@ import logging
 
 from .base import Result, ValidationMixin
 
+class IcmpHeader(ValidationMixin):
+    """
+    But why did we stop here?  Why not go all the way and define subclasses for
+    each object and for `mpls`?  it comes down to a question of complexity vs.
+    usefulness.  This is such a fringe case that it's probably fine to just
+    dump the data in to `self.objects` and let people work from there.  If
+    however you feel that this needs expansion, pull requests are welcome :-)
+
+    Further information regarding the structure and meaning of the data in
+    this class can be found here: http://localhost:8000/docs/data_struct/
+    """
+
+    def __init__(self, data):
+
+        self.raw_data = data
+
+        self.version = self.ensure("version", int)
+        self.rfc4884 = self.ensure("rfc4884", bool)
+        self.objects = self.ensure("obj",     list)
+
+
 class Packet(ValidationMixin):
-    """
-    origin: The `from` value, if any
-    rtt:    Return trip time
-    size:   The packet size
-    ttl:    Time to live
-    """
 
     ERROR_CONDITIONS = {
         "N": "Network unreachable",
@@ -28,21 +43,26 @@ class Packet(ValidationMixin):
         self.ttl    = self.ensure("ttl",  int)
         self.error  = self.ensure("err",  str)
 
+        self.arrived_late_by = self.ensure("late", int, 0)
+        self.internal_ttl    = self.ensure("ittl", int, 1)
+
         if self.rtt:
             self.rtt = round(self.rtt, 3)
 
         if self.error in self.ERROR_CONDITIONS.keys():
             self.error = self.ERROR_CONDITIONS[self.error]
 
+        icmp_header = self.ensure("icmpext", dict)
+
+        self.icmp_header = None
+        if icmp_header:
+            self.icmp_header = IcmpHeader(icmp_header)
+
     def __str__(self):
         return self.origin
 
 
 class Hop(ValidationMixin):
-    """
-    index:   The hop number
-    packets: A list of packet objects
-    """
 
     def __init__(self, data):
 
@@ -84,9 +104,21 @@ class TracerouteResult(Result):
         self.last_rtt   = None
         self._parse_hops()  # Sets hops, last_rtt, and total_hops
 
-        self.target_responded = False
-        if self.hops and self.hops[-1].index == self.total_hops:
-            self.target_responded = True
+        self._target_responded = None  # Used by target_responded() below
+
+    @property
+    def target_responded(self):
+
+        if self._target_responded is not None:
+            return self._target_responded
+
+        self._target_responded = False
+        if self.hops and self.hops[-1].packets:
+            for packet in self.hops[-1].packets:
+                if self.destination_address == packet.origin:
+                    self._target_responded = True
+
+        return self.target_responded
 
     @property
     def end_time_timestamp(self):

@@ -248,6 +248,11 @@ def test_traceroute_responding_target():
     assert(result.hops[19].packets[1].rtt == 217.103)
     assert(result.hops[19].packets[1].size == 68)
     assert(result.hops[19].packets[2].ttl == 45)
+    assert(result.hops[7].packets[0].internal_ttl == 2)
+    assert(result.hops[7].packets[0].icmp_header.rfc4884 == 1)
+    assert(result.hops[7].packets[0].icmp_header.version == 2)
+    assert(result.hops[7].packets[0].icmp_header.objects == [{u"class":1,u"mpls":[{u"exp":0,u"label":1692,u"s":1,u"ttl":1}],u"type":1}])
+    assert(result.hops[1].packets[0].icmp_header is None)
     assert(result.hops[-1].index == 20)
 
 def test_traceroute_error():
