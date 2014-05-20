@@ -1,4 +1,5 @@
 import logging
+from IPy import IP
 
 from .base import Result, ValidationMixin
 
@@ -37,14 +38,16 @@ class Packet(ValidationMixin):
 
         self.raw_data = data
 
-        self.origin = self.ensure("from", str)
-        self.rtt    = self.ensure("rtt",  float)
-        self.size   = self.ensure("size", int)
-        self.ttl    = self.ensure("ttl",  int)
-        self.error  = self.ensure("err",  str)
-
-        self.arrived_late_by = self.ensure("late", int, 0)
-        self.internal_ttl    = self.ensure("ittl", int, 1)
+        self.origin                  = self.ensure("from",       str)
+        self.rtt                     = self.ensure("rtt",        float)
+        self.size                    = self.ensure("size",       int)
+        self.ttl                     = self.ensure("ttl",        int)
+        self.mtu                     = self.ensure("mtu",        int)
+        self.error                   = self.ensure("err",        str)
+        self.destination_option_size = self.ensure("dstoptsize", int)
+        self.hop_by_hop_option_size  = self.ensure("hbhoptsize", int)
+        self.arrived_late_by         = self.ensure("late",       int, 0)
+        self.internal_ttl            = self.ensure("ittl",       int, 1)
 
         if self.rtt:
             self.rtt = round(self.rtt, 3)
@@ -114,8 +117,9 @@ class TracerouteResult(Result):
 
         self._target_responded = False
         if self.hops and self.hops[-1].packets:
+            destination_address = IP(self.destination_address)
             for packet in self.hops[-1].packets:
-                if self.destination_address == packet.origin:
+                if packet.origin and destination_address == IP(packet.origin):
                     self._target_responded = True
 
         return self.target_responded

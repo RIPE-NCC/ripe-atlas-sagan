@@ -124,14 +124,49 @@ packets                list   A list of tracroute :ref:`traceroute-packet` objec
 Packet
 ------
 
-=====================  =====  ================================================================
-Property               Type   Explanation
-=====================  =====  ================================================================
-origin                 str    The IP address of where the packet is coming from
-rtt                    float
-size                   int
-ttl                    int
-=====================  =====  ================================================================
+=======================  ==========  ===========================================================================================
+Property                 Type        Explanation
+=======================  ==========  ===========================================================================================
+origin                   str         The IP address of where the packet is coming from
+rtt                      float
+size                     int
+ttl                      int
+error                    str         The error message, if any
+arrived_late_by          int         If the packet arrived late, this number represents "how many hops ago" this packet was sent
+internal_ttl             int         The time-to-live for the packet that triggered the error ICMP.  The default is 1
+destination_option_size  int         The size of the IPv6 destination option header
+hop_by_hop_option_size   int         The size of the IPv6 hop-by-hop option header
+icmp_header              IcmpHeader  See :ref:`traceroute-icmp-header` below
+=======================  ==========  ===========================================================================================
+
+
+.. _traceroute-icmp-header
+
+IcmpHeader
+----------
+
+This class is slightly different than other parts of Sagan as it in ``objects``
+we find a complex generic list containing generic dictionaries pulled directly
+from the JSON blob.  The decision not to further parse this bob into separate
+Python models was made based on the assumption that much of this section is very
+edge-case and the contents are present sporadically.
+
+If however there is a demand for further development of this portion of the
+result, we can expand it.  Until then though, ``IcmpHeader`` is a very simple
+class, the majority of data living in ``objects``.
+
+For further information about this portion of a traceroute result, you should
+consult our `data structure documenttaion`_
+
+.. _data structure documenttaion: https://atlas.ripe.net/docs/data_struct/#v4610_traceroute
+
+=====================  ==========  =========================================================================
+Property               Type        Explanation
+=====================  ==========  =========================================================================
+version                int         RFC4884 version
+rfc4884                bool        ``True`` if length indication is present, ``False`` otherwise
+objects                list        As mentioned above a complete dump of whatever is in the ``obj`` property
+=====================  ==========  =========================================================================
 
 
 .. _dns:

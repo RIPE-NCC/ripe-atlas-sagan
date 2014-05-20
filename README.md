@@ -162,6 +162,7 @@ are a few dependencies:
 * [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL)
 * [python-dateutil](https://pypi.python.org/pypi/python-dateutil)
 * [pytz](https://pypi.python.org/pypi/pytz)
+* [IPy](https://pypi.python.org/pypi/IPy/)
 
 Additionally, we recommend that you also install
 [ujson](https://pypi.python.org/pypi/ujson) as it will speed up the

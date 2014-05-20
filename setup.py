@@ -8,6 +8,7 @@ install_requires = [
     "arrow>=0.4.2",
     "python-dateutil>=2.2",
     "pytz>=2014.2",
+    "IPy",
 ]
 
 # pyOpenSSL support is flakey on some systems (I'm looking at you Apple)
