@@ -70,12 +70,12 @@ Every result type has its own properties, with a few common between all types.
 
 Specifically, these attributes exist on all `*Result` objects:
 
-* `created`  **An arrow object (like datetime, but better) of the `timestamp` field**
+* `created`  An arrow object (like datetime, but better) of the `timestamp` field
 * `measurement_id`
 * `probe_id`
-* `firmware` **An integer representing the firmware version**
-* `origin`  **The `from` attribute in the result**
-* `is_error` **Set to `True` if an error was found**
+* `firmware` An integer representing the firmware version
+* `origin`  The `from` attribute in the result
+* `is_error` Set to `True` if an error was found
 
 Additionally, each of the result types have their own properties, like
 `packet_size`, `responses`, `certificates`, etc.  You can take a look at the
