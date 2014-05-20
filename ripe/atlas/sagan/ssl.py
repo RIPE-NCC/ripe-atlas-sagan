@@ -33,8 +33,11 @@ class Certificate(ValidationMixin):
         self.issuer_c    = None
         self.valid_from  = None
         self.valid_until = None
-        self.checksum    = None
-        self.sha1        = None
+
+        self.checksum_md5    = None
+        self.checksum_sha1   = None
+        self.checksum_sha256 = None
+
         self.has_expired = None
 
         # Clean up the certificate data and use OpenSSL to parse it
@@ -53,8 +56,16 @@ class Certificate(ValidationMixin):
             self.issuer_cn   = issuer.get("CN")
             self.issuer_o    = issuer.get("O")
             self.issuer_c    = issuer.get("C")
+<<<<<<< HEAD
             self.checksum    = x509.digest("sha256")
             self.sha1        = x509.digest("sha1")
+=======
+
+            self.checksum_md5    = x509.digest("md5")
+            self.checksum_sha1   = x509.digest("sha1")
+            self.checksum_sha256 = x509.digest("sha256")
+
+>>>>>>> 747a405f617b1610f0f3ca7ad60aa21eadee36d3
             self.has_expired = bool(x509.has_expired())
 
             self.valid_from  = None
@@ -84,6 +95,10 @@ class Certificate(ValidationMixin):
     @property
     def country(self):
         return self.c
+
+    @property
+    def checksum(self):
+        return self.checksum_sha256
 
     def _process_validation_times(self, x509):
         """

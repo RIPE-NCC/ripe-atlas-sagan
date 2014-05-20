@@ -117,8 +117,9 @@ class AbufParser(object):
         tc           = 0x0200
         rd           = 0x0100
         ra           = 0x0080
-        z_mask       = 0x0070
-        z_shift      = 4
+        z_mask       = 0x0040
+        ad           = 0x0020
+        cd           = 0x0010
         rcode_mask   = 0x000F
         rcode_shift  = 0
 
@@ -128,7 +129,9 @@ class AbufParser(object):
         hdr['TC']      = not not(res[1] & tc)
         hdr['RD']      = not not(res[1] & rd)
         hdr['RA']      = not not(res[1] & ra)
-        hdr['Z']       = (res[1] & z_mask) >> z_shift
+        hdr['Z']       = res[1] & z_mask
+        hdr['AD']      = res[1] & ad
+        hdr['CD']      = res[1] & cd
         hdr['ReturnCode'] = rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
         hdr['QDCOUNT'] = res[2]
         hdr['ANCOUNT'] = res[3]
@@ -217,14 +220,52 @@ class AbufParser(object):
             rr['EDNS0'] = edns0
             return offset, rr
 
-        if rr['Type'] == 'A' and rr['Class'] == "IN":  # this is per type_to_text function
-            fmt           = "!BBBB"
-            a, b, c, d    = struct.unpack(fmt, rdata)
-            rr['Address'] = str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d)
-
-        if rr['Type'] == 'NS' and rr['Class'] == "IN":  # this is per type_to_text function
-            doffset, name = cls._do_name(buf, rdata_offset)
-            rr['Target'] = name
+        if rr['Class'] == "IN":
+            # this is per type_to_text function
+            if rr['Type'] == 'A':
+                fmt           = "!BBBB"
+                rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
+                rr['Answer'] = rr['Address']
+            elif rr['Type'] == 'AAAA':
+                fmt           = "!BBBBBBBBBBBBBBBB"
+                rr['Address'] = ':'.join(str(nibble) for nibble in struct.unpack(fmt, rdata))
+                rr['Answer'] = rr['Address']
+            elif rr['Type'] == 'CNAME':
+                doffset, name = cls._do_name(buf, rdata_offset)
+                rr['Answer'] = name
+            elif rr['Type'] == 'NS': 
+                doffset, name = cls._do_name(buf, rdata_offset)
+            elif rr['Type'] == 'MX': 
+                fmt = '!H'
+                fmtsz = struct.calcsize(fmt)
+                rr['Pref'] = struct.unpack(fmt, rdata[:fmtsz])[0]
+                rr_offset, rr['Exchange'] = cls._do_name(buf, rdata_offset+fmtsz)
+                rr['Answer'] = '{} {}'.format(rr['Pref'], rr['Exchange'])
+            elif rr['Type'] == 'SOA': 
+                fmt = '!IIIII'
+                rr_offset, rr['Mname'] = cls._do_name(buf, rdata_offset)
+                rr_offset, rr['Rname'] = cls._do_name(buf, rr_offset)
+                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['Minimum']\
+                        = struct.unpack(fmt, buf[rr_offset:rr_offset + struct.calcsize(fmt)])
+                rr['Answer'] = '{} {} {} {} {} {} {}'.format(rr['Mname'], rr['Rname'],
+                        rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], 
+                        rr['Minimum'])
+            elif rr['Type'] == 'DS': 
+                fmt = '!HBB'
+                digest_size = 0
+                rr['KeyTag'], rr['Algo'], rr['DigestType'] = \
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['Digest'] = rdata[struct.calcsize(fmt):].encode('hex')
+                rr['Answer'] = '{} {} {} {}'.format(rr['KeyTag'], rr['Algo'], 
+                        rr['DigestType'], rr['Digest'])
+            elif rr['Type'] == 'DNSKEY': 
+                fmt = '!HBB'
+                rr['Flags'], rr['Proto'], rr['Algo'] =\
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['Data'] = ''.join(base64.encodestring(
+                    rdata[struct.calcsize(fmt):]).split())
+                rr['Answer'] = '{} {} {} {}'.format(rr['Flags'], rr['Proto'], rr['Algo'], 
+                        rr['Data'])
 
         return offset, rr
 
