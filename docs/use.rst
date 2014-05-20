@@ -93,6 +93,31 @@ type up front.  Note that this does incur a small performance penalty however.
 Examples
 ========
 
+.. _examples-file:
+
+Parsing Results out of a Local File
+-----------------------------------
+
+Assume for a moment that you've downloaded a bunch of results into a local file
+using our *fragmented JSON* format.  That is, you have in your possession a file
+that has a separate JSON result on every line.  For the purposes of our example
+we'll call it ``file.txt``.::
+
+    from ripe.atlas.sagan import Result
+
+    my_results_file = "/path/to/file.txt"
+    with open(my_results_file) as results:
+        for result in results.readlines():
+            parsed_result = Result.get(result)
+            print(parsed_result.origin)
+
+Basically you use Python to open the file (using ``with``) and then loop over
+each line in the file (``.readlines()``), sending each line into Sagan which
+returns a ``parsed_result``.  With that result, you can then pull out any of
+the values you like, using the :ref:`attributes-methods` documentation as a
+reference.
+
+
 .. _examples-api:
 
 Pulling Directly from the API
