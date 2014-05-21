@@ -1,6 +1,7 @@
 import arrow
 import logging
 
+# Try to use ujson if it's available
 try:
     import ujson as json
 except ImportError:
@@ -9,6 +10,13 @@ except ImportError:
         "using ujson, a much faster parser."
     )
     import json
+
+# Hack for Python2/3
+try:
+    compat_basestring = basestring  # Python2
+except NameError:
+    compat_basestring = str  # Python3
+
 
 class ResultParseError(Exception):
     pass
@@ -100,7 +108,7 @@ class Result(ValidationMixin):
         self._on_error = on_error
 
         self.raw_data = data
-        if isinstance(data, basestring):
+        if isinstance(data, compat_basestring):
             self.raw_data = json.loads(data)
 
         for key in ("timestamp", "msm_id", "prb_id", "fw"):
@@ -148,7 +156,7 @@ class Result(ValidationMixin):
         """
 
         raw_data = data
-        if isinstance(data, basestring):
+        if isinstance(data, compat_basestring):
             raw_data = json.loads(data)
 
         try:
