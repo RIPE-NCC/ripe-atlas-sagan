@@ -140,7 +140,7 @@ icmp_header              IcmpHeader  See :ref:`traceroute-icmp-header` below
 =======================  ==========  ===========================================================================================
 
 
-.. _traceroute-icmp-header
+.. _traceroute-icmp-header:
 
 IcmpHeader
 ----------
