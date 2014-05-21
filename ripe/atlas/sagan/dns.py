@@ -4,17 +4,6 @@ import base64
 import logging
 import struct
 
-try:
-    from dns.opcode import to_text as opcode_to_text
-    from dns.rdataclass import to_text as class_to_text
-    from dns.rcode import to_text as rcode_to_text
-    from dns.rdatatype import to_text as type_to_text
-except ImportError:
-    logging.warning(
-        "dnspython isn't installed, without it you cannot parse DNS "
-        "measurement results"
-    )
-
 from .base import Result, ValidationMixin
 from .helpers.abuf import AbufParser
 
@@ -174,28 +163,66 @@ class Additional(ValidationMixin):
         return self.rd_length
 
 
+class Message(ValidationMixin):
+
+    def __init__(self, message):
+
+        self.string_representation = message
+        self.raw_data = AbufParser.parse(base64.b64decode(message))
+
+        self.header = Header(self.raw_data["HEADER"])
+        self.questions   = []
+        self.answers     = []
+        self.authorities = []
+        self.additionals = []
+
+        if "EDNS0" in self.raw_data:
+            self.edns0 = Edns0(self.raw_data["EDNS0"])
+
+        for question in self.raw_data.get("QuestionSection", []):
+            self.questions.append(Question(question))
+
+        for answer in self.raw_data.get("AnswerSection", []):
+            self.answers.append(Answer(answer))
+
+        for authority in self.raw_data.get("AuthoritySection", []):
+            self.authorities.append(Authority(authority))
+
+        for additional in self.raw_data.get("AdditionalSection", []):
+            self.additionals.append(Additional(additional))
+
+    def __str__(self):
+        return self.string_representation
+
+    def __repr__(self):
+        return str(self)
+
+
 class Response(ValidationMixin):
 
     def __init__(self, data, af=None, destination=None, source=None,
                  protocol=None, part_of_set=True, parse_abuf=True):
 
         self.raw_data    = data
-        self.header      = None
-        self.edns0       = None
-        self.questions   = []
-        self.answers     = []
-        self.authorities = []
-        self.additionals = []
 
         self.af                  = self.ensure("af",       int, af)
         self.destination_address = self.ensure("dst_addr", str, destination)
         self.source_address      = self.ensure("src_addr", str, source)
         self.protocol            = self.ensure("proto",    str, protocol)
 
+        self.abuf        = None
+        self.qbuf        = None
+        self.response_id = None
+
         try:
-            self.abuf = self.raw_data["result"]["abuf"]
+            self.abuf_string = self.raw_data["result"]["abuf"]
         except KeyError:
-            self.abuf = self.ensure("abuf", str)
+            self.abuf_string = self.ensure("abuf", str)
+
+        try:
+            self.qbuf_string = self.raw_data["result"]["qbuf"]
+        except KeyError:
+            self.qbuf_string = self.ensure("qbuf", str)
 
         try:
             self.response_time = round(float(self.raw_data["result"]["rt"]), 3)
@@ -210,34 +237,67 @@ class Response(ValidationMixin):
         except KeyError:
             self.response_size = self.ensure("size", int)
 
-        self.response_id = None
-
         if part_of_set:
             self.response_id = self.ensure("subid", int)
 
         if self.protocol and isinstance(self.protocol, str):
             self.protocol = self.clean_protocol(self.protocol)
 
-        if self.abuf and parse_abuf:
+        if self.abuf_string and parse_abuf:
+            self.abuf = Message(self.abuf_string)
 
-            parsed_abuf = AbufParser.parse(base64.b64decode(self.abuf))
+        if self.qbuf_string and parse_abuf:
+            self.qbuf = Message(self.qbuf_string)
 
-            self.header = Header(parsed_abuf["HEADER"])
+    # Deprecated properties
 
-            if "EDNS0" in parsed_abuf:
-                self.edns0 = Edns0(parsed_abuf["EDNS0"])
+    @property
+    def header(self):
+        logging.warning(
+            "Response.header is deprecated and will disappear in v0.2. Use "
+            "Response.parsed_abuf.header instead."
+        )
+        return self.abuf.header
 
-            for question in parsed_abuf.get("QuestionSection", []):
-                self.questions.append(Question(question))
+    @property
+    def edns0(self):
+        logging.warning(
+            "Response.edns0 is deprecated and will disappear in v0.2. Use "
+            "Response.parsed_abuf.edns0 instead."
+        )
+        return self.abuf.edns0
 
-            for answer in parsed_abuf.get("AnswerSection", []):
-                self.answers.append(Answer(answer))
+    @property
+    def questions(self):
+        logging.warning(
+            "Response.questions is deprecated and will disappear in v0.2. Use "
+            "Response.parsed_abuf.questions instead."
+        )
+        return self.abuf.questions
 
-            for authority in parsed_abuf.get("AuthoritySection", []):
-                self.authorities.append(Authority(authority))
+    @property
+    def answers(self):
+        logging.warning(
+            "Response.answers is deprecated and will disappear in v0.2. "
+            "Use Response.parsed_abuf.answers instead."
+        )
+        return self.abuf.answers
 
-            for additional in parsed_abuf.get("AdditionalSection", []):
-                self.additionals.append(Additional(additional))
+    @property
+    def authorities(self):
+        logging.warning(
+            "Response.authorities is deprecated and will disappear in v0.2. "
+            "Use Response.parsed_abuf.authorities instead."
+        )
+        return self.abuf.authorities
+
+    @property
+    def additionals(self):
+        logging.warning(
+            "Response.additionals is deprecated and will disappear in v0.2. "
+            "Use Response.parsed_abuf.additionals instead."
+        )
+        return self.abuf.additionals
 
 
 class DnsResult(Result):
