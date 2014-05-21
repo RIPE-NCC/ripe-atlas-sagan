@@ -167,10 +167,12 @@ class Message(ValidationMixin):
 
     def __init__(self, message):
 
-        self.string_representation = message
+        self._string_representation = message
+
         self.raw_data = AbufParser.parse(base64.b64decode(message))
 
-        self.header = Header(self.raw_data["HEADER"])
+        self.header      = Header(self.raw_data["HEADER"])
+        self.edns0       = None
         self.questions   = []
         self.answers     = []
         self.authorities = []
@@ -192,7 +194,7 @@ class Message(ValidationMixin):
             self.additionals.append(Additional(additional))
 
     def __str__(self):
-        return self.string_representation
+        return self._string_representation
 
     def __repr__(self):
         return str(self)
