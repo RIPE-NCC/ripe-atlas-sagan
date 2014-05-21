@@ -79,6 +79,7 @@ print(my_result.af)
 6
 ```
 
+
 ### Which attributes are supported?
 
 Every result type has its own properties, with a few common between all types.
