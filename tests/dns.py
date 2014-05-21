@@ -1,4 +1,4 @@
-from ripe.atlas.sagan import Result
+from ripe.atlas.sagan import Result, ResultParseError
 from ripe.atlas.sagan.dns import DnsResult, Edns0
 
 def test_dns_4460():
@@ -337,3 +337,13 @@ def test_edns0():
     assert(result.responses[0].edns0.options[0].code == 3)
     assert(result.responses[0].edns0.options[0].length == 20)
     assert(result.responses[0].edns0.options[0].name == "NSID")
+
+def test_error_timeout():
+    broken_result = {u'from': u'84.132.219.105', u'msm_id': 1666006, u'timestamp':1400570732, u'fw': 4610, u'proto': u'UDP', u'af': 4, u'msm_name':u'Tdig', u'prb_id': 2960, u'error': {u'timeout': 5000}, u'src_addr':u'192.168.179.20', u'group_id': 1666005, u'type': u'dns', u'dst_addr':u'194.0.25.16'}
+    result = Result.get(broken_result)
+    assert(result.is_error is True)
+    try:
+        result = Result.get(broken_result, on_error=Result.ERROR_FAIL)
+        assert(False)
+    except ResultParseError as e:
+        assert(e.message == "Timeout: 5000")

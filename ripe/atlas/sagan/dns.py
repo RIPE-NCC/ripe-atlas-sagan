@@ -220,7 +220,7 @@ class Response(ValidationMixin):
 
         if self.abuf and parse_abuf:
 
-            parsed_abuf = AbufParser.parse(base64.decodestring(self.abuf))
+            parsed_abuf = AbufParser.parse(base64.b64decode(self.abuf))
 
             self.header = Header(parsed_abuf["HEADER"])
 
@@ -292,6 +292,24 @@ class DnsResult(Result):
                 parse_abuf=parse_abuf
             ))
 
+        if "error" in self.raw_data:
+            if isinstance(self.raw_data["error"], dict):
+                if "timeout" in self.raw_data["error"]:
+                    self._handle_error("Timeout: {timeout}".format(
+                        timeout=self.raw_data["error"]["timeout"]
+                    ))
+                elif "getaddrinfo" in self.raw_data["error"]:
+                    self._handle_error("Name resolution error: {msg}".format(
+                        msg=self.raw_data["error"]["getaddrinfo"]
+                    ))
+                else:
+                    self._handle_error("Unknown error: {msg}".format(
+                        msg=self.raw_data["error"]
+                    ))
+            else:
+                self._handle_error("Unknown error: {msg}".format(
+                    msg=self.raw_data["error"]
+                ))
 
 __all__ = (
     "DnsResult",
