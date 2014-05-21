@@ -286,7 +286,7 @@ klass                  str       The ``CLASS`` value, spelt this way to conform 
 type                   str
 name                   str
 ttl                    int
-address                str       An IP address
+answer                 str       Text representation of the annswer
 rd_length              int
 =====================  ========  ===================================================================================
 

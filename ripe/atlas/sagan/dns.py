@@ -35,6 +35,8 @@ class Header(ValidationMixin):
         self.opcode      = self.ensure("OpCode",     str)
         self.ra          = self.ensure("RA",         bool)
         self.z           = self.ensure("Z",          int)
+        self.ad          = self.ensure("AD",         bool)
+        self.cd          = self.ensure("CD",         bool)
         self.id          = self.ensure("ID",         int)
 
     def __str__(self):
@@ -130,10 +132,33 @@ class Answer(ValidationMixin):
         self.raw_data  = data
         self.name      = self.ensure("Name",     str)
         self.ttl       = self.ensure("TTL",      int)
-        self.address   = self.ensure("Address",  str)
+        self.answer    = self.ensure("Answer",  str)
         self.type      = self.ensure("Type",     str)
         self.klass     = self.ensure("Class",    str)
         self.rd_length = self.ensure("RDlength", int)
+        if self.type in ['A', 'AAAA']:
+            self.address   = self.ensure("Address",  str)
+        elif self.type == 'MX':
+            self.exchange = self.ensure('Exchange', str)
+            self.pref     = self.ensure('Pref',     int)
+        elif self.type == 'SOA':
+            self.mname    = self.ensure('Mname',    str)
+            self.rname    = self.ensure('Rname',    str)
+            self.serial   = self.ensure('Serial',   int)
+            self.refresh  = self.ensure('Refresh',  int)
+            self.update   = self.ensure('Update',   int)
+            self.expire   = self.ensure('Expire',   int)
+            self.nxdomain = self.ensure('Nxdomain', int)
+        elif self.type == 'DS':
+            self.key_tag     = self.ensure('KeyTag',     int)
+            self.algo        = self.ensure('Algo',       int)
+            self.digest_type = self.ensure('DigestType', int) 
+            self.digest      = self.ensure('Digest',     str)
+        elif self.type == 'DNSKEY':
+            self.flags    = self.ensure('Flags', int)
+            self.proto    = self.ensure('Proto', int) 
+            self.algo     = self.ensure('Algo',  int)
+            self.data     = self.ensure('Data',  str)
 
     @property
     def resource_data_length(self):
@@ -191,7 +216,7 @@ class Response(ValidationMixin):
         self.destination_address = self.ensure("dst_addr", str, destination)
         self.source_address      = self.ensure("src_addr", str, source)
         self.protocol            = self.ensure("proto",    str, protocol)
-
+        
         try:
             self.abuf = self.raw_data["result"]["abuf"]
         except KeyError:
