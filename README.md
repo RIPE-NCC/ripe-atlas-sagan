@@ -18,13 +18,13 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
-* `0.1.13`
+* 0.1.13
     * Better handling of `DNSResult` errors
     * Rearranged the way abufs were handled in the `DnsResult` class to make way
     for `qbuf` values as well.  The old method of accessing `header`, `answers`,
     `questions`, etc is still available via `Response`, but this will go away
     when we move to 0.2.  Deprecation warnings are in place.
-* `0.1.12`
+* 0.1.12
     * Smarter code for checking whether the target was reached in
     `TracerouteResults`.
     * We now handle the `destination_option_size` and `hop_by_hop_option_size`
