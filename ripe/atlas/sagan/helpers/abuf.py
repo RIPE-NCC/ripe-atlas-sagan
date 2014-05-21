@@ -239,14 +239,42 @@ class AbufParser(object):
             rr['EDNS0'] = edns0
             return offset, rr
 
-        if rr['Type'] == 'A' and rr['Class'] == "IN":  # this is per cls._type_to_text function
-            fmt           = "!BBBB"
-            a, b, c, d    = struct.unpack(fmt, rdata)
-            rr['Address'] = str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d)
-
-        if rr['Type'] == 'NS' and rr['Class'] == "IN":  # this is per cls._type_to_text function
-            doffset, name = cls._do_name(buf, rdata_offset)
-            rr['Target'] = name
+        if rr['Class'] == "IN":
+            # this is per cls._type_to_text function
+            if rr['Type'] == 'A':
+                fmt           = "!BBBB"
+                rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
+            elif rr['Type'] == 'AAAA':
+                fmt           = "!BBBBBBBBBBBBBBBB"
+                rr['Target'] = ':'.join(str(nibble) for nibble in struct.unpack(fmt, rdata))
+            elif rr['Type'] == 'CNAME':
+                doffset, name = cls._do_name(buf, rdata_offset)
+                rr['Target'] = name
+            elif rr['Type'] == 'NS': 
+                doffset, name = cls._do_name(buf, rdata_offset)
+            elif rr['Type'] == 'MX': 
+                fmt = '!H'
+                fmtsz = struct.calcsize(fmt)
+                rr['Preference'] = struct.unpack(fmt, rdata[:fmtsz])[0]
+                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz)
+            elif rr['Type'] == 'SOA': 
+                fmt = '!IIIII'
+                rr_offset, rr['MasterServerName'] = cls._do_name(buf, rdata_offset)
+                rr_offset, rr['MaintainerName'] = cls._do_name(buf, rr_offset)
+                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
+                        = struct.unpack(fmt, buf[rr_offset:rr_offset + struct.calcsize(fmt)])
+            elif rr['Type'] == 'DS': 
+                fmt = '!HBB'
+                digest_size = 0
+                rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['DelegationKey'] = rdata[struct.calcsize(fmt):].encode('hex')
+            elif rr['Type'] == 'DNSKEY': 
+                fmt = '!HBB'
+                rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['Key'] = ''.join(base64.encodestring(
+                    rdata[struct.calcsize(fmt):]).split())
 
         return offset, rr
 
