@@ -202,15 +202,32 @@ af                     int       The address family.  It's always either a ``4``
 destination_address    str       An IP address represented as a string
 source_address         str       An IP address represented as a string
 protocol               str       One of ``TCP``, ``UDP``
-abuf                   str       The raw, unparsed abuf string
+abuf                   Message   See :ref:`dns-message` below
+qbuf                   Message   See :ref:`dns-message` below
 response_time          float     Time, in seconds until response was received
 response_id            int       The sequence number of this result within a group of results, available if the resolution was done by the probe's local resolver
+=====================  ========  ===================================================================================
+
+
+.. _dns-message:
+
+Message
+-------
+
+Responses can contain either an ``abuf`` or a ``qbuf`` which are both ``Mesage``
+objects.  If you want the string representation, simply case the object as a
+string with ``str()``.
+
+=====================  ========  ===================================================================================
+Property               Type      Explanation
+=====================  ========  ===================================================================================
+raw_data               dict      The fragment of the initial JSON that pertains to this response
 header                 Header    See :ref:`dns-header` below
 edns0                  Edns0     See :ref:`dns-edns0` below, if any
-questions              list      a list of :ref:`dns-question` objects
-answers                list      a list of :ref:`dns-answer` objects
-authorities            list      a list of :ref:`dns-authority` objects
-additionals            list      a list of :ref:`dns-additional` objects, if any
+questions              list      A list of :ref:`dns-question` objects
+answers                list      A list of :ref:`dns-answer` objects
+authorities            list      A list of :ref:`dns-authority` objects
+additionals            list      A list of :ref:`dns-additional` objects, if any
 =====================  ========  ===================================================================================
 
 
