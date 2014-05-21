@@ -28,7 +28,12 @@ result, and return to you a useful, native Python object.
     * Smarter code for checking whether the target was reached in
     `TracerouteResults`.
     * We now handle the `destination_option_size` and `hop_by_hop_option_size`
-    values in `TracerouteResults`.
+    values in `TracerouteResult`.
+    * Extended support for ICMP header info in traceroute `Hop` class by
+    introducing a new `IcmpHeader` class.
+* 0.1.8
+    * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
+    as well as the original `sha256`.
 
 
 ## How to use it
@@ -78,6 +83,7 @@ print(my_result.rtt_median)
 print(my_result.af)
 6
 ```
+
 
 ### Which attributes are supported?
 
