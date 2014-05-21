@@ -217,14 +217,14 @@ class Response(ValidationMixin):
         self.response_id = None
 
         try:
-            self.abuf_string = self.raw_data["result"]["abuf"]
+            abuf_string = self.raw_data["result"]["abuf"]
         except KeyError:
-            self.abuf_string = self.ensure("abuf", str)
+            abuf_string = self.ensure("abuf", str)
 
         try:
-            self.qbuf_string = self.raw_data["result"]["qbuf"]
+            qbuf_string = self.raw_data["result"]["qbuf"]
         except KeyError:
-            self.qbuf_string = self.ensure("qbuf", str)
+            qbuf_string = self.ensure("qbuf", str)
 
         try:
             self.response_time = round(float(self.raw_data["result"]["rt"]), 3)
@@ -245,13 +245,13 @@ class Response(ValidationMixin):
         if self.protocol and isinstance(self.protocol, str):
             self.protocol = self.clean_protocol(self.protocol)
 
-        if self.abuf_string and parse_abuf:
-            self.abuf = Message(self.abuf_string)
+        if abuf_string and parse_abuf:
+            self.abuf = Message(abuf_string)
 
-        if self.qbuf_string and parse_abuf:
-            self.qbuf = Message(self.qbuf_string)
+        if qbuf_string and parse_abuf:
+            self.qbuf = Message(qbuf_string)
 
-    # Deprecated properties
+    # Deprecation shortcuts
 
     @property
     def header(self):
