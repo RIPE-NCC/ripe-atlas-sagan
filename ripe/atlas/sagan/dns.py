@@ -257,7 +257,7 @@ class Response(ValidationMixin):
     def header(self):
         logging.warning(
             "Response.header is deprecated and will disappear in v0.2. Use "
-            "Response.parsed_abuf.header instead."
+            "Response.abuf.header instead."
         )
         return self.abuf.header
 
@@ -265,7 +265,7 @@ class Response(ValidationMixin):
     def edns0(self):
         logging.warning(
             "Response.edns0 is deprecated and will disappear in v0.2. Use "
-            "Response.parsed_abuf.edns0 instead."
+            "Response.abuf.edns0 instead."
         )
         return self.abuf.edns0
 
@@ -273,7 +273,7 @@ class Response(ValidationMixin):
     def questions(self):
         logging.warning(
             "Response.questions is deprecated and will disappear in v0.2. Use "
-            "Response.parsed_abuf.questions instead."
+            "Response.abuf.questions instead."
         )
         return self.abuf.questions
 
@@ -281,7 +281,7 @@ class Response(ValidationMixin):
     def answers(self):
         logging.warning(
             "Response.answers is deprecated and will disappear in v0.2. "
-            "Use Response.parsed_abuf.answers instead."
+            "Use Response.abuf.answers instead."
         )
         return self.abuf.answers
 
@@ -289,7 +289,7 @@ class Response(ValidationMixin):
     def authorities(self):
         logging.warning(
             "Response.authorities is deprecated and will disappear in v0.2. "
-            "Use Response.parsed_abuf.authorities instead."
+            "Use Response.abuf.authorities instead."
         )
         return self.abuf.authorities
 
@@ -297,7 +297,7 @@ class Response(ValidationMixin):
     def additionals(self):
         logging.warning(
             "Response.additionals is deprecated and will disappear in v0.2. "
-            "Use Response.parsed_abuf.additionals instead."
+            "Use Response.abuf.additionals instead."
         )
         return self.abuf.additionals
 
