@@ -18,6 +18,8 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.1.14
+    * Fixed the deprecation warnings in `DnsResult` to point to the right place.
 * 0.1.13
     * Better handling of `DNSResult` errors
     * Rearranged the way abufs were handled in the `DnsResult` class to make way
