@@ -128,6 +128,16 @@ class TracerouteResult(Result):
     def end_time_timestamp(self):
         return self.end_time.timestamp
 
+    @property
+    def ip_path(self):
+        """
+        Returns just the IPs from the traceroute.
+        """
+        r = []
+        for hop in self.hops:
+            r.append([packet.origin for packet in hop.packets])
+        return r
+
     def _parse_hops(self):
 
         try:

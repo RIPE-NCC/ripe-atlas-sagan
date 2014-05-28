@@ -99,6 +99,7 @@ size                   int       The packet size
 protocol               str       One of ``ICMP``, ``TCP``, ``UDP``
 hops                   list      A list of :ref:`traceroute-hop` objects
 total_hops             int       The total number of hops
+ip_path                list      A list of dicts containing the IPs at each hop. This is just for convenience as all of these values are accessible via the :ref:`traceroute-hop` and :ref:`traceroute-packet` objects.
 last_rtt               float     The RTT from the last successful hop
 target_responded       bool      Set to ``True`` if the target actually responded
 =====================  ========  ===================================================================================
