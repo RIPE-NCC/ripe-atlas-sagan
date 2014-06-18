@@ -4,18 +4,6 @@ import base64
 import logging
 import struct
 
-try:
-    from dns.opcode import to_text as opcode_to_text
-    from dns.rdataclass import to_text as class_to_text
-    from dns.rcode import to_text as rcode_to_text
-    from dns.rdatatype import to_text as type_to_text
-except ImportError:
-    logging.warning(
-        "dnspython isn't installed, without it you cannot parse DNS "
-        "measurement results"
-    )
-
-
 class AbufParser(object):
 
     @classmethod
@@ -99,6 +87,37 @@ class AbufParser(object):
 
         return dnsres
 
+    @staticmethod
+    def _opcode_to_text(opcode):
+        return { 0: 'QUERY', 1: 'IQUERY', 2: 'STATUS',
+                4: 'NOTIFY', 5: 'UPDATE'}.get(opcode, opcode)
+
+    @staticmethod
+    def _class_to_text(rdataclass):
+        return {0: 'RESERVED0', 1: 'IN', 3: 'CH', 4: 'HS',
+                254: 'NONE', 255: 'ANY'}.get(rdataclass, rdataclass)
+
+    @staticmethod
+    def _rcode_to_text(rcode):
+        return {0: 'NOERROR', 1: 'FORMERR', 2: 'SERVFAIL', 3: 'NXDOMAIN',
+                4: 'NOTIMP',  5: 'REFUSED', 6: 'YXDOMAIN', 7: 'YXRRSET',
+                8: 'NXRRSET', 9: 'NOTAUTH', 10: 'NOTZONE',
+                16: 'BADVERS'}.get(rcode, rcode)
+
+    @staticmethod
+    def _type_to_text(rdatatype):
+        return {0: 'NONE', 1: 'A', 2: 'NS', 3: 'MD', 4: 'MF', 5: 'CNAME', 6: 'SOA',
+                7: 'MB', 8: 'MG', 9: 'MR', 10: 'NULL', 11: 'WKS', 12: 'PTR', 13: 'HINFO',
+                14: 'MINFO', 15: 'MX', 16: 'TXT', 17: 'RP', 18: 'AFSDB', 19: 'X25',
+                20: 'ISDN', 21: 'RT', 22: 'NSAP', 23: 'NSAP_PTR', 24: 'SIG', 25: 'KEY',
+                26: 'PX', 27: 'GPOS', 28: 'AAAA', 29: 'LOC', 30: 'NXT', 33: 'SRV',
+                35: 'NAPTR', 36: 'KX', 37: 'CERT', 38: 'A6', 39: 'DNAME', 41: 'OPT',
+                42: 'APL', 43: 'DS', 44: 'SSHFP', 45: 'IPSECKEY', 46: 'RRSIG', 47: 'NSEC',
+                48: 'DNSKEY', 49: 'DHCID', 50: 'NSEC3', 51: 'NSEC3PARAM', 52: 'TLSA',
+                55: 'HIP', 99: 'SPF', 103: 'UNSPEC', 249: 'TKEY', 250: 'TSIG', 251: 'IXFR',
+                252: 'AXFR', 253: 'MAILB', 254: 'MAILA', 255: 'ANY', 32768: 'TA',
+                32769: 'DLV'}.get(rdatatype,rdatatype)
+
     @classmethod
     def _parse_header(cls, buf, offset):
 
@@ -117,19 +136,23 @@ class AbufParser(object):
         tc           = 0x0200
         rd           = 0x0100
         ra           = 0x0080
-        z_mask       = 0x0070
-        z_shift      = 4
+        z_mask       = 0x0040
+        z_shift      = 6
+        ad           = 0x0020
+        cd           = 0x0010
         rcode_mask   = 0x000F
         rcode_shift  = 0
 
-        hdr['QR']      = not not(res[1] & qr)
-        hdr['OpCode']  = opcode_to_text((res[1] & opcode_mask) >> opcode_shift)
-        hdr['AA']      = not not(res[1] & aa)
-        hdr['TC']      = not not(res[1] & tc)
-        hdr['RD']      = not not(res[1] & rd)
-        hdr['RA']      = not not(res[1] & ra)
+        hdr['QR']      = bool(res[1] & qr)
+        hdr['OpCode']  = cls._opcode_to_text((res[1] & opcode_mask) >> opcode_shift)
+        hdr['AA']      = bool(res[1] & aa)
+        hdr['TC']      = bool(res[1] & tc)
+        hdr['RD']      = bool(res[1] & rd)
+        hdr['RA']      = bool(res[1] & ra)
         hdr['Z']       = (res[1] & z_mask) >> z_shift
-        hdr['ReturnCode'] = rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
+        hdr['AD']      = bool(res[1] & ad)
+        hdr['CD']      = bool(res[1] & cd)
+        hdr['ReturnCode'] = cls._rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
         hdr['QDCOUNT'] = res[2]
         hdr['ANCOUNT'] = res[3]
         hdr['NSCOUNT'] = res[4]
@@ -147,8 +170,8 @@ class AbufParser(object):
         reqlen        = struct.calcsize(fmt)
         strng         = buf[offset:offset + reqlen]
         res           = struct.unpack(fmt, strng)
-        qry['Qtype']  = type_to_text(res[0])
-        qry['Qclass'] = class_to_text(res[1])
+        qry['Qtype']  = cls._type_to_text(res[0])
+        qry['Qclass'] = cls._class_to_text(res[1])
 
         return offset + reqlen, qry
 
@@ -167,9 +190,13 @@ class AbufParser(object):
         fmt            = "!HHIH"
         reqlen         = struct.calcsize(fmt)
         dat            = buf[offset:offset + reqlen]
+	if len(dat) != reqlen:
+	    e= ("_do_rr", offset, ('offset out of range: buf size = %d') % len(buf))
+	    error.append(e)
+	    return None
         res            = struct.unpack(fmt, dat)
-        rr['Type']     = type_to_text(res[0])
-        rr['Class']    = class_to_text(res[1])
+        rr['Type']     = cls._type_to_text(res[0])
+        rr['Class']    = cls._class_to_text(res[1])
         rr['TTL']      = res[2]
         rr['RDlength'] = res[3]
 
@@ -180,7 +207,7 @@ class AbufParser(object):
 
         offset         = offset + rr['RDlength']
 
-        if rr['Type'] == 'OPT':      # this is per type_to_text function
+        if rr['Type'] == 'OPT':      # this is per cls._type_to_text function
             edns0 = {
                 'UDPsize':            res[1],
                 'ExtendedReturnCode': res[2] >> 24,
@@ -217,14 +244,42 @@ class AbufParser(object):
             rr['EDNS0'] = edns0
             return offset, rr
 
-        if rr['Type'] == 'A' and rr['Class'] == "IN":  # this is per type_to_text function
-            fmt           = "!BBBB"
-            a, b, c, d    = struct.unpack(fmt, rdata)
-            rr['Address'] = str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d)
-
-        if rr['Type'] == 'NS' and rr['Class'] == "IN":  # this is per type_to_text function
-            doffset, name = cls._do_name(buf, rdata_offset)
-            rr['Target'] = name
+        if rr['Class'] == "IN":
+            # this is per cls._type_to_text function
+            if rr['Type'] == 'A':
+                fmt           = "!BBBB"
+                rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
+            elif rr['Type'] == 'AAAA':
+                fmt           = "!BBBBBBBBBBBBBBBB"
+                rr['Target'] = ':'.join(str(nibble) for nibble in struct.unpack(fmt, rdata))
+            elif rr['Type'] == 'CNAME':
+                doffset, name = cls._do_name(buf, rdata_offset)
+                rr['Target'] = name
+            elif rr['Type'] == 'NS': 
+                doffset, name = cls._do_name(buf, rdata_offset)
+            elif rr['Type'] == 'MX': 
+                fmt = '!H'
+                fmtsz = struct.calcsize(fmt)
+                rr['Preference'] = struct.unpack(fmt, rdata[:fmtsz])[0]
+                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz)
+            elif rr['Type'] == 'SOA': 
+                fmt = '!IIIII'
+                rr_offset, rr['MasterServerName'] = cls._do_name(buf, rdata_offset)
+                rr_offset, rr['MaintainerName'] = cls._do_name(buf, rr_offset)
+                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
+                        = struct.unpack(fmt, buf[rr_offset:rr_offset + struct.calcsize(fmt)])
+            elif rr['Type'] == 'DS': 
+                fmt = '!HBB'
+                digest_size = 0
+                rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['DelegationKey'] = rdata[struct.calcsize(fmt):].encode('hex')
+            elif rr['Type'] == 'DNSKEY': 
+                fmt = '!HBB'
+                rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
+                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                rr['Key'] = ''.join(base64.encodestring(
+                    rdata[struct.calcsize(fmt):]).split())
 
         return offset, rr
 
