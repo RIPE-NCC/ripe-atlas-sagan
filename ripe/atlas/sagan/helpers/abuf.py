@@ -257,6 +257,7 @@ class AbufParser(object):
                 rr['Target'] = name
             elif rr['Type'] == 'NS': 
                 doffset, name = cls._do_name(buf, rdata_offset)
+                rr['Target'] = name
             elif rr['Type'] == 'MX': 
                 fmt = '!H'
                 fmtsz = struct.calcsize(fmt)
