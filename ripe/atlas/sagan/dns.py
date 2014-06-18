@@ -24,6 +24,8 @@ class Header(ValidationMixin):
         self.opcode      = self.ensure("OpCode",     str)
         self.ra          = self.ensure("RA",         bool)
         self.z           = self.ensure("Z",          int)
+        self.cd          = self.ensure("AD",         int)
+        self.ad          = self.ensure("CD",         int)
         self.id          = self.ensure("ID",         int)
 
     def __str__(self):
@@ -70,6 +72,14 @@ class Header(ValidationMixin):
     @property
     def zero(self):
         return self.z
+
+    @property
+    def checking_disabled(self):
+        return self.cd
+
+    @property
+    def authenticated_data(self):
+        return self.aa
 
 
 class Option(ValidationMixin):
