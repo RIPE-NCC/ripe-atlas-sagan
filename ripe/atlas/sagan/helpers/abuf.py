@@ -190,6 +190,10 @@ class AbufParser(object):
         fmt            = "!HHIH"
         reqlen         = struct.calcsize(fmt)
         dat            = buf[offset:offset + reqlen]
+	if len(dat) != reqlen:
+	    e= ("_do_rr", offset, ('offset out of range: buf size = %d') % len(buf))
+	    error.append(e)
+	    return None
         res            = struct.unpack(fmt, dat)
         rr['Type']     = cls._type_to_text(res[0])
         rr['Class']    = cls._class_to_text(res[1])
