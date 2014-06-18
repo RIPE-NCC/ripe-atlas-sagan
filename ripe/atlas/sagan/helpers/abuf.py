@@ -136,7 +136,8 @@ class AbufParser(object):
         tc           = 0x0200
         rd           = 0x0100
         ra           = 0x0080
-        z            = 0x0040
+        z_mask       = 0x0040
+        z_shift      = 6
         ad           = 0x0020
         cd           = 0x0010
         rcode_mask   = 0x000F
@@ -148,7 +149,7 @@ class AbufParser(object):
         hdr['TC']      = bool(res[1] & tc)
         hdr['RD']      = bool(res[1] & rd)
         hdr['RA']      = bool(res[1] & ra)
-        hdr['Z']       = bool(res[1] & z)
+        hdr['Z']       = (res[1] & z_mask) >> z_shift
         hdr['AD']      = bool(res[1] & ad)
         hdr['CD']      = bool(res[1] & cd)
         hdr['ReturnCode'] = cls._rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
