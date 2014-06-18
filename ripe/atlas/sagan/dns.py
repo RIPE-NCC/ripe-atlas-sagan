@@ -283,7 +283,6 @@ class Message(ValidationMixin):
             self.questions.append(Question(question))
 
         for answer in self.raw_data.get("AnswerSection", []):
-            print(answer["Type"], type(answer["Type"]))
             self.answers.append(
                 answer_classes.get(answer["Type"], Answer)(answer)
             )
