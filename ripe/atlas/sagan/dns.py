@@ -129,7 +129,6 @@ class Answer(ValidationMixin):
         self.raw_data  = data
         self.name      = self.ensure("Name",     str)
         self.ttl       = self.ensure("TTL",      int)
-        self.address   = self.ensure("Address",  str)
         self.type      = self.ensure("Type",     str)
         self.klass     = self.ensure("Class",    str)
         self.rd_length = self.ensure("RDlength", int)
@@ -137,6 +136,84 @@ class Answer(ValidationMixin):
     @property
     def resource_data_length(self):
         return self.rd_length
+
+
+class AAnswer(Answer):
+
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.address = self.ensure("Address", str)
+
+
+class AaaaAnswer(AAnswer):
+    pass
+
+
+class NsAnswer(Answer):
+
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.target = self.ensure("Target", str)
+
+
+class CnameAnswer(NsAnswer):
+    pass
+
+
+class MxAnswer(Answer):
+
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.preference     = self.ensure("Preference",    int)
+        self.mail_exchanger = self.ensure("MailExchanger", str)
+
+
+class SoaAnswer(Answer):
+
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.mname    = self.ensure("MasterServerName", str)
+        self.rname    = self.ensure("MaintainerName",   str)
+        self.serial   = self.ensure("Serial",           int)
+        self.refresh  = self.ensure("Refresh",          int)
+        self.retry    = self.ensure("Retry",            int)
+        self.expire   = self.ensure("Expire",           int)
+        self.minimum  = self.ensure("NegativeTtl",      int)
+
+    @property
+    def master_server_name(self):
+        return self.mname
+
+    @property
+    def maintainer_name(self):
+        return self.rname
+
+    @property
+    def negative_ttl(self):
+        return self.minimum
+
+    @property
+    def nxdomain(self):
+        return self.minimum
+
+
+class DsAnswer(Answer):
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.tag            = self.ensure("Tag",           int)
+        self.algorithm      = self.ensure("Algorithm",     int)
+        self.digest_type    = self.ensure("DigestType",    int)
+        self.delegation_key = self.ensure("DelegationKey", str)
+
+
+class DnskeyAnswer(Answer):
+
+    def __init__(self, data):
+        Answer.__init__(self, data)
+        self.flags       = self.ensure("Flags",     int)
+        self.algorithm   = self.ensure("Algorithm", int)
+        self.protocol    = self.ensure("Protocol",  int)
+        self.key         = self.ensure("Key",       str)
 
 
 class Authority(ValidationMixin):
@@ -188,6 +265,17 @@ class Message(ValidationMixin):
         self.authorities = []
         self.additionals = []
 
+        answer_classes = {
+            "A":      AAnswer,
+            "AAAA":   AaaaAnswer,
+            "NS":     NsAnswer,
+            "CNAME":  CnameAnswer,
+            "MX":     MxAnswer,
+            "SOA":    SoaAnswer,
+            "DS":     DsAnswer,
+            "DNSKEY": DnskeyAnswer
+        }
+
         if "EDNS0" in self.raw_data:
             self.edns0 = Edns0(self.raw_data["EDNS0"])
 
@@ -195,7 +283,9 @@ class Message(ValidationMixin):
             self.questions.append(Question(question))
 
         for answer in self.raw_data.get("AnswerSection", []):
-            self.answers.append(Answer(answer))
+            self.answers.append(
+                answer_classes.get(answer["Type"], Answer)(answer)
+            )
 
         for authority in self.raw_data.get("AuthoritySection", []):
             self.authorities.append(Authority(authority))
