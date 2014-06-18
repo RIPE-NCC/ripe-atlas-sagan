@@ -251,8 +251,8 @@ class AbufParser(object):
                 rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
             elif rr['Type'] == 'AAAA':
                 fmt           = "!HHHHHHHH"
-		addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
-                rr['Target'] = addr
+                addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
+                rr['Address'] = addr
             elif rr['Type'] == 'CNAME':
                 doffset, name = cls._do_name(buf, rdata_offset)
                 rr['Target'] = name
