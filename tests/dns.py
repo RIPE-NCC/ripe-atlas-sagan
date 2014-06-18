@@ -1,5 +1,8 @@
 from ripe.atlas.sagan import Result, ResultParseError
-from ripe.atlas.sagan.dns import DnsResult, Edns0
+from ripe.atlas.sagan.dns import (
+    DnsResult, Edns0, AAnswer, AaaaAnswer, NsAnswer, CnameAnswer, MxAnswer,
+    SoaAnswer, DsAnswer, DnskeyAnswer
+)
 
 def test_dns_4460():
     result = Result.get('{"af":4,"dst_addr":"193.227.234.53","from":"217.172.81.146","fw":4460,"msm_id":1004041,"prb_id":184,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":0,"ID":39825,"NSCOUNT":0,"QDCOUNT":1,"abuf":"m5GEAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaoZA==","answers":[{"RDLENGTH":4,"TYPE":1}],"rt":45.305,"size":43},"timestamp":1347765990,"type":"dns"}')
@@ -38,6 +41,7 @@ def test_dns_4460():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.100")
@@ -82,6 +86,7 @@ def test_dns_4470():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.100")
@@ -126,6 +131,7 @@ def test_dns_4480():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.100")
@@ -170,6 +176,7 @@ def test_dns_4500():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.100")
@@ -214,6 +221,7 @@ def test_dns_4520():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.160")
@@ -258,6 +266,7 @@ def test_dns_4610():
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "as250.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 3600)
     assert(result.responses[0].abuf.answers[0].address == "194.150.168.160")
@@ -306,6 +315,7 @@ def test_resultset():
     assert(result.responses[1].abuf.questions[0].type == "A")
     assert(result.responses[2].abuf.questions[0].name == "www.ripe.net.")
     assert(isinstance(result.responses[0].abuf.answers, list))
+    assert(isinstance(result.responses[0].abuf.answers[0], AAnswer))
     assert(result.responses[0].abuf.answers[0].name == "www.ripe.net.")
     assert(result.responses[0].abuf.answers[0].ttl == 10162)
     assert(result.responses[0].abuf.answers[0].address == "193.0.6.139")
@@ -394,3 +404,52 @@ def test_qbuf():
     assert(result.responses[0].qbuf.edns0.options[0].name == "NSID")
     assert(result.responses[0].qbuf.edns0.options[0].nsid == "")
     assert(result.responses[0].qbuf.edns0.options[0].length == 0)
+
+def test_soaanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:dcd:7::1","from":"2a03:b280::280:a3ff:fe91:3bb2","fw":4610,"group_id":1674999,"msm_id":1675002,"msm_name":"Tdig","name":"2001:dcd:7:0:0:0:0:1","prb_id":3498,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":1,"ID":53767,"NSCOUNT":0,"QDCOUNT":1,"abuf":"0geEAAABAAEAAAABCHRlc3R6b25lAAAGAAHADAAGAAEAAAOEAEYDYXJpBWFscGhhBmFyaWRucwNuZXQCYXUAB3N1cHBvcnQLYXJpc2VydmljZXMDY29tAFOhbEUAAAcIAAABLAAbr4AAAAcIAAApEAAAAAAAAAwAAwAIZG5zMi5hbXM=","answers":[{"MNAME":"ari.alpha.aridns.net.au.","NAME":"testzone.","RNAME":"support.ariservices.com.","SERIAL":1403087941,"TTL":900,"TYPE":"SOA"}],"rt":21.566,"size":131},"result-rdata":null,"result-rname":"support.ariservices.com.","result-rt":21.566,"result-serial":1403087941,"src_addr":"2a03:b280::280:a3ff:fe91:3bb2","timestamp":1403087945,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], SoaAnswer))
+    assert(result.responses[0].abuf.answers[0].retry == 300)
+    assert(result.responses[0].abuf.answers[0].name == 'testzone.')
+    assert(result.responses[0].abuf.answers[0].minimum == 1800)
+    assert(result.responses[0].abuf.answers[0].refresh == 1800)
+    assert(result.responses[0].abuf.answers[0].mname == "ari.alpha.aridns.net.au.")
+    assert(result.responses[0].abuf.answers[0].expire == 1814400)
+    assert(result.responses[0].abuf.answers[0].rname == "support.ariservices.com.")
+    assert(result.responses[0].abuf.answers[0].ttl == 900)
+    assert(result.responses[0].abuf.answers[0].serial == 1403087941)
+    assert(result.responses[0].abuf.answers[0].type == "SOA")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 70)
+
+def test_dnskeyanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:500:40::1","from":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","fw":4610,"group_id":1672218,"msm_id":1672220,"msm_name":"Tdig","prb_id":15060,"proto":"TCP","result":{"ANCOUNT":7,"ARCOUNT":1,"ID":57207,"NSCOUNT":0,"QDCOUNT":1,"abuf":"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","rt":62.748,"size":1625},"result-rt":62.748,"src_addr":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","timestamp":1402768690,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], DnskeyAnswer))
+    assert(result.responses[0].abuf.answers[0].flags == 256)
+    assert(result.responses[0].abuf.answers[0].algorithm == 7)
+    assert(result.responses[0].abuf.answers[0].protocol == 3)
+    assert(result.responses[0].abuf.answers[0].key == "AwEAAX7wnIyA9rd+WWcUxE6ILCCtZWvJ9aVgG7wiNYbbQp6tPn5gTmZxR35tV2WK0bHordMGJrlTuH3u8rqBYxOM/LWHj6OAGtsE8RQQhcJCzOGpQADJggSAoSNhoJ/qiXAT6wcwPrwmVnUFLV8Sok/kEbRKnXuSqIPfSVj+j9VodpFH")
+    assert(result.responses[0].abuf.answers[0].name == "org.")
+    assert(result.responses[0].abuf.answers[0].ttl == 900)
+    assert(result.responses[0].abuf.answers[0].type == "DNSKEY")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 136)
+
+def test_aaaaanswer():
+    result = Result.get('{"from":"2001:67c:2e8:11::c100:136c","msm_id":1663540,"fw":4620,"af":6,"timestamp":1403091608,"proto":"UDP","dst_addr":"2001:41d0:1:4874::1","prb_id":6012,"result":{"abuf":"1jKEAAABAAEAAgADCnBvc3RtYXN0ZXICZnIAABwAAcAMABwAAQAAASwAECABQdAAAUh0AAAAAAAAAAHADAACAAEAAAEsAAYDbnMxwAzADAACAAEAAAEsAAYDbnMywAzARwABAAEAAAEsAARXYtl0wEcAHAABAAABLAAQIAFB0AABSHQAAAAAAAAAAcBZAAEAAQAAASwABFzzEZ8=","rt":8.656,"NSCOUNT":2,"QDCOUNT":1,"ANCOUNT":1,"ARCOUNT":3,"ID":54834,"size":155},"result-rt":8.656,"src_addr":"2001:67c:2e8:11::c100:136c","group_id":1663540,"type":"dns","msm_name":"Tdig","name":"2001:41d0:1:4874:0:0:0:1"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], AaaaAnswer))
+    assert(result.responses[0].abuf.answers[0].address == "2001:41d0:1:4874::1")
+    assert(result.responses[0].abuf.answers[0].name == "postmaster.fr.")
+    assert(result.responses[0].abuf.answers[0].ttl == 300)
+    assert(result.responses[0].abuf.answers[0].type == "AAAA")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 16)
+
+def test_():
+    result = Result.get('{"from":"2607:fcc0:3:2:220:4aff:fee0:219e","msm_id":1687652,"fw":4610,"timestamp":1403098937,"resultset":[{"src_addr":"208.70.247.155","proto":"UDP","submax":3,"af":4,"subid":1,"result":{"abuf":"KESBgAABAAIAAAAABHJpcGUDbmV0AAAPAAHADAAPAAEAAAEsAAkAyARrb2tvwAzADAAPAAEAAAEsAAkA+gRrYWthwAw=","rt":198.454,"NSCOUNT":0,"QDCOUNT":1,"ID":10308,"ARCOUNT":0,"ANCOUNT":2,"size":68},"time":1403098937,"dst_addr":"208.70.244.7"},{"src_addr":"208.70.247.155","proto":"UDP","submax":3,"af":4,"subid":2,"result":{"abuf":"emqBgAABAAIAAAAABHJpcGUDbmV0AAAPAAHADAAPAAEAAAEsAAkAyARrb2tvwAzADAAPAAEAAAEsAAkA+gRrYWthwAw=","rt":127.644,"NSCOUNT":0,"QDCOUNT":1,"ID":31338,"ARCOUNT":0,"ANCOUNT":2,"size":68},"time":1403098938,"dst_addr":"208.70.245.7"},{"src_addr":"2607:fcc0:3:2:220:4aff:fee0:219e","proto":"UDP","submax":3,"af":6,"subid":3,"time":1403098939,"error":{"timeout":5000},"dst_addr":"2001:4860:4860::8888"}],"prb_id":2793,"group_id":1687652,"type":"dns","msm_name":"Tdig"}')
+    print(type(result.responses[0].abuf.answers[0]))
+    assert(isinstance(result.responses[0].abuf.answers[0], int))
+
+# def test_aaaaanswer():
+#     result = Result.get('')
+#     print(type(result.responses[0].abuf.answers[0]))
+#     assert(isinstance(result.responses[0].abuf.answers[0], int))

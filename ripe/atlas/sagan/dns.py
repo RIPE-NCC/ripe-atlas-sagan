@@ -142,55 +142,59 @@ class AAnswer(Answer):
 
     def __init__(self, data):
         Answer.__init__(self, data)
-        self.address   = self.ensure("Address",  str)
+        self.address = self.ensure("Address", str)
 
-AaaaAnswer = AAnswer
+
+class AaaaAnswer(AAnswer):
+    pass
 
 
 class NsAnswer(Answer):
 
     def __init__(self, data):
         Answer.__init__(self, data)
-        self.target   = self.ensure("Target",  str)
+        self.target = self.ensure("Target", str)
 
-CnameAnswer = NsAnswer
+
+class CnameAnswer(NsAnswer):
+    pass
 
 
 class MxAnswer(Answer):
 
     def __init__(self, data):
         Answer.__init__(self, data)
-        self.preference     = self.ensure("Preference",     int)
-        self.mail_exchanger = self.ensure("MailExchanger",  str)
+        self.preference     = self.ensure("Preference",    int)
+        self.mail_exchanger = self.ensure("MailExchanger", str)
 
 
 class SoaAnswer(Answer):
 
     def __init__(self, data):
         Answer.__init__(self, data)
-        self.master_server_name = self.ensure("MasterServerName", str)
-        self.maintainer_name    = self.ensure("MaintainerName",   str)
-        self.serial             = self.ensure("Serial",           int)
-        self.refresh            = self.ensure("Refresh",          int)
-        self.retry              = self.ensure("Retry",            int)
-        self.expire             = self.ensure("Expire",           int)
-        self.negative_ttl       = self.ensure("NegativeTtl",      int)
+        self.mname    = self.ensure("MasterServerName", str)
+        self.rname    = self.ensure("MaintainerName",   str)
+        self.serial   = self.ensure("Serial",           int)
+        self.refresh  = self.ensure("Refresh",          int)
+        self.retry    = self.ensure("Retry",            int)
+        self.expire   = self.ensure("Expire",           int)
+        self.minimum  = self.ensure("NegativeTtl",      int)
 
     @property
-    def mname(self):
-        return self.master_server_name
+    def master_server_name(self):
+        return self.mname
 
     @property
-    def rname(self):
-        return self.maintainer_name
+    def maintainer_name(self):
+        return self.rname
 
     @property
-    def minimum(self):
-        return self.negative_ttl
+    def negative_ttl(self):
+        return self.minimum
 
     @property
     def nxdomain(self):
-        return self.negative_ttl
+        return self.minimum
 
 
 class DsAnswer(Answer):
@@ -206,10 +210,10 @@ class DnskeyAnswer(Answer):
 
     def __init__(self, data):
         Answer.__init__(self, data)
-        self.flags       = self.ensure("Flags",      int)
-        self.algorithm   = self.ensure("Algorithm",  int)
-        self.protocol    = self.ensure("Protocol",   int)
-        self.key         = self.ensure("Key",        str)
+        self.flags       = self.ensure("Flags",     int)
+        self.algorithm   = self.ensure("Algorithm", int)
+        self.protocol    = self.ensure("Protocol",  int)
+        self.key         = self.ensure("Key",       str)
 
 
 class Authority(ValidationMixin):
@@ -261,15 +265,16 @@ class Message(ValidationMixin):
         self.authorities = []
         self.additionals = []
 
-        answer_class = { 
-                'A'      : AAnswer, 
-                'AAAA'   : AaaaAnswer, 
-                'NS'     : NsAnswer,
-                'CNAME'  : CnameAnswer,
-                'MX'     : MxAnswer,
-                'SOA'    : SoaAnswer,
-                'DS'     : DsAnswer,
-                'DNSKEY' : DnskeyAnswer}
+        answer_classes = {
+            "A":      AAnswer,
+            "AAAA":   AaaaAnswer,
+            "NS":     NsAnswer,
+            "CNAME":  CnameAnswer,
+            "MX":     MxAnswer,
+            "SOA":    SoaAnswer,
+            "DS":     DsAnswer,
+            "DNSKEY": DnskeyAnswer
+        }
 
         if "EDNS0" in self.raw_data:
             self.edns0 = Edns0(self.raw_data["EDNS0"])
@@ -278,8 +283,10 @@ class Message(ValidationMixin):
             self.questions.append(Question(question))
 
         for answer in self.raw_data.get("AnswerSection", []):
+            print(answer["Type"], type(answer["Type"]))
             self.answers.append(
-                    answer_class.get(answer['Type'], Answer)(answer))
+                answer_classes.get(answer["Type"], Answer)(answer)
+            )
 
         for authority in self.raw_data.get("AuthoritySection", []):
             self.authorities.append(Authority(authority))
