@@ -250,8 +250,9 @@ class AbufParser(object):
                 fmt           = "!BBBB"
                 rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
             elif rr['Type'] == 'AAAA':
-                fmt           = "!BBBBBBBBBBBBBBBB"
-                rr['Target'] = ':'.join(str(nibble) for nibble in struct.unpack(fmt, rdata))
+                fmt           = "!HHHHHHHH"
+		addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
+                rr['Target'] = addr
             elif rr['Type'] == 'CNAME':
                 doffset, name = cls._do_name(buf, rdata_offset)
                 rr['Target'] = name
@@ -313,7 +314,12 @@ class AbufParser(object):
                 strng   = buf[offset:offset + reqlen]
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
-                poffset, pname = cls._do_name(buf, poffset)
+		n= cls._do_name(buf, poffset)
+		if n == None:
+		    e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
+		    error.append(e)
+		    return None
+                poffset, pname = n
                 offset  += reqlen
                 name    = name + pname
                 break
