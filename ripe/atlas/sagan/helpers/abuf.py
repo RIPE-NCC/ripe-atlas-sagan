@@ -190,10 +190,10 @@ class AbufParser(object):
         fmt            = "!HHIH"
         reqlen         = struct.calcsize(fmt)
         dat            = buf[offset:offset + reqlen]
-	if len(dat) != reqlen:
-	    e= ("_do_rr", offset, ('offset out of range: buf size = %d') % len(buf))
-	    error.append(e)
-	    return None
+        if len(dat) != reqlen:
+            e= ("_do_rr", offset, ('offset out of range: buf size = %d') % len(buf))
+            error.append(e)
+            return None
         res            = struct.unpack(fmt, dat)
         rr['Type']     = cls._type_to_text(res[0])
         rr['Class']    = cls._class_to_text(res[1])
@@ -314,11 +314,11 @@ class AbufParser(object):
                 strng   = buf[offset:offset + reqlen]
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
-		n= cls._do_name(buf, poffset)
-		if n == None:
-		    e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
-		    error.append(e)
-		    return None
+                n= cls._do_name(buf, poffset)
+                if n == None:
+                    e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
+                    error.append(e)
+                    return None
                 poffset, pname = n
                 offset  += reqlen
                 name    = name + pname
