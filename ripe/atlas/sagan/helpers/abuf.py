@@ -40,28 +40,28 @@ class AbufParser(object):
         if do_header:
             dnsres['HEADER'] = hdr
         for i in range(hdr['QDCOUNT']):
-            offset, qry = cls._do_query(buf, offset)
+            offset, qry = cls._do_query(buf, offset, error)
             if do_question:
                 if i == 0:
                     dnsres['QuestionSection'] = [qry]
                 else:
                     dnsres['QuestionSection'].append(qry)
         for i in range(hdr['ANCOUNT']):
-            offset, rr = cls._do_rr(buf, offset)
+            offset, rr = cls._do_rr(buf, offset, error)
             if do_answer:
                 if i == 0:
                     dnsres['AnswerSection'] = [rr]
                 else:
                     dnsres['AnswerSection'].append(rr)
         for i in range(hdr['NSCOUNT']):
-            offset, rr = cls._do_rr(buf, offset)
+            offset, rr = cls._do_rr(buf, offset, error)
             if do_authority:
                 if i == 0:
                     dnsres['AuthoritySection'] = [rr]
                 else:
                     dnsres['AuthoritySection'].append(rr)
         for i in range(hdr['ARCOUNT']):
-            res = cls._do_rr(buf, offset)
+            res = cls._do_rr(buf, offset, error)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -124,6 +124,10 @@ class AbufParser(object):
         fmt = "!HHHHHH"
         reqlen = struct.calcsize(fmt)
         strng = buf[offset:offset + reqlen]
+        if len(strng) != reqlen:
+            e= ("_parse_header", offset, ('offset out of range: buf size = %d') % len(buf))
+            error.append(e)
+            return None
         res = struct.unpack(fmt, strng)
         hdr = {
             "ID": res[0]
@@ -161,14 +165,18 @@ class AbufParser(object):
         return offset + reqlen, hdr
 
     @classmethod
-    def _do_query(cls, buf, offset):
+    def _do_query(cls, buf, offset, error):
         qry           = {}
-        offset, name  = cls._do_name(buf, offset)
+        offset, name  = cls._do_name(buf, offset, error)
         qry['Qname']  = name
 
         fmt           = "!HH"
         reqlen        = struct.calcsize(fmt)
         strng         = buf[offset:offset + reqlen]
+        if len(strng) != reqlen:
+            e= ("_do_query", offset, ('offset out of range: buf size = %d') % len(buf))
+            error.append(e)
+            return None
         res           = struct.unpack(fmt, strng)
         qry['Qtype']  = cls._type_to_text(res[0])
         qry['Qclass'] = cls._class_to_text(res[1])
@@ -176,11 +184,10 @@ class AbufParser(object):
         return offset + reqlen, qry
 
     @classmethod
-    def _do_rr(cls, buf, offset):
+    def _do_rr(cls, buf, offset, error):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
-        error          = []
         rr             = {}
-        res = cls._do_name(buf, offset)
+        res = cls._do_name(buf, offset, error)
         if res is None:
             e = ("_do_rr", offset, "_do_name failed")
             error.append(e)
@@ -223,6 +230,10 @@ class AbufParser(object):
                 fmt    = "!HH"
                 reqlen = struct.calcsize(fmt)
                 dat    = rdata[o:o + reqlen]
+                if len(dat) != reqlen:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
                 res    = struct.unpack(fmt, dat)
                 opt = {
                     'OptionCode': res[0],
@@ -248,47 +259,80 @@ class AbufParser(object):
             # this is per cls._type_to_text function
             if rr['Type'] == 'A':
                 fmt           = "!BBBB"
+                reqlen        = struct.calcsize(fmt)
+                if reqlen > len(rdata):
+                    e= ("_do_rr", rdata_offset, ('rdata too small: size = %d') % len(rdata))
+                    error.append(e)
+                    return None
                 rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
             elif rr['Type'] == 'AAAA':
                 fmt           = "!HHHHHHHH"
+                reqlen        = struct.calcsize(fmt)
+                if reqlen > len(rdata):
+                    e= ("_do_rr", rdata_offset, ('rdata too small: size = %d') % len(rdata))
+                    error.append(e)
+                    return None
                 addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
                 rr['Address'] = addr
             elif rr['Type'] == 'CNAME':
-                doffset, name = cls._do_name(buf, rdata_offset)
+                doffset, name = cls._do_name(buf, rdata_offset, error)
                 rr['Target'] = name
             elif rr['Type'] == 'NS': 
-                doffset, name = cls._do_name(buf, rdata_offset)
+                doffset, name = cls._do_name(buf, rdata_offset, error)
                 rr['Target'] = name
             elif rr['Type'] == 'MX': 
                 fmt = '!H'
                 fmtsz = struct.calcsize(fmt)
-                rr['Preference'] = struct.unpack(fmt, rdata[:fmtsz])[0]
-                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Preference'] = struct.unpack(fmt, dat)[0]
+                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, error)
             elif rr['Type'] == 'SOA': 
                 fmt = '!IIIII'
-                rr_offset, rr['MasterServerName'] = cls._do_name(buf, rdata_offset)
-                rr_offset, rr['MaintainerName'] = cls._do_name(buf, rr_offset)
+                fmtsz = struct.calcsize(fmt)
+                dat= buf[rr_offset:rr_offset + fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
+                rr_offset, rr['MasterServerName'] = cls._do_name(buf, rdata_offset, error)
+                rr_offset, rr['MaintainerName'] = cls._do_name(buf, rr_offset, error)
                 rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
-                        = struct.unpack(fmt, buf[rr_offset:rr_offset + struct.calcsize(fmt)])
+                        = struct.unpack(fmt, dat)
             elif rr['Type'] == 'DS': 
-                fmt = '!HBB'
                 digest_size = 0
+
+                fmt = '!HBB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
                 rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
-                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                        struct.unpack(fmt, dat)
                 rr['DelegationKey'] = rdata[struct.calcsize(fmt):].encode('hex')
             elif rr['Type'] == 'DNSKEY': 
                 fmt = '!HBB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
                 rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
-                        struct.unpack(fmt, rdata[:struct.calcsize(fmt)])
+                        struct.unpack(fmt, dat)
                 rr['Key'] = ''.join(base64.encodestring(
                     rdata[struct.calcsize(fmt):]).split())
 
         return offset, rr
 
     @classmethod
-    def _do_name(cls, buf, offset):
+    def _do_name(cls, buf, offset, error):
         name  = ''
-        error = []
         while True:
             fmt    = "!B"
             reqlen = struct.calcsize(fmt)
@@ -312,9 +356,13 @@ class AbufParser(object):
                 fmt     = "!H"
                 reqlen  = struct.calcsize(fmt)
                 strng   = buf[offset:offset + reqlen]
+                if len(strng) != reqlen:
+                    e= ("_do_name", offset, ('offset out of range: buf size = %d') % len(buf))
+                    error.append(e)
+                    return None
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
-                n= cls._do_name(buf, poffset)
+                n= cls._do_name(buf, poffset, error)
                 if n == None:
                     e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
                     error.append(e)
