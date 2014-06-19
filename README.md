@@ -18,24 +18,29 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.1.15
+    * Added a bunch of abuf parsing features from
+      [b4ldr](https://github.com/b4ldr) with some help from
+      [phicoh](https://github.com/phicoh).
 * 0.1.14
-    * Fixed the deprecation warnings in `DnsResult` to point to the right place.
+    * Fixed the deprecation warnings in `DnsResult` to point to the right
+      place.
 * 0.1.13
     * Better handling of `DNSResult` errors
-    * Rearranged the way abufs were handled in the `DnsResult` class to make way
-    for `qbuf` values as well.  The old method of accessing `header`, `answers`,
-    `questions`, etc is still available via `Response`, but this will go away
-    when we move to 0.2.  Deprecation warnings are in place.
+    * Rearranged the way abufs were handled in the `DnsResult` class to make
+      way for `qbuf` values as well.  The old method of accessing `header`,
+      `answers`, `questions`, etc is still available via `Response`, but this
+      will go away when we move to 0.2.  Deprecation warnings are in place.
 * 0.1.12
     * Smarter code for checking whether the target was reached in
-    `TracerouteResults`.
+      `TracerouteResults`.
     * We now handle the `destination_option_size` and `hop_by_hop_option_size`
-    values in `TracerouteResult`.
+      values in `TracerouteResult`.
     * Extended support for ICMP header info in traceroute `Hop` class by
-    introducing a new `IcmpHeader` class.
+      introducing a new `IcmpHeader` class.
 * 0.1.8
     * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
-    as well as the original `sha256`.
+      as well as the original `sha256`.
 
 
 ## How to use it
