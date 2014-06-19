@@ -12,7 +12,6 @@ As you might have guessed, with all of the magic going on under the hood, there
 are a few dependencies:
 
 * `arrow`_
-* dnspython `v2`_ or `v3`_
 * `pyOpenSSL`_
 * `python-dateutil`_
 * `pytz`_
@@ -23,8 +22,6 @@ the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
 documentation files for offline use.
 
 .. _arrow: https://pypi.python.org/pypi/arrow/
-.. _v2: https://pypi.python.org/pypi/dnspython/
-.. _v3: https://pypi.python.org/pypi/dnspython3/
 .. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL/
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil/
 .. _pytz: https://pypi.python.org/pypi/pytz/
@@ -80,18 +77,9 @@ same directory as ``setup.py``.::
 Troubleshooting
 ---------------
 
-Some setups (like MacOS) have trouble with some of the dependencies we're
-using, so if they explode during the installation, you can still make use of
-*some* of the parsers by deliberately excluding the problematic ones at
-install time.
-
-For example, if you want to skip the installation of ``pyOpenSSL`` (required for
-parsing SSL certificate results), you can do this:::
+Some setups (like MacOS) have trouble with building the dependencies required
+for reading SSL certificates.  If you don't care about SSL stuff and only want
+to use sagan to say, parse traceroute or DNS results, then you can tell the
+installer to skip building ``pyOpenSSL`` by doing the following:::
 
      $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
-
-
-Similarly, you can skip the installation of ``dnspython`` and forgo any DNS
-result parsing:::
-
-    $ SAGAN_WITHOUT_DNS=1 pip install ripe.atlas.sagan

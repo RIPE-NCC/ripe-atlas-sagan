@@ -186,7 +186,6 @@ As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
 * [arrow](https://pypi.python.org/pypi/arrow)
-* dnspython [v2](https://pypi.python.org/pypi/dnspython) or [v3](https://pypi.python.org/pypi/dnspython3)
 * [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL)
 * [python-dateutil](https://pypi.python.org/pypi/python-dateutil)
 * [pytz](https://pypi.python.org/pypi/pytz)
