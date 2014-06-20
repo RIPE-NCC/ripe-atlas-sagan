@@ -291,15 +291,25 @@ class AbufParser(object):
                 rr['Preference'] = struct.unpack(fmt, dat)[0]
                 rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, error)
             elif rr['Type'] == 'SOA': 
+                offset_name= cls._do_name(buf, rdata_offset, error)
+                if offset_name == None:
+                        e= ("do_rr", rdata_offset, ('_do_name failed'))
+                        error.append(e)
+                        return None
+                rr_offset, rr['MasterServerName'] = offset_name
+                offset_name = cls._do_name(buf, rr_offset, error)
+                if offset_name == None:
+                        e= ("do_rr", rr_offset, ('_do_name failed'))
+                        error.append(e)
+                        return None
+                rr_offset, rr['MaintainerName'] = offset_name
                 fmt = '!IIIII'
                 fmtsz = struct.calcsize(fmt)
                 dat= buf[rr_offset:rr_offset + fmtsz]
                 if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rr_offset, ('offset out of range: rdata size = %d') % len(rdata))
                     error.append(e)
                     return None
-                rr_offset, rr['MasterServerName'] = cls._do_name(buf, rdata_offset, error)
-                rr_offset, rr['MaintainerName'] = cls._do_name(buf, rr_offset, error)
                 rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
                         = struct.unpack(fmt, dat)
             elif rr['Type'] == 'DS': 
