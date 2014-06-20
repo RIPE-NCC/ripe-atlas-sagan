@@ -327,6 +327,24 @@ class AbufParser(object):
                         struct.unpack(fmt, dat)
                 rr['Key'] = ''.join(base64.encodestring(
                     rdata[struct.calcsize(fmt):]).split())
+        if rr['Class'] == "CH":
+            if rr['Type'] == 'TXT':
+                fmt    = "!B"
+                reqlen = struct.calcsize(fmt)
+                strng    = rdata[:reqlen]
+                if len(strng) != reqlen:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
+                res    = struct.unpack(fmt, strng)
+                llen   = res[0]
+                o= reqlen
+                strng= rdata[o:o+llen]
+                if len(strng) < llen:
+                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Data'] = strng
 
         return offset, rr
 
