@@ -1,4 +1,4 @@
-from ripe.atlas.sagan import Result, ResultParseError
+from ripe.atlas.sagan import Result, ResultError
 from ripe.atlas.sagan.dns import (
     DnsResult, Edns0, AAnswer, AaaaAnswer, NsAnswer, CnameAnswer, MxAnswer,
     SoaAnswer, DsAnswer, DnskeyAnswer
@@ -216,7 +216,7 @@ def test_dns_4520():
     assert(result.responses[0].abuf.header.ra is False)
     assert(result.responses[0].abuf.header.z == 0)
     assert(result.responses[0].abuf.header.id == 1472)
-    assert(isinstance(result.responses[0].questions, list))
+    assert(isinstance(result.responses[0].abuf.questions, list))
     assert(result.responses[0].abuf.questions[0].klass == "IN")
     assert(result.responses[0].abuf.questions[0].type == "A")
     assert(result.responses[0].abuf.questions[0].name == "as250.net.")
@@ -348,7 +348,7 @@ def test_edns0():
     result = Result.get('{"from":"2001:d98:6004:1:6666:b3ff:feb0:ec1e","msm_id":1004048,"timestamp":1398939936,"fw":4610,"proto":"UDP","af":6,"result-rdata":null,"dst_addr":"2001:7fd::1","prb_id":14184,"result":{"abuf":"ACuEAAABAAEADQAYAAAGAAEAAAYAAQABUYAAQAFhDHJvb3Qtc2VydmVycwNuZXQABW5zdGxkDHZlcmlzaWduLWdycwNjb20AeAv3NAAABwgAAAOEAAk6gAABUYAAAAIAAQAH6QAAAsAcAAACAAEAB+kAAAQBYsAeAAACAAEAB+kAAAQBY8AeAAACAAEAB+kAAAQBZMAeAAACAAEAB+kAAAQBZcAeAAACAAEAB+kAAAQBZsAeAAACAAEAB+kAAAQBZ8AeAAACAAEAB+kAAAQBaMAeAAACAAEAB+kAAAQBacAeAAACAAEAB+kAAAQBasAeAAACAAEAB+kAAAQBa8AeAAACAAEAB+kAAAQBbMAeAAACAAEAB+kAAAQBbcAewBwAAQABAAfpAAAExikABMB0AAEAAQAH6QAABMDkT8nAgwABAAEAB+kAAATAIQQMwJIAAQABAAfpAAAExwdbDcChAAEAAQAH6QAABMDL5grAsAABAAEAB+kAAATABQXxwL8AAQABAAfpAAAEwHAkBMDOAAEAAQAH6QAABIA\/AjXA3QABAAEAB+kAAATAJJQRwOwAAQABAAfpAAAEwDqAHsD7AAEAAQAH6QAABMEADoHBCgABAAEAB+kAAATHB1MqwRkAAQABAAfpAAAEygwbIcAcABwAAQAH6QAAECABBQO6PgAAAAAAAAACADDAgwAcAAEAB+kAABAgAQUAAAIAAAAAAAAAAAAMwJIAHAABAAfpAAAQIAEFAAAtAAAAAAAAAAAADcCwABwAAQAH6QAAECABBQAALwAAAAAAAAAAAA\/AzgAcAAEAB+kAABAgAQUAAAEAAAAAAACAPwI1wN0AHAABAAfpAAAQIAEH\/gAAAAAAAAAAAAAAU8DsABwAAQAH6QAAECABBQMMJwAAAAAAAAACADDA+wAcAAEAB+kAABAgAQf9AAAAAAAAAAAAAAABwQoAHAABAAfpAAAQIAEFAAADAAAAAAAAAAAAQsEZABwAAQAH6QAAECABDcMAAAAAAAAAAAAAADUAACkQAAAAAAAAGAADABRrMy5hbXMtaXguay5yaXBlLm5ldA==","rt":219.205,"NSCOUNT":13,"QDCOUNT":1,"answers":[{"RNAME":"nstld.verisign-grs.com.","NAME":".","MNAME":"a.root-servers.net.","TTL":86400,"SERIAL":2014050100,"TYPE":"SOA"}],"ID":43,"ARCOUNT":24,"ANCOUNT":1,"size":808},"type":"dns","result-rname":"nstld.verisign-grs.com.","src_addr":"2001:d98:6004:1:6666:b3ff:feb0:ec1e","result-rt":219.205,"result-serial":2014050100,"msm_name":"Tdig"}')
     assert(isinstance(result, DnsResult))
     assert(isinstance(result.responses, list))
-    assert(isinstance(result.responses[0].edns0, Edns0))
+    assert(isinstance(result.responses[0].abuf.edns0, Edns0))
     assert(result.responses[0].abuf.edns0.extended_return_code == 0)
     assert(result.responses[0].abuf.edns0.name == ".")
     assert(result.responses[0].abuf.edns0.type == "OPT")
@@ -367,9 +367,9 @@ def test_error_timeout():
     result = Result.get(broken_result)
     assert(result.is_error is True)
     try:
-        result = Result.get(broken_result, on_error=Result.ERROR_FAIL)
+        result = Result.get(broken_result, on_error=Result.ACTION_FAIL)
         assert(False)
-    except ResultParseError as e:
+    except ResultError as e:
         assert(e.message == "Timeout: 5000")
 
 def test_qbuf():

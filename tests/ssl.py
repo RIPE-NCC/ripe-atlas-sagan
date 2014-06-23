@@ -1,4 +1,4 @@
-from ripe.atlas.sagan import Result, ResultParseError
+from ripe.atlas.sagan import Result, ResultError
 from ripe.atlas.sagan.ssl import SslResult
 
 def test_ssl_4480():
@@ -188,9 +188,9 @@ def test_ssl_4550_error():
     assert(len(result.certificates) == 0)
     assert(result.is_error is True)
     try:
-        result = Result.get(result_string, on_error=Result.ERROR_FAIL)
+        result = Result.get(result_string, on_error=Result.ACTION_FAIL)
         assert False
-    except ResultParseError:
+    except ResultError:
         pass
 
 

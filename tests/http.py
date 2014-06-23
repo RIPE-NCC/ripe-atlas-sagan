@@ -1,4 +1,4 @@
-from ripe.atlas.sagan import Result, ResultParseError
+from ripe.atlas.sagan import Result, ResultError, ResultParseError
 from ripe.atlas.sagan.http import HttpResult
 
 def test_http_0():
@@ -6,9 +6,9 @@ def test_http_0():
     result = Result.get(data)
     assert(result.is_error is True)
     try:
-        Result.get(data, on_error=Result.ERROR_FAIL)
+        Result.get(data, on_error=Result.ACTION_FAIL)
         assert False
-    except ResultParseError:
+    except ResultError:
         pass
 
 def test_http_0_error():
@@ -16,9 +16,9 @@ def test_http_0_error():
     result = Result.get(data)
     assert(result.is_error is True)
     try:
-        Result.get(data, on_error=Result.ERROR_FAIL)
+        Result.get(data, on_error=Result.ACTION_FAIL)
         assert False
-    except ResultParseError:
+    except ResultError:
         pass
 
 def test_http_1():

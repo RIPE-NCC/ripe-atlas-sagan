@@ -18,6 +18,17 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.2.0
+    * Totally reworked error and malformation handling.  We now differentiate
+      between a result (or portion thereof) being malformed (and therefore
+      unparsable) and simply containing an error such as a timeout.  Look for
+      an `is_error` property or an `is_malformed` property on every object
+      to check for it, or simply pass `on_malformation=Result.ACTION_FAIL` if
+      you'd prefer things to explode with an exception.  See the documentation
+      for more details
+    * Removed the deprecated propertiesfrom `dns.Response`.  You must now
+      access values like `edns0` from `dns.Response.abuf.edns0`.
+    * More edge cases have been found and accommodated.
 * 0.1.15
     * Added a bunch of abuf parsing features from
       [b4ldr](https://github.com/b4ldr) with some help from
@@ -146,7 +157,7 @@ http_result.responses[0].body_size  # The size of the body of the first response
 ### "But... I'd rather my code explode when there's an error"
 
 If you'd like Sagan to be less forgiving, you only need to pass
-`on_error=Result.ERROR_FAIL` when you're instantiating your object.  To use one
+`on_error=Result.ACTION_FAIL` when you're instantiating your object.  To use one
 of our previous examples:
 
 ```python
@@ -154,7 +165,7 @@ from ripe.atlas.sagan import Result
 
 my_result = Result.get(
     '{"dnserr":"non-recoverable failure in name resolution",...}',
-    on_error=Result.ERROR_FAIL
+    on_error=Result.ACTION_FAIL
 )
 ```
 

@@ -15,7 +15,9 @@ class IcmpHeader(ValidationMixin):
     this class can be found here: http://localhost:8000/docs/data_struct/
     """
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
 
@@ -34,7 +36,9 @@ class Packet(ValidationMixin):
         "p": "Port unreachable",
     }
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
 
@@ -54,6 +58,7 @@ class Packet(ValidationMixin):
 
         if self.error in self.ERROR_CONDITIONS.keys():
             self.error = self.ERROR_CONDITIONS[self.error]
+            self._handle_error(self.error)
 
         icmp_header = self.ensure("icmpext", dict)
 
@@ -67,7 +72,9 @@ class Packet(ValidationMixin):
 
 class Hop(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
 

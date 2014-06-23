@@ -76,7 +76,7 @@ make use of the parent ``Result`` class' ``get()`` method:::
 
     from ripe.atlas.sagan import PingResult
 
-    my_result = Result.get('this is where your big JSON blob goes')
+    my_result = PingResult('this is where your big JSON blob goes')
 
     my_result.af
     # Returns 6
@@ -86,6 +86,54 @@ make use of the parent ``Result`` class' ``get()`` method:::
 
 As you can see it works just like PingResult, but doesn't force you to know its
 type up front.  Note that this does incur a small performance penalty however.
+
+
+.. _use-errors-and-malformations:
+
+Erorrs & Malformations
+----------------------
+
+RIPE Atlas, like the Internet is never 100% what you'd expect.  Sometimes your
+measurement will return an error such as a timout or DNS lookup problem, and
+sometimes the data in a result might even be malformed on account of data
+corruption, damaged probe storage, etc.
+
+And like the most applications on the Internet, Sagan attemps to handle these
+inconsistencies gracefully.  You can decide just how gracefully however.
+
+Say for example you've got a result that looks alright, but the ``abuf`` value
+is damaged in some way rendering it unreadable.  You'll find that while the
+``DnsResult`` object will not have a ``is_malformed=False``, the portion that is
+unreadable will be set to ``True``:::
+
+    from ripe.atlas.sagan import DnsResult
+    my_result = DnsResult('your JSON blob')
+
+    my_result.is_error                        # False
+    my_result.is_malformed                    # False
+    my_result.responses[0].abuf.is_malformed  # True
+    my_result.responses[1].abuf.is_malformed  # False
+
+You can control what you'd like Sagan to do in these cases by setting
+``on_malformation=`` when parsing:::
+
+    from ripe.atlas.sagan import DnsResult
+
+    # Sets is_malformed=True and issues a warning
+    my_result = DnsResult('your JSON blob')
+
+    # Sets is_malformed=True
+    my_result = DnsResult('your JSON blob', on_malformation=DnsResult.ACTION_IGNORE)
+
+    # Sets explodes with a ResultParseError
+    my_result = DnsResult('your JSON blob', on_malformation=DnsResult.ACTION_FAIL)
+
+Similarly, you can do the same thing with ``on_error=``, which perform the same
+way when Sagan encounters an error like a timeout or DNS lookup problem.
+
+Error handling is not yet complete in Sagan, so if you run across a case where
+it behaves in a way other than what you'd expect, please sent a copy of the
+problematic result to atlas@ripe.net and we'll use it to update this library.
 
 
 .. _examples:

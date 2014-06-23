@@ -22,6 +22,10 @@ class ResultParseError(Exception):
     pass
 
 
+class ResultError(Exception):
+    pass
+
+
 class DictionaryLikeMixin(object):
     """
     Python 2.x and 3.x handle the creation of dictionary-like objects
@@ -59,14 +63,31 @@ class ValidationMixin(DictionaryLikeMixin):
     classes.
     """
 
+    ACTION_IGNORE = 1
+    ACTION_WARN   = 2
+    ACTION_FAIL   = 3
+
     PROTOCOL_ICMP = "ICMP"
     PROTOCOL_UDP  = "UDP"
     PROTOCOL_TCP  = "TCP"
     PROTOCOL_MAP = {
         "ICMP": PROTOCOL_ICMP,
+        "I":    PROTOCOL_ICMP,
         "UDP":  PROTOCOL_UDP,
-        "TCP":  PROTOCOL_TCP
+        "U":    PROTOCOL_UDP,
+        "TCP":  PROTOCOL_TCP,
+        "T":    PROTOCOL_TCP,
     }
+
+    def __init__(self, **kwargs):
+
+        DictionaryLikeMixin.__init__(self)
+
+        self._on_error = kwargs.pop("on_error", self.ACTION_WARN)
+        self.is_error  = False
+
+        self._on_malformation = kwargs.pop("on_malformation", self.ACTION_WARN)
+        self.is_malformed     = False
 
     def ensure(self, key, kind, default=None):
         try:
@@ -85,11 +106,25 @@ class ValidationMixin(DictionaryLikeMixin):
             try:
                 return self.PROTOCOL_MAP[protocol]
             except KeyError:
-                raise ResultParseError(
+                self._handle_malformation(
                     '"{protocol}" is not a recognised protocol'.format(
                         protocol=protocol
                     )
                 )
+
+    def _handle_malformation(self, message):
+        if self._on_malformation == self.ACTION_FAIL:
+            raise ResultParseError(message)
+        elif self._on_malformation == self.ACTION_WARN:
+            logging.warning(message)
+        self.is_malformed = True
+
+    def _handle_error(self, message):
+        if self._on_error == self.ACTION_FAIL:
+            raise ResultError(message)
+        elif self._on_error == self.ACTION_WARN:
+            logging.warning(message)
+        self.is_error = True
 
 
 class Result(ValidationMixin):
@@ -99,21 +134,17 @@ class Result(ValidationMixin):
     figure out the type for you.
     """
 
-    ERROR_IGNORE = 1
-    ERROR_WARN   = 2
-    ERROR_FAIL   = 3
+    def __init__(self, data, *args, **kwargs):
 
-    def __init__(self, data, on_error=ERROR_WARN):
-
-        self._on_error = on_error
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
         if isinstance(data, compat_basestring):
             self.raw_data = json.loads(data)
 
-        for key in ("timestamp", "msm_id", "prb_id", "fw"):
+        for key in ("timestamp", "msm_id", "prb_id", "fw", "type"):
             if key not in self.raw_data:
-                raise ResultParseError(
+                raise ResultParseErrorrseError(
                     "This does not look like a RIPE Atlas "
                     "measurement: {raw_data}".format(raw_data=self.raw_data))
 
@@ -122,11 +153,10 @@ class Result(ValidationMixin):
         self.probe_id       = self.ensure("prb_id", int)
         self.firmware       = self.ensure("fw", int)
         self.origin         = self.ensure("from", str)
-        self.is_error       = False
 
         # Handle the weird case where fw=0 and we don't know what to expect
         if self.firmware == 0:
-            self._handle_error("Unknown firmware: {fw}".format(
+            self._handle_malformation("Unknown firmware: {fw}".format(
                 fw=self.firmware)
             )
 
@@ -181,13 +211,6 @@ class Result(ValidationMixin):
             return HttpResult(raw_data, **kwargs)
 
         raise ResultParseError("Unknown type value was found in the JSON input")
-
-    def _handle_error(self, message):
-        if self._on_error == self.ERROR_FAIL:
-            raise ResultParseError(message)
-        elif self._on_error == self.ERROR_WARN:
-            logging.warning(message)
-        self.is_error = True
 
 
 __all__ = (

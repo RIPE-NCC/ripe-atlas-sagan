@@ -2,7 +2,9 @@ from .base import Result, ValidationMixin
 
 class Response(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, *args, **kwargs):
+
+        ValidationMixin.__init__(self, *args, **kwargs)
 
         self.raw_data            = data
         self.af                  = self.ensure("af",       int)
@@ -13,9 +15,7 @@ class Response(ValidationMixin):
         self.code                = self.ensure("res",      int)
         self.response_time       = self.ensure("rt",     float)
         self.version             = self.ensure("ver",      str)
-
-        self.is_error     = False
-        self.error_string = self.ensure("err",      str)
+        self.error_string        = self.ensure("err",      str)
 
         if not self.destination_address:
             self.destination_address = self.ensure("addr", str, self.destination_address)

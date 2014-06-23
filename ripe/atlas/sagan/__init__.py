@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import os
 
-from .base import Result, ResultParseError
+from .base import Result, ResultError, ResultParseError
 from .dns import DnsResult
 from .http import HttpResult
 from .ping import PingResult

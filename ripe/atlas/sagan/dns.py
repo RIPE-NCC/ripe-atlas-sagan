@@ -9,7 +9,9 @@ from .helpers.abuf import AbufParser
 
 class Header(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data    = data
         self.aa          = self.ensure("AA",         bool)
@@ -84,7 +86,9 @@ class Header(ValidationMixin):
 
 class Option(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
         self.nsid   = self.ensure("NSID",         str)
@@ -95,7 +99,9 @@ class Option(ValidationMixin):
 
 class Edns0(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
         self.extended_return_code = self.ensure("ExtendedReturnCode", int)
@@ -114,7 +120,9 @@ class Edns0(ValidationMixin):
 
 class Question(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
         self.klass    = self.ensure("Qclass", str)
@@ -124,7 +132,9 @@ class Question(ValidationMixin):
 
 class Answer(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.name      = self.ensure("Name",     str)
@@ -139,9 +149,8 @@ class Answer(ValidationMixin):
 
 
 class AAnswer(Answer):
-
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.address = self.ensure("Address", str)
 
 
@@ -150,9 +159,8 @@ class AaaaAnswer(AAnswer):
 
 
 class NsAnswer(Answer):
-
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.target = self.ensure("Target", str)
 
 
@@ -161,17 +169,16 @@ class CnameAnswer(NsAnswer):
 
 
 class MxAnswer(Answer):
-
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.preference     = self.ensure("Preference",    int)
         self.mail_exchanger = self.ensure("MailExchanger", str)
 
 
 class SoaAnswer(Answer):
 
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.mname    = self.ensure("MasterServerName", str)
         self.rname    = self.ensure("MaintainerName",   str)
         self.serial   = self.ensure("Serial",           int)
@@ -198,8 +205,8 @@ class SoaAnswer(Answer):
 
 
 class DsAnswer(Answer):
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.tag            = self.ensure("Tag",           int)
         self.algorithm      = self.ensure("Algorithm",     int)
         self.digest_type    = self.ensure("DigestType",    int)
@@ -207,18 +214,25 @@ class DsAnswer(Answer):
 
 
 class DnskeyAnswer(Answer):
-
-    def __init__(self, data):
-        Answer.__init__(self, data)
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
         self.flags       = self.ensure("Flags",     int)
         self.algorithm   = self.ensure("Algorithm", int)
         self.protocol    = self.ensure("Protocol",  int)
         self.key         = self.ensure("Key",       str)
 
 
+class TxtAnswer(Answer):
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.data = self.ensure("Data", str)
+
+
 class Authority(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.klass     = self.ensure("Class",    int)
@@ -235,7 +249,9 @@ class Authority(ValidationMixin):
 
 class Additional(ValidationMixin):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.address   = self.ensure("Address",  str)
@@ -252,13 +268,30 @@ class Additional(ValidationMixin):
 
 class Message(ValidationMixin):
 
-    def __init__(self, message):
+    def __init__(self, message, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self._string_representation = message
 
-        self.raw_data = AbufParser.parse(base64.b64decode(message))
+        try:
+            self.raw_data = AbufParser.parse(base64.b64decode(message))
+        except Exception as e:
+            self.raw_data = {}
+            self._handle_malformation(
+                "{exception}: Unable to parse buffer: {buffer}".format(
+                    exception=e,
+                    buffer=self._string_representation
+                )
+            )
+        else:
+            if "ERROR" in self.raw_data:
+                self._handle_error(self.raw_data["ERROR"])
 
-        self.header      = Header(self.raw_data["HEADER"])
+        self.header = None
+        if "HEADER" in self.raw_data:
+            self.header = Header(self.raw_data["HEADER"], **kwargs)
+
         self.edns0       = None
         self.questions   = []
         self.answers     = []
@@ -273,25 +306,25 @@ class Message(ValidationMixin):
             "MX":     MxAnswer,
             "SOA":    SoaAnswer,
             "DS":     DsAnswer,
-            "DNSKEY": DnskeyAnswer
+            "DNSKEY": DnskeyAnswer,
+            "TXT":    TxtAnswer,
         }
 
         if "EDNS0" in self.raw_data:
-            self.edns0 = Edns0(self.raw_data["EDNS0"])
+            self.edns0 = Edns0(self.raw_data["EDNS0"], **kwargs)
 
         for question in self.raw_data.get("QuestionSection", []):
-            self.questions.append(Question(question))
+            self.questions.append(Question(question, **kwargs))
 
         for answer in self.raw_data.get("AnswerSection", []):
-            self.answers.append(
-                answer_classes.get(answer["Type"], Answer)(answer)
-            )
+            answer_class = answer_classes.get(answer["Type"], Answer)
+            self.answers.append(answer_class(answer, **kwargs))
 
         for authority in self.raw_data.get("AuthoritySection", []):
-            self.authorities.append(Authority(authority))
+            self.authorities.append(Authority(authority, **kwargs))
 
         for additional in self.raw_data.get("AdditionalSection", []):
-            self.additionals.append(Additional(additional))
+                self.additionals.append(Additional(additional, **kwargs))
 
     def __str__(self):
         return self._string_representation
@@ -303,28 +336,22 @@ class Message(ValidationMixin):
 class Response(ValidationMixin):
 
     def __init__(self, data, af=None, destination=None, source=None,
-                 protocol=None, part_of_set=True, parse_abuf=True):
+                 protocol=None, part_of_set=True, **kwargs):
 
-        self.raw_data    = data
+        ValidationMixin.__init__(self, **kwargs)
+
+        self.raw_data = data
 
         self.af                  = self.ensure("af",       int, af)
         self.destination_address = self.ensure("dst_addr", str, destination)
         self.source_address      = self.ensure("src_addr", str, source)
         self.protocol            = self.ensure("proto",    str, protocol)
 
-        self.abuf        = None
-        self.qbuf        = None
         self.response_id = None
 
-        try:
-            abuf_string = self.raw_data["result"]["abuf"]
-        except KeyError:
-            abuf_string = self.ensure("abuf", str)
-
-        try:
-            qbuf_string = self.raw_data["result"]["qbuf"]
-        except KeyError:
-            qbuf_string = self.ensure("qbuf", str)
+        # Preparing for lazy stuff
+        self._abuf = None
+        self._qbuf = None
 
         try:
             self.response_time = round(float(self.raw_data["result"]["rt"]), 3)
@@ -345,71 +372,37 @@ class Response(ValidationMixin):
         if self.protocol and isinstance(self.protocol, str):
             self.protocol = self.clean_protocol(self.protocol)
 
-        if abuf_string and parse_abuf:
-            self.abuf = Message(abuf_string)
-
-        if qbuf_string and parse_abuf:
-            self.qbuf = Message(qbuf_string)
-
-    # Deprecation shortcuts
+    @property
+    def abuf(self):
+        return self._get_buf("a")
 
     @property
-    def header(self):
-        logging.warning(
-            "Response.header is deprecated and will disappear in v0.2. Use "
-            "Response.abuf.header instead."
-        )
-        return self.abuf.header
+    def qbuf(self):
+        return self._get_buf("q")
 
-    @property
-    def edns0(self):
-        logging.warning(
-            "Response.edns0 is deprecated and will disappear in v0.2. Use "
-            "Response.abuf.edns0 instead."
-        )
-        return self.abuf.edns0
-
-    @property
-    def questions(self):
-        logging.warning(
-            "Response.questions is deprecated and will disappear in v0.2. Use "
-            "Response.abuf.questions instead."
-        )
-        return self.abuf.questions
-
-    @property
-    def answers(self):
-        logging.warning(
-            "Response.answers is deprecated and will disappear in v0.2. "
-            "Use Response.abuf.answers instead."
-        )
-        return self.abuf.answers
-
-    @property
-    def authorities(self):
-        logging.warning(
-            "Response.authorities is deprecated and will disappear in v0.2. "
-            "Use Response.abuf.authorities instead."
-        )
-        return self.abuf.authorities
-
-    @property
-    def additionals(self):
-        logging.warning(
-            "Response.additionals is deprecated and will disappear in v0.2. "
-            "Use Response.abuf.additionals instead."
-        )
-        return self.abuf.additionals
+    def _get_buf(self, prefix):
+        """
+        Lazy read-only accessor for the (a|q)buf.
+        The qbuf Message object is cached for subsequent requests.
+        """
+        kind = "{prefix}buf".format(prefix=prefix)
+        private_name = "_" + kind
+        buf = getattr(self, private_name)
+        if buf:
+            return buf
+        try:
+            buf_string = self.raw_data["result"][kind]
+        except KeyError:
+            buf_string = self.ensure(kind, str)
+        if buf_string:
+            setattr(self, private_name, Message(buf_string, on_error=self._on_error, on_malformation=self._on_malformation))
+        return getattr(self, private_name)
 
 
 class DnsResult(Result):
 
-    def __init__(self, data, parse_abuf=True, **kwargs):
+    def __init__(self, data, **kwargs):
         """
-        Set `parse_abuf=False` if you don't want the `responses` values to
-        include all of the parsed abuf data.  This is faster, but will leave a
-        lot of fields empty.
-
         Note that we're not setting `self.af` here, but rather we have it as a
         property of `Response` as it's possible that one result can contain
         multiple responses, each with either af=4 or af=6.
@@ -424,6 +417,9 @@ class DnsResult(Result):
         protocol            = self.ensure("proto",    str)
         source_address      = self.ensure("src_addr", str)
         destination_address = self.ensure("dst_addr", str)
+
+        if 0 < self.firmware < 4460:
+            af = self.ensure("pf", int)
 
         responses = []
         part_of_set = True
@@ -451,7 +447,7 @@ class DnsResult(Result):
                 source=source_address,
                 protocol=protocol,
                 part_of_set=part_of_set,
-                parse_abuf=parse_abuf
+                **kwargs
             ))
 
         if "error" in self.raw_data:
