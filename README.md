@@ -192,7 +192,7 @@ from ripe.atlas.sagan import DnsResult
 
 my_dns_result = DnsResult("<result string from a RIPE Atlas DNS measurement>")
 my_dns_result.responses[0].abuf  # The entire string
-my_dns_result.responses[0].header.arcount  # Decoded from the abuf
+my_dns_result.responses[0].abuf.header.arcount  # Decoded from the abuf
 ```
 
 We do the same sort of thing for SSL measurements, traceroutes, everything.  We
@@ -205,7 +205,7 @@ As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
 * [arrow](https://pypi.python.org/pypi/arrow)
-* [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL)
+* [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL) (Optional: see "Troubleshooting" below)
 * [python-dateutil](https://pypi.python.org/pypi/python-dateutil)
 * [pytz](https://pypi.python.org/pypi/pytz)
 * [IPy](https://pypi.python.org/pypi/IPy/)
@@ -227,23 +227,13 @@ $ pip install ripe.atlas.sagan
 
 ### Troubleshooting
 
-Some setups (like MacOS) have trouble with some of the dependencies we're
-using, so if they explode during the installation, you can still make use of
-*some* of the parsers by deliberately excluding the problematic ones at
-install time.
-
-For example, if you want to skip the installation of `pyOpenSSL` (required for
-parsing SSL certificate results), you can do this:
+Some setups (like MacOS) have trouble with building the dependencies required
+for reading SSL certificates.  If you don't care about SSL stuff and only want
+to use sagan to say, parse traceroute or DNS results, then you can tell the
+installer to skip building ``pyOpenSSL`` by doing the following:
 
 ```bash
 $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
-```
-
-Similarly, you can skip the installation of `dnspython` and forego any DNS
-result parsing:
-
-```bash
-$ SAGAN_WITHOUT_DNS=1 pip install ripe.atlas.sagan
 ```
 
 
@@ -260,4 +250,3 @@ should need is in there.
 But why *Sagan*?  The RIPE Atlas team decided to name all of its modules after
 explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
-
