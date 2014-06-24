@@ -4,21 +4,21 @@ from ripe.atlas.sagan.http import HttpResult
 def test_http_0():
     data = '{"fw":0,"msm_id":12023,"prb_id":1,"src_addr":"GET4 193.0.6.139 0.042268 200 263 1406","timestamp":1319704299,"type":"http"}'
     result = Result.get(data)
-    assert(result.is_error is True)
+    assert(result.is_malformed is True)
     try:
-        Result.get(data, on_error=Result.ACTION_FAIL)
+        Result.get(data, on_malformation=Result.ACTION_FAIL)
         assert False
-    except ResultError:
+    except ResultParseError:
         pass
 
-def test_http_0_error():
-    data = '{"fw":0,"msm_id":12023,"prb_id":1,"src_addr":"connect error 4","timestamp":1323118908,"type":"http"}'
+def test_http_1_error():
+    data = '{"fw":1,"msm_id":12023,"prb_id":1,"src_addr":"connect error 4","timestamp":1323118908,"type":"http"}'
     result = Result.get(data)
-    assert(result.is_error is True)
+    assert(result.is_malformed is True)
     try:
-        Result.get(data, on_error=Result.ACTION_FAIL)
+        Result.get(data, on_malformation=Result.ACTION_FAIL)
         assert False
-    except ResultError:
+    except ResultParseError:
         pass
 
 def test_http_1():
@@ -326,4 +326,4 @@ def test_http_4610_fail():
     assert(result.responses[0].source_address == "2001:630:301:1080:220:4aff:fee0:20a0")
     assert(result.responses[0].version is None)
     assert(result.responses[0].is_error is True)
-    assert(result.responses[0].error_string == "timeout reading chunk")
+    assert(result.responses[0].error_message == "timeout reading chunk")
