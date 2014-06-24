@@ -15,7 +15,6 @@ class Response(ValidationMixin):
         self.code                = self.ensure("res",      int)
         self.response_time       = self.ensure("rt",     float)
         self.version             = self.ensure("ver",      str)
-        self.error_string        = self.ensure("err",      str)
 
         if not self.destination_address:
             self.destination_address = self.ensure("addr", str, self.destination_address)
@@ -23,8 +22,12 @@ class Response(ValidationMixin):
         if not self.source_address:
             self.source_address = self.ensure("srcaddr", str, self.source_address)
 
-        if not self.code or self.error_string:
-            self.is_error = True
+        if not self.code:
+            self._handle_malformation("No response code available")
+
+        error = self.ensure("err", str)
+        if error:
+            self._handle_error(error)
 
 
 class HttpResult(Result):
@@ -52,7 +55,7 @@ class HttpResult(Result):
         self.responses = []
 
         if "result" not in self.raw_data:
-            self._handle_error("No result value found")
+            self._handle_malformation("No result value found")
             return
 
         if isinstance(self.raw_data["result"], list):

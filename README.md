@@ -18,6 +18,12 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.2.1
+    * Added a `median_rtt` value to traceroute ``Hop`` objects.
+    * Smartter and more consistent error handling in traceroute and HTTP
+      results.
+    * Added an `error_message` property to all objects that is set to `None`
+      by default.
 * 0.2.0
     * Totally reworked error and malformation handling.  We now differentiate
       between a result (or portion thereof) being malformed (and therefore
@@ -26,7 +32,9 @@ result, and return to you a useful, native Python object.
       to check for it, or simply pass `on_malformation=Result.ACTION_FAIL` if
       you'd prefer things to explode with an exception.  See the documentation
       for more details
-    * Removed the deprecated propertiesfrom `dns.Response`.  You must now
+    * Added lazy-loading features for parsing abuf and qbuf values out of DNS
+      results.
+    * Removed the deprecated properties from `dns.Response`.  You must now
       access values like `edns0` from `dns.Response.abuf.edns0`.
     * More edge cases have been found and accommodated.
 * 0.1.15

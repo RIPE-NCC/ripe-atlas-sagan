@@ -83,8 +83,9 @@ class ValidationMixin(DictionaryLikeMixin):
 
         DictionaryLikeMixin.__init__(self)
 
-        self._on_error = kwargs.pop("on_error", self.ACTION_WARN)
-        self.is_error  = False
+        self._on_error     = kwargs.pop("on_error", self.ACTION_WARN)
+        self.is_error      = False
+        self.error_message = None
 
         self._on_malformation = kwargs.pop("on_malformation", self.ACTION_WARN)
         self.is_malformed     = False
@@ -125,6 +126,7 @@ class ValidationMixin(DictionaryLikeMixin):
         elif self._on_error == self.ACTION_WARN:
             logging.warning(message)
         self.is_error = True
+        self.error_message = message
 
 
 class Result(ValidationMixin):

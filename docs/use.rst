@@ -132,7 +132,7 @@ Similarly, you can do the same thing with ``on_error=``, which perform the same
 way when Sagan encounters an error like a timeout or DNS lookup problem.
 
 Error handling is not yet complete in Sagan, so if you run across a case where
-it behaves in a way other than what you'd expect, please sent a copy of the
+it behaves in a way other than what you'd expect, please send a copy of the
 problematic result to atlas@ripe.net and we'll use it to update this library.
 
 

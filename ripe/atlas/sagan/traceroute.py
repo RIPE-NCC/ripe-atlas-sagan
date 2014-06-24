@@ -47,7 +47,6 @@ class Packet(ValidationMixin):
         self.size                    = self.ensure("size",       int)
         self.ttl                     = self.ensure("ttl",        int)
         self.mtu                     = self.ensure("mtu",        int)
-        self.error                   = self.ensure("err",        str)
         self.destination_option_size = self.ensure("dstoptsize", int)
         self.hop_by_hop_option_size  = self.ensure("hbhoptsize", int)
         self.arrived_late_by         = self.ensure("late",       int, 0)
@@ -56,9 +55,8 @@ class Packet(ValidationMixin):
         if self.rtt:
             self.rtt = round(self.rtt, 3)
 
-        if self.error in self.ERROR_CONDITIONS.keys():
-            self.error = self.ERROR_CONDITIONS[self.error]
-            self._handle_error(self.error)
+        error = self.ensure("err", str)
+        self._handle_error(self.ERROR_CONDITIONS.get(error, error))
 
         icmp_header = self.ensure("icmpext", dict)
 
@@ -79,12 +77,21 @@ class Hop(ValidationMixin):
         self.raw_data = data
 
         self.index = self.ensure("hop", int)
-        self.error = self.ensure("error", str)
+
+        error = self.ensure("error", str)
+        if error:
+            self._handle_error(error)
 
         self.packets = []
         if "result" in self.raw_data:
             for packet in self.raw_data["result"]:
                 self.packets.append(Packet(packet))
+
+        self.median_rtt = None
+        if self.packets:
+            rtts = sorted([p.rtt for p in self.packets if p and p.rtt])
+            if rtts:
+                self.median_rtt = rtts[int(len(rtts) / 2)]
 
     def __str__(self):
         return self.index
@@ -158,12 +165,8 @@ class TracerouteResult(Result):
 
             hop = Hop(hop)
 
-            rtts = []
-            for packet in hop.packets:
-                if packet.rtt is not None:
-                    rtts.append(packet.rtt)
-                    self.last_rtt = packet.rtt
-            rtts.sort()
+            if hop.median_rtt:
+                self.last_rtt = hop.median_rtt
 
             self.hops.append(hop)
             self.total_hops += 1

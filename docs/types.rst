@@ -21,7 +21,9 @@ measurement_id         int
 probe_id               int
 firmware               int       The probe firmware release
 origin                 str       The IP address of the probe
+is_malformed           bool      Whether the result (or related portion thereof) is unparseable
 is_error               bool      Whether or not there were errors in parsing/handling this result
+error_message          str       If the result is an error, the message string is in here
 =====================  ========  ================================================================
 
 * Note that an ``arrow`` object is essentially a ``datetime`` object with some
@@ -132,7 +134,6 @@ origin                   str         The IP address of where the packet is comin
 rtt                      float
 size                     int
 ttl                      int
-error                    str         The error message, if any
 arrived_late_by          int         If the packet arrived late, this number represents "how many hops ago" this packet was sent
 internal_ttl             int         The time-to-live for the packet that triggered the error ICMP.  The default is 1
 destination_option_size  int         The size of the IPv6 destination option header
@@ -503,7 +504,5 @@ source_address         str       An IP address
 code                   int       The HTTP response code
 response_time          float     Time, in seconds until response was received
 version                str       The HTTP version
-is_error               bool      If an error message is supplied, this will be ``True``
-error_string           str       An error message, if any
 =====================  ========  ===================================================================================
 
