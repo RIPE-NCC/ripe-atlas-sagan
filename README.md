@@ -20,7 +20,7 @@ result, and return to you a useful, native Python object.
 
 * 0.2.1
     * Added a `median_rtt` value to traceroute ``Hop`` objects.
-    * Smartter and more consistent error handling in traceroute and HTTP
+    * Smarter and more consistent error handling in traceroute and HTTP
       results.
     * Added an `error_message` property to all objects that is set to `None`
       by default.
