@@ -56,7 +56,8 @@ class Packet(ValidationMixin):
             self.rtt = round(self.rtt, 3)
 
         error = self.ensure("err", str)
-        self._handle_error(self.ERROR_CONDITIONS.get(error, error))
+        if error:
+            self._handle_error(self.ERROR_CONDITIONS.get(error, error))
 
         icmp_header = self.ensure("icmpext", dict)
 
