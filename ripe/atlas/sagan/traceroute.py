@@ -1,4 +1,3 @@
-import logging
 from IPy import IP
 
 from .base import Result, ValidationMixin
@@ -159,7 +158,7 @@ class TracerouteResult(Result):
             hops = self.raw_data["result"]
             assert(isinstance(hops, list))
         except (KeyError, AssertionError):
-            logging.warning("Legacy formats not supported")
+            self._handle_malformation("Legacy formats not supported")
             return
 
         for hop in hops:

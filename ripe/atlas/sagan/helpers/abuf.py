@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import base64
-import logging
 import struct
 
 class AbufParser(object):
@@ -277,10 +276,10 @@ class AbufParser(object):
             elif rr['Type'] == 'CNAME':
                 doffset, name = cls._do_name(buf, rdata_offset, error)
                 rr['Target'] = name
-            elif rr['Type'] == 'NS': 
+            elif rr['Type'] == 'NS':
                 doffset, name = cls._do_name(buf, rdata_offset, error)
                 rr['Target'] = name
-            elif rr['Type'] == 'MX': 
+            elif rr['Type'] == 'MX':
                 fmt = '!H'
                 fmtsz = struct.calcsize(fmt)
                 dat= rdata[:fmtsz]
@@ -290,7 +289,7 @@ class AbufParser(object):
                     return None
                 rr['Preference'] = struct.unpack(fmt, dat)[0]
                 rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, error)
-            elif rr['Type'] == 'SOA': 
+            elif rr['Type'] == 'SOA':
                 offset_name= cls._do_name(buf, rdata_offset, error)
                 if offset_name == None:
                         e= ("do_rr", rdata_offset, ('_do_name failed'))
@@ -312,7 +311,7 @@ class AbufParser(object):
                     return None
                 rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
                         = struct.unpack(fmt, dat)
-            elif rr['Type'] == 'DS': 
+            elif rr['Type'] == 'DS':
                 digest_size = 0
 
                 fmt = '!HBB'
@@ -325,7 +324,7 @@ class AbufParser(object):
                 rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
                         struct.unpack(fmt, dat)
                 rr['DelegationKey'] = rdata[struct.calcsize(fmt):].encode('hex')
-            elif rr['Type'] == 'DNSKEY': 
+            elif rr['Type'] == 'DNSKEY':
                 fmt = '!HBB'
                 fmtsz = struct.calcsize(fmt)
                 dat= rdata[:fmtsz]

@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 
 import base64
-import logging
-import struct
 
 from .base import Result, ValidationMixin
 from .helpers.abuf import AbufParser
