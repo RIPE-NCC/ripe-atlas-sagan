@@ -319,7 +319,9 @@ class Message(ValidationMixin):
             if answer_type is None:
                 self._handle_malformation(
                     "Answer has no parseable Type: {answer}".format(
-                        answer=answer))
+                        answer=answer
+                    )
+                )
             answer_class = answer_classes.get(answer_type, Answer)
             self.answers.append(answer_class(answer, **kwargs))
 
@@ -327,7 +329,7 @@ class Message(ValidationMixin):
             self.authorities.append(Authority(authority, **kwargs))
 
         for additional in self.raw_data.get("AdditionalSection", []):
-                self.additionals.append(Additional(additional, **kwargs))
+            self.additionals.append(Additional(additional, **kwargs))
 
     def __str__(self):
         return self._string_representation
