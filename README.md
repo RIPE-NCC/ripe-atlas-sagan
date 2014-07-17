@@ -18,6 +18,10 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.2.3
+    * "Treat a missing Type value in a DNS result as a malformation" (Issue #36)
+* 0.2.2
+    * Minor bugfixes
 * 0.2.1
     * Added a `median_rtt` value to traceroute ``Hop`` objects.
     * Smarter and more consistent error handling in traceroute and HTTP
