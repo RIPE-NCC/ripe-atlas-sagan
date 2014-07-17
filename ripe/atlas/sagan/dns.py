@@ -315,7 +315,12 @@ class Message(ValidationMixin):
             self.questions.append(Question(question, **kwargs))
 
         for answer in self.raw_data.get("AnswerSection", []):
-            answer_class = answer_classes.get(answer["Type"], Answer)
+            answer_type = answer.get("Type")
+            if answer_type is None:
+                self._handle_malformation(
+                    "Answer has no parseable Type: {answer}".format(
+                        answer=answer))
+            answer_class = answer_classes.get(answer_type, Answer)
             self.answers.append(answer_class(answer, **kwargs))
 
         for authority in self.raw_data.get("AuthoritySection", []):
