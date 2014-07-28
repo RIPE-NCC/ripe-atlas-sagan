@@ -18,6 +18,8 @@ result, and return to you a useful, native Python object.
 
 ## Changelog
 
+* 0.2.4
+    * Support for `seconds_since_sync` across all measurement types
 * 0.2.3
     * "Treat a missing Type value in a DNS result as a malformation" (Issue #36)
 * 0.2.2
