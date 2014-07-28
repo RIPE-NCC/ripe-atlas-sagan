@@ -16,58 +16,6 @@ parser that's smart enough to figure out the best course of action for each
 result, and return to you a useful, native Python object.
 
 
-## Changelog
-
-* 0.2.4
-    * Support for `seconds_since_sync` across all measurement types
-* 0.2.3
-    * "Treat a missing Type value in a DNS result as a malformation" (Issue #36)
-* 0.2.2
-    * Minor bugfixes
-* 0.2.1
-    * Added a `median_rtt` value to traceroute ``Hop`` objects.
-    * Smarter and more consistent error handling in traceroute and HTTP
-      results.
-    * Added an `error_message` property to all objects that is set to `None`
-      by default.
-* 0.2.0
-    * Totally reworked error and malformation handling.  We now differentiate
-      between a result (or portion thereof) being malformed (and therefore
-      unparsable) and simply containing an error such as a timeout.  Look for
-      an `is_error` property or an `is_malformed` property on every object
-      to check for it, or simply pass `on_malformation=Result.ACTION_FAIL` if
-      you'd prefer things to explode with an exception.  See the documentation
-      for more details
-    * Added lazy-loading features for parsing abuf and qbuf values out of DNS
-      results.
-    * Removed the deprecated properties from `dns.Response`.  You must now
-      access values like `edns0` from `dns.Response.abuf.edns0`.
-    * More edge cases have been found and accommodated.
-* 0.1.15
-    * Added a bunch of abuf parsing features from
-      [b4ldr](https://github.com/b4ldr) with some help from
-      [phicoh](https://github.com/phicoh).
-* 0.1.14
-    * Fixed the deprecation warnings in `DnsResult` to point to the right
-      place.
-* 0.1.13
-    * Better handling of `DNSResult` errors
-    * Rearranged the way abufs were handled in the `DnsResult` class to make
-      way for `qbuf` values as well.  The old method of accessing `header`,
-      `answers`, `questions`, etc is still available via `Response`, but this
-      will go away when we move to 0.2.  Deprecation warnings are in place.
-* 0.1.12
-    * Smarter code for checking whether the target was reached in
-      `TracerouteResults`.
-    * We now handle the `destination_option_size` and `hop_by_hop_option_size`
-      values in `TracerouteResult`.
-    * Extended support for ICMP header info in traceroute `Hop` class by
-      introducing a new `IcmpHeader` class.
-* 0.1.8
-    * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
-      as well as the original `sha256`.
-
-
 ## How to use it
 
 You can parse a result in a few ways.  You can just pass the JSON-encoded
@@ -256,3 +204,55 @@ should need is in there.
 But why *Sagan*?  The RIPE Atlas team decided to name all of its modules after
 explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
+
+
+## Changelog
+
+* 0.2.4
+    * Support for `seconds_since_sync` across all measurement types
+* 0.2.3
+    * "Treat a missing Type value in a DNS result as a malformation" (Issue #36)
+* 0.2.2
+    * Minor bugfixes
+* 0.2.1
+    * Added a `median_rtt` value to traceroute ``Hop`` objects.
+    * Smarter and more consistent error handling in traceroute and HTTP
+      results.
+    * Added an `error_message` property to all objects that is set to `None`
+      by default.
+* 0.2.0
+    * Totally reworked error and malformation handling.  We now differentiate
+      between a result (or portion thereof) being malformed (and therefore
+      unparsable) and simply containing an error such as a timeout.  Look for
+      an `is_error` property or an `is_malformed` property on every object
+      to check for it, or simply pass `on_malformation=Result.ACTION_FAIL` if
+      you'd prefer things to explode with an exception.  See the documentation
+      for more details
+    * Added lazy-loading features for parsing abuf and qbuf values out of DNS
+      results.
+    * Removed the deprecated properties from `dns.Response`.  You must now
+      access values like `edns0` from `dns.Response.abuf.edns0`.
+    * More edge cases have been found and accommodated.
+* 0.1.15
+    * Added a bunch of abuf parsing features from
+      [b4ldr](https://github.com/b4ldr) with some help from
+      [phicoh](https://github.com/phicoh).
+* 0.1.14
+    * Fixed the deprecation warnings in `DnsResult` to point to the right
+      place.
+* 0.1.13
+    * Better handling of `DNSResult` errors
+    * Rearranged the way abufs were handled in the `DnsResult` class to make
+      way for `qbuf` values as well.  The old method of accessing `header`,
+      `answers`, `questions`, etc is still available via `Response`, but this
+      will go away when we move to 0.2.  Deprecation warnings are in place.
+* 0.1.12
+    * Smarter code for checking whether the target was reached in
+      `TracerouteResults`.
+    * We now handle the `destination_option_size` and `hop_by_hop_option_size`
+      values in `TracerouteResult`.
+    * Extended support for ICMP header info in traceroute `Hop` class by
+      introducing a new `IcmpHeader` class.
+* 0.1.8
+    * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
+      as well as the original `sha256`.
