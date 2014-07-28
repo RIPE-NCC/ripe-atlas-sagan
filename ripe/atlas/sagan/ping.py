@@ -55,19 +55,18 @@ class PingResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af                    = self.ensure("af",       int)
-        self.duplicates            = self.ensure("dup",      int)
-        self.rtt_average           = self.ensure("avg",      float)
-        self.rtt_median            = None  # Redefined in self._set_median()
-        self.rtt_max               = self.ensure("max",      float)
-        self.rtt_min               = self.ensure("min",      float)
-        self.packets_sent          = self.ensure("sent",     int)
-        self.packets_received      = self.ensure("rcvd",     int)
-        self.packet_size           = self.ensure("size",     int)
-        self.destination_name      = self.ensure("dst_name", str)
-        self.destination_address   = self.ensure("dst_addr", str)
-        self.seconds_since_sync    = self.ensure("lts",      int)
-        self.step                  = self.ensure("step",     int)
+        self.af                  = self.ensure("af",       int)
+        self.duplicates          = self.ensure("dup",      int)
+        self.rtt_average         = self.ensure("avg",      float)
+        self.rtt_median          = None  # Redefined in self._set_median()
+        self.rtt_max             = self.ensure("max",      float)
+        self.rtt_min             = self.ensure("min",      float)
+        self.packets_sent        = self.ensure("sent",     int)
+        self.packets_received    = self.ensure("rcvd",     int)
+        self.packet_size         = self.ensure("size",     int)
+        self.destination_name    = self.ensure("dst_name", str)
+        self.destination_address = self.ensure("dst_addr", str)
+        self.step                = self.ensure("step",     int)
         self.packets = []
 
         if self.rtt_average < 0:
@@ -77,10 +76,6 @@ class PingResult(Result):
             self.af = self.ensure("pf", int)
 
         self.protocol = self.clean_protocol(self.ensure("proto", str))
-
-        if self.seconds_since_sync is not None:
-            if self.seconds_since_sync < 0:
-                self.seconds_since_sync = None
 
         if 0 < self.firmware < 4460:
             self.destination_address = self.ensure("addr", str)

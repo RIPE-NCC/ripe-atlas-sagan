@@ -327,3 +327,7 @@ def test_http_4610_fail():
     assert(result.responses[0].version is None)
     assert(result.responses[0].is_error is True)
     assert(result.responses[0].error_message == "timeout reading chunk")
+
+def test_http_lts():
+    result = Result.get('{"lts":275,"from":"","msm_id":1003932,"fw":4650,"timestamp":1406558081,"uri":"http:\/\/www.afrinic.net\/","prb_id":902,"result":[{"method":"GET","dst_addr":"2001:42d0:0:200::6","err":"connect: Network is unreachable","af":6}],"type":"http","msm_name":"HTTPGet"}')
+    assert(result.seconds_since_sync == 275)

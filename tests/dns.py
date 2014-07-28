@@ -370,7 +370,7 @@ def test_error_timeout():
         result = Result.get(broken_result, on_error=Result.ACTION_FAIL)
         assert(False)
     except ResultError as e:
-        assert(e.message == "Timeout: 5000")
+        assert(str(e) == "Timeout: 5000")
 
 def test_qbuf():
     result = Result.get('{"from":"208.118.139.24","fw":4610,"group_id":1666151,"msm_id":1666151,"msm_name":"Tdig","prb_id":15112,"resultset":[{"af":4,"dst_addr":"8.8.8.8","proto":"TCP","qbuf":"dakBgAABAAAAAAABBTE1MTEyCjE0MDA2NjU1MjMDd3d3B3R3aXR0ZXIDY29tAAABAAEAACkCAAAAgAAABAADAAA=","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":30121,"NSCOUNT":1,"QDCOUNT":1,"rt":57.764,"size":133},"src_addr":"10.0.5.101","subid":1,"submax":2,"time":1400665523},{"af":4,"dst_addr":"8.8.4.4","proto":"TCP","qbuf":"JTEBgAABAAAAAAABBTE1MTEyCjE0MDA2NjU1MjQDd3d3B3R3aXR0ZXIDY29tAAABAAEAACkCAAAAgAAABAADAAA=","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":9521,"NSCOUNT":1,"QDCOUNT":1,"rt":57.263,"size":133},"src_addr":"10.0.5.101","subid":2,"submax":2,"time":1400665524}],"timestamp":1400665523,"type":"dns"}')
@@ -488,7 +488,7 @@ def test_dnskeyanswer():
     assert(result.responses[0].abuf.answers[0].klass == "IN")
     assert(result.responses[0].abuf.answers[0].rd_length == 136)
 
-# def test_aaaaanswer():
-#     result = Result.get('')
-#     print(type(result.responses[0].abuf.answers[0]))
-#     assert(isinstance(result.responses[0].abuf.answers[0], int))
+def test_dns_lts():
+    result = Result.get('{"lts":161,"from":"46.17.16.18","msm_id":1004041,"timestamp":1406560725,"fw":4650,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":778,"result":{"abuf":"vb2EAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaooA==","rt":36.661,"NSCOUNT":0,"QDCOUNT":1,"ID":48573,"ARCOUNT":0,"ANCOUNT":1,"size":43},"result-rt":36.661,"src_addr":"192.168.1.12","type":"dns","dst_addr":"193.227.234.53"}')
+    assert(result.seconds_since_sync == 161)
+

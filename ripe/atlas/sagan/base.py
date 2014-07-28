@@ -146,21 +146,28 @@ class Result(ValidationMixin):
 
         for key in ("timestamp", "msm_id", "prb_id", "fw", "type"):
             if key not in self.raw_data:
-                raise ResultParseErrorrseError(
-                    "This does not look like a RIPE Atlas "
-                    "measurement: {raw_data}".format(raw_data=self.raw_data))
+                raise ResultParseError(
+                    "This does not look like a RIPE Atlas measurement: {raw_data}".format(
+                        raw_data=self.raw_data
+                    )
+                )
 
-        self.created        = arrow.get(self.raw_data["timestamp"])
-        self.measurement_id = self.ensure("msm_id", int)
-        self.probe_id       = self.ensure("prb_id", int)
-        self.firmware       = self.ensure("fw", int)
-        self.origin         = self.ensure("from", str)
+        self.created            = arrow.get(self.raw_data["timestamp"])
+        self.measurement_id     = self.ensure("msm_id", int)
+        self.probe_id           = self.ensure("prb_id", int)
+        self.firmware           = self.ensure("fw",     int)
+        self.origin             = self.ensure("from",   str)
+        self.seconds_since_sync = self.ensure("lts",    int)
 
         # Handle the weird case where fw=0 and we don't know what to expect
         if self.firmware == 0:
             self._handle_malformation("Unknown firmware: {fw}".format(
                 fw=self.firmware)
             )
+
+        if self.seconds_since_sync is not None:
+            if self.seconds_since_sync < 0:
+                self.seconds_since_sync = None
 
         if "dnserr" in self.raw_data:
             self._handle_error("Error found: {err}".format(

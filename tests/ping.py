@@ -463,3 +463,7 @@ def test_ping_buggy():
     assert(result.packets[0].source_address == "192.168.1.229")
     assert(result.packets[1].source_address == "192.168.1.229")
     assert(result.packets[2].source_address == "192.168.1.229")
+
+def test_ping_lts():
+    result = Result.get('{"af":4,"prb_id":270,"result":[{"rtt":70.265},{"rtt":54.584,"ttl":51},{"rtt":52.875}],"ttl":51,"avg":59.2413333333,"size":12,"from":"188.193.157.75","proto":"ICMP","timestamp":1406561624,"dup":0,"type":"ping","sent":3,"msm_id":1000192,"fw":4650,"max":70.265,"step":360,"src_addr":"192.168.178.21","rcvd":3,"msm_name":"Ping","lts":76,"dst_name":"hsi.cablecom.ch","min":52.875,"group_id":1000192,"dst_addr":"62.2.16.24"}')
+    assert(result.seconds_since_sync == 76)
