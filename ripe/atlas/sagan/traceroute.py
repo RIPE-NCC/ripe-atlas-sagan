@@ -62,7 +62,7 @@ class Packet(ValidationMixin):
 
         self.icmp_header = None
         if icmp_header:
-            self.icmp_header = IcmpHeader(icmp_header)
+            self.icmp_header = IcmpHeader(icmp_header, **kwargs)
 
     def __str__(self):
         return self.origin
@@ -85,7 +85,7 @@ class Hop(ValidationMixin):
         self.packets = []
         if "result" in self.raw_data:
             for packet in self.raw_data["result"]:
-                self.packets.append(Packet(packet))
+                self.packets.append(Packet(packet, **kwargs))
 
         self.median_rtt = None
         if self.packets:
@@ -119,7 +119,7 @@ class TracerouteResult(Result):
         self.hops       = []
         self.total_hops = 0
         self.last_rtt   = None
-        self._parse_hops()  # Sets hops, last_rtt, and total_hops
+        self._parse_hops(**kwargs)  # Sets hops, last_rtt, and total_hops
 
         self._target_responded = None  # Used by target_responded() below
 
@@ -152,7 +152,7 @@ class TracerouteResult(Result):
             r.append([packet.origin for packet in hop.packets])
         return r
 
-    def _parse_hops(self):
+    def _parse_hops(self, **kwargs):
 
         try:
             hops = self.raw_data["result"]
@@ -163,7 +163,7 @@ class TracerouteResult(Result):
 
         for hop in hops:
 
-            hop = Hop(hop)
+            hop = Hop(hop, **kwargs)
 
             if hop.median_rtt:
                 self.last_rtt = hop.median_rtt

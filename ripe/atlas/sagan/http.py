@@ -2,9 +2,9 @@ from .base import Result, ValidationMixin
 
 class Response(ValidationMixin):
 
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, *args, **kwargs)
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data            = data
         self.af                  = self.ensure("af",       int)
@@ -63,7 +63,7 @@ class HttpResult(Result):
             # All modern results
 
             for response in self.raw_data["result"]:
-                self.responses.append(Response(response))
+                self.responses.append(Response(response, **kwargs))
 
             if self.responses:
                 method = self.raw_data["result"][0].get(

@@ -208,6 +208,9 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.2.5
+    * Fixed a bug in how the `on_error` and `on_malformation` preferences
+      weren't being passed down into the subcomponents of the results.
 * 0.2.4
     * Support for `seconds_since_sync` across all measurement types
 * 0.2.3

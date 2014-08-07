@@ -93,17 +93,22 @@ class PingResult(Result):
         if self.rtt_average:
             self.rtt_average = round(self.rtt_average, 3)
 
-        self._parse_packets()
+        self._parse_packets(**kwargs)
         self._set_median()
 
-    def _parse_packets(self):
+    def _parse_packets(self, **kwargs):
 
         source_address = self.raw_data.get(
             "src_addr", self.raw_data.get("srcaddr")
         )
         for packet in self.ensure("result", list, []):
             self.packets.append(
-                Packet(packet, self.ensure("ttl", int), source_address)
+                Packet(
+                    packet,
+                    self.ensure("ttl", int),
+                    source_address,
+                    **kwargs
+                )
             )
 
     def _set_median(self):

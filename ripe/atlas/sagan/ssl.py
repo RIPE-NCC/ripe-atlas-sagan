@@ -22,7 +22,9 @@ class Certificate(ValidationMixin):
         "(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\+|\-)(\d\d)(\d\d)"
     )
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
+
+        ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data    = data
         self.subject_cn  = None
@@ -179,7 +181,7 @@ class SslResult(Result):
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
             for certificate in self.raw_data["cert"]:
-                self.certificates.append(Certificate(certificate))
+                self.certificates.append(Certificate(certificate, **kwargs))
 
             if len(self.raw_data["cert"]) == 1:
                 certificate = self.certificates[0]
