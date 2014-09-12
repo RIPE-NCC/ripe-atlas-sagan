@@ -419,28 +419,8 @@ response_time          float     Time, in seconds until response was received
 time_to_connect        float     Time, in seconds until the connection was established
 certificates           list      A list of :ref:`sslcert-certificate` objects
 is_signed              bool      Set to ``True`` if the certificate is self-signed
+checksum_chain         str       A list of all checksums for all certificates in this result, joined with the arbitrary string ``::``.  This can come in handy when you're trying to compare checksums of multiple results.
 =====================  ========  ===================================================================================
-
-.. _sslcert-methods:
-
-Methods
--------
-
-
-.. _sslcert-methods-get_checksum_chain:
-
-get_checksum_chain()
-....................
-
-This method can come in handy when you're trying to compare checksums of
-multiple results.  It returns a list of all checksums for all certificates
-in this result, joined with the arbitrary string ``::``.
-
-Example:::
-
-    my_result = SslResult('<JSON data>')
-    print(my_result.get_checksum_chan())
-
 
 .. _sslcert-certificate:
 

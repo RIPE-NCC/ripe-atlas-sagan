@@ -188,7 +188,8 @@ class SslResult(Result):
                 if certificate.subject_cn == certificate.issuer_cn:
                     self.is_self_signed = True
 
-    def get_checksum_chain(self):
+    @property
+    def checksum_chain(self):
         """
         Returns a list of checksums joined with "::".
         """
