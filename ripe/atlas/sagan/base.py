@@ -170,14 +170,10 @@ class Result(ValidationMixin):
                 self.seconds_since_sync = None
 
         if "dnserr" in self.raw_data:
-            self._handle_error("Error found: {err}".format(
-                err=self.raw_data["dnserr"]
-            ))
+            self._handle_error(self.raw_data["dnserr"])
 
         if "err" in self.raw_data:
-            self._handle_error("Error found: {err}".format(
-                err=self.raw_data["err"]
-            ))
+            self._handle_error(self.raw_data["err"])
 
     def __repr__(self):
         return "Measurement #{measurement}, Probe #{probe}".format(
