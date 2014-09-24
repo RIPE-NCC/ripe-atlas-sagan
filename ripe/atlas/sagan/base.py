@@ -174,6 +174,11 @@ class Result(ValidationMixin):
                 err=self.raw_data["dnserr"]
             ))
 
+        if "err" in self.raw_data:
+            self._handle_error("Error found: {err}".format(
+                err=self.raw_data["err"]
+            ))
+
     def __repr__(self):
         return "Measurement #{measurement}, Probe #{probe}".format(
             measurement=self.measurement_id,
