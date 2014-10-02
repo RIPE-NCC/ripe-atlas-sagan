@@ -208,12 +208,13 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.2.7
+    * Made abuf more robust in dealing with truncation.
 * 0.2.6
     * Replaced `SslResult.get_checksum_chain()` with the
       `SslResult.checksum_chain` property.
     * Added support for catching results with an `err` property as an actual
       error.
-    * Made abuf more robust in dealing with truncation.
 * 0.2.5
     * Fixed a bug in how the `on_error` and `on_malformation` preferences
       weren't being passed down into the subcomponents of the results.
