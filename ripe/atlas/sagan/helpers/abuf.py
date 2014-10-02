@@ -39,21 +39,39 @@ class AbufParser(object):
         if do_header:
             dnsres['HEADER'] = hdr
         for i in range(hdr['QDCOUNT']):
-            offset, qry = cls._do_query(buf, offset, error)
+            res = cls._do_query(buf, offset, error)
+            if res is None:
+                e = ('additional', offset, ('_do_query failed, additional record %d' % i))
+                error.append(e)
+                dnsres['ERROR'] = error
+                return dnsres
+            offset, qry = res
             if do_question:
                 if i == 0:
                     dnsres['QuestionSection'] = [qry]
                 else:
                     dnsres['QuestionSection'].append(qry)
         for i in range(hdr['ANCOUNT']):
-            offset, rr = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error)
+            if res is None:
+                e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
+                error.append(e)
+                dnsres['ERROR'] = error
+                return dnsres
+            offset, rr = res
             if do_answer:
                 if i == 0:
                     dnsres['AnswerSection'] = [rr]
                 else:
                     dnsres['AnswerSection'].append(rr)
         for i in range(hdr['NSCOUNT']):
-            offset, rr = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error)
+            if res is None:
+                e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
+                error.append(e)
+                dnsres['ERROR'] = error
+                return dnsres
+            offset, rr = res
             if do_authority:
                 if i == 0:
                     dnsres['AuthoritySection'] = [rr]
@@ -65,7 +83,6 @@ class AbufParser(object):
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
                 dnsres['ERROR'] = error
-                #result['decodedabufs_with_ERROR'] += 1
                 return dnsres
             offset, rr = res
             if do_options:
