@@ -213,6 +213,7 @@ decades reaching out to the public about the wonders of the cosmos?
       `SslResult.checksum_chain` property.
     * Added support for catching results with an `err` property as an actual
       error.
+    * Made abuf more robust in dealing with truncation.
 * 0.2.5
     * Fixed a bug in how the `on_error` and `on_malformation` preferences
       weren't being passed down into the subcomponents of the results.
@@ -264,3 +265,4 @@ decades reaching out to the public about the wonders of the cosmos?
 * 0.1.8
     * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
       as well as the original `sha256`.
+
