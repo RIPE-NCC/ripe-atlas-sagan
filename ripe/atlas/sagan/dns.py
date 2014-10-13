@@ -400,7 +400,11 @@ class Response(ValidationMixin):
         except KeyError:
             buf_string = self.ensure(kind, str)
         if buf_string:
-            setattr(self, private_name, Message(buf_string, on_error=self._on_error, on_malformation=self._on_malformation))
+            setattr(self, private_name, Message(
+                buf_string,
+                on_error=self._on_error,
+                on_malformation=self._on_malformation
+            ))
         return getattr(self, private_name)
 
 
