@@ -492,3 +492,11 @@ def test_dns_lts():
     result = Result.get('{"lts":161,"from":"46.17.16.18","msm_id":1004041,"timestamp":1406560725,"fw":4650,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":778,"result":{"abuf":"vb2EAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaooA==","rt":36.661,"NSCOUNT":0,"QDCOUNT":1,"ID":48573,"ARCOUNT":0,"ANCOUNT":1,"size":43},"result-rt":36.661,"src_addr":"192.168.1.12","type":"dns","dst_addr":"193.227.234.53"}')
     assert(result.seconds_since_sync == 161)
 
+def test_txt_with_class_in():
+    result = Result.get('{"msm_id": 10209, "fw": 4660, "timestamp": 1413417973, "prb_id": 4232, "result": {"abuf": "nfCAgAABAAEAAAAAB3ZlcnNpb24EYmluZAAAEAADwAwAEAABAAAfMAAdHFBvd2VyRE5TIFJlY3Vyc29yIDMuNS4yICRJZCQ=", "rt": 298.828, "size": 71, "ARCOUNT": 0, "NSCOUNT": 0, "QDCOUNT": 1, "ANCOUNT": 1, "answers": [{"TYPE": "TXT", "NAME": "version.bind", "RDATA": "PowerDNS Recursor 3.5.2 $Id$"}], "ID": 40432}, "src_addr": "10.0.3.6", "msm_name": "Tdig", "lts": 71, "from": "89.179.73.12", "proto": "UDP", "af": 4, "type": "dns", "dst_addr": "198.41.0.4"}')
+    assert(result.responses[0].abuf.answers[0].name == "version.bind.")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 29)
+    assert(result.responses[0].abuf.answers[0].type == "TXT")
+    assert(result.responses[0].abuf.answers[0].ttl == 7984)
+    assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
