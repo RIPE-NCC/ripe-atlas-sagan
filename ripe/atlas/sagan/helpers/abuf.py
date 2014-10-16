@@ -353,8 +353,8 @@ class AbufParser(object):
                         struct.unpack(fmt, dat)
                 rr['Key'] = ''.join(base64.encodestring(
                     rdata[struct.calcsize(fmt):]).split())
-        if rr['Class'] == "CH":
-            if rr['Type'] == 'TXT':
+	if rr['Type'] == 'TXT' and \
+		(rr['Class'] == "IN" or rr['Class'] == "CH"):
                 fmt    = "!B"
                 reqlen = struct.calcsize(fmt)
                 strng    = rdata[:reqlen]
