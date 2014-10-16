@@ -208,6 +208,11 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.2.8
+    * Fixed a bug where DNS `TXT` results with class `IN` were missing a
+      `.data` value.
+    * Fixed a problem in the SSL unit tests where `\n` was being
+      misinterpreted.
 * 0.2.7
     * Made abuf more robust in dealing with truncation.
 * 0.2.6
