@@ -13,6 +13,6 @@ $ nosetests __init__.py
 
 ```bash
 $ cd /path/to/this/directory
-$ nosetests traceroute
+$ nosetests traceroute.py
 ```
 
