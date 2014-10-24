@@ -35,7 +35,7 @@ class AbufParser(object):
 
         dnsres = {}
         offset = 0
-        offset, hdr = cls._parse_header(buf, offset)
+        offset, hdr = cls._parse_header(buf, offset, error)
         if do_header:
             dnsres['HEADER'] = hdr
         for i in range(hdr['QDCOUNT']):
@@ -135,7 +135,7 @@ class AbufParser(object):
                 32769: 'DLV'}.get(rdatatype,rdatatype)
 
     @classmethod
-    def _parse_header(cls, buf, offset):
+    def _parse_header(cls, buf, offset, error):
 
         fmt = "!HHHHHH"
         reqlen = struct.calcsize(fmt)
