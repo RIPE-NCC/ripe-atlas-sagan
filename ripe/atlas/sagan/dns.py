@@ -266,27 +266,19 @@ class Additional(ValidationMixin):
 
 class Message(ValidationMixin):
 
-    def __init__(self, message, parse_buf=True, **kwargs):
+    def __init__(self, message, response_data, parse_buf=True, **kwargs):
 
         ValidationMixin.__init__(self, **kwargs)
 
         self._string_representation = message
+        self.raw_data = {}
 
         if parse_buf:
-            try:
-                self.raw_data = AbufParser.parse(base64.b64decode(message))
-            except Exception as e:
-                self.raw_data = {}
-                self._handle_malformation(
-                    "{exception}: Unable to parse buffer: {buffer}".format(
-                        exception=e,
-                        buffer=self._string_representation
-                    )
-                )
-            else:
-                if "ERROR" in self.raw_data:
-                    self._handle_error(self.raw_data["ERROR"])
+            self._parse_buf(message)
+        else:
+            self._backfill_raw_data_from_result(response_data)
 
+        print(self.raw_data)
         self.header = None
         if "HEADER" in self.raw_data:
             self.header = Header(self.raw_data["HEADER"], **kwargs)
@@ -338,11 +330,57 @@ class Message(ValidationMixin):
     def __repr__(self):
         return str(self)
 
+    def _parse_buf(self, message):
+
+        try:
+            self.raw_data = AbufParser.parse(base64.b64decode(message))
+        except Exception as e:
+            self.raw_data = {}
+            self._handle_malformation(
+                "{exception}: Unable to parse buffer: {buffer}".format(
+                    exception=e,
+                    buffer=self._string_representation
+                )
+            )
+        else:
+            if "ERROR" in self.raw_data:
+                self._handle_error(self.raw_data["ERROR"])
+
+    def _backfill_raw_data_from_result(self, response_data):
+
+        # Header
+        self.raw_data["Header"] = {}
+        for key in ("NSCOUNT", "QDCOUNT", "ID", "ARCOUNT", "ANCOUNT"):
+            if key in response_data:
+                self.raw_data["Header"][key] = response_data[key]
+
+        # Answers
+        if "answers" in response_data and response_data["answers"]:
+            self.raw_data["AnswerSection"] = []
+            # The names used in the result don't align to those used in the abuf parser
+            name_map = {
+                "TTL":      "TTL",
+                "TYPE":     "Type",
+                "NAME":     "Name",
+                "RDATA":    "Data",
+                "MNAME":    "MasterServerName",
+                "RNAME":    "MaintainerName",
+                "SERIAL":   "Serial",
+                "RDLENGTH": "RDlength",
+            }
+            for answer in response_data["answers"]:
+                temporary = {}
+                for k, v in name_map.items():
+                    if k in answer:
+                        temporary[v] = answer[k]
+                if temporary:
+                    self.raw_data["AnswerSection"].append(temporary)
+
 
 class Response(ValidationMixin):
 
     def __init__(self, data, af=None, destination=None, source=None,
-                 protocol=None, part_of_set=True, parse_buf=False, **kwargs):
+                 protocol=None, part_of_set=True, parse_buf=True, **kwargs):
 
         ValidationMixin.__init__(self, **kwargs)
 
@@ -405,7 +443,7 @@ class Response(ValidationMixin):
             setattr(self, private_name, Message(
                 buf_string,
                 self.raw_data,
-                parse=self._parse_buf,
+                parse_buf=self._parse_buf,
                 on_error=self._on_error,
                 on_malformation=self._on_malformation
             ))

@@ -501,3 +501,11 @@ def test_txt_with_class_in():
     assert(result.responses[0].abuf.answers[0].ttl == 7984)
     assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
 
+def test_unparsed_abuf():
+    result = Result.get('{"msm_id": 10209, "fw": 4660, "timestamp": 1413417973, "prb_id": 4232, "result": {"abuf": "nfCAgAABAAEAAAAAB3ZlcnNpb24EYmluZAAAEAADwAwAEAABAAAfMAAdHFBvd2VyRE5TIFJlY3Vyc29yIDMuNS4yICRJZCQ=", "rt": 298.828, "size": 71, "ARCOUNT": 0, "NSCOUNT": 0, "QDCOUNT": 1, "ANCOUNT": 1, "answers": [{"TYPE": "TXT", "NAME": "version.bind", "RDATA": "PowerDNS Recursor 3.5.2 $Id$"}], "ID": 40432}, "src_addr": "10.0.3.6", "msm_name": "Tdig", "lts": 71, "from": "89.179.73.12", "proto": "UDP", "af": 4, "type": "dns", "dst_addr": "198.41.0.4"}', parse_buf=False)
+    assert(result.responses[0].abuf.answers[0].name == "version.bind")
+    assert(result.responses[0].abuf.answers[0].klass is None)
+    assert(result.responses[0].abuf.answers[0].rd_length is None)
+    assert(result.responses[0].abuf.answers[0].type == "TXT")
+    assert(result.responses[0].abuf.answers[0].ttl is None)
+    assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
