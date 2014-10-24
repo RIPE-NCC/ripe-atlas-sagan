@@ -208,7 +208,9 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
-* 0.2.9
+* 0.3
+    * Added support for making use of some of the pre-calculated values in DNS
+      measurements so you don't have to parse the abuf if you don't need it.
     * Fixed a bug in the abuf parser where a variable was being referenced by
       never defined.
     * Cleaned up some of the abuf parser to better conform to pep8.

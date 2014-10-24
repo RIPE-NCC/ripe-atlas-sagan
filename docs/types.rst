@@ -216,8 +216,8 @@ response_id            int       The sequence number of this result within a gro
 Message
 -------
 
-Responses can contain either an ``abuf`` or a ``qbuf`` which are both ``Mesage``
-objects.  If you want the string representation, simply case the object as a
+Responses can contain either an ``abuf`` or a ``qbuf`` which are both ``Message``
+objects.  If you want the string representation, simply cast the object as a
 string with ``str()``.
 
 =====================  ========  ===================================================================================
@@ -232,11 +232,51 @@ authorities            list      A list of :ref:`dns-authority` objects
 additionals            list      A list of :ref:`dns-additional` objects, if any
 =====================  ========  ===================================================================================
 
+.. _dns-message-precalculatedvalues:
+
+A note on pre-calculated values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, when you pass a result into Sagan, it will attempt to parse the
+``abuf`` and ``qbuf`` strings (if any) into ``Message`` objects.  However, some
+of the values in that abuf may have already been pre-calculated and stored
+alongside the other attributes in the result.  Many ``Header`` values for
+example, can be found in the raw result (outside of the abuf string), so parsing
+the abuf for these values is redundant and potentially unnecessary if these
+values are all you need.
+
+For this case, Sagan supports passing ``parse_buf=False`` to the ``DnsResult``
+class.  If you opt for this method, the abuf will not be parsed, and any values
+not immediately available in the result will return ``None``.  For example:::
+
+
+    from ripe.atlas.sagan import DnsResult
+    my_result = DnsResult(
+        '<some result data including name, type, and rdata, but not ttl or class>',
+        parse_buf=False
+    )
+    result.responses[0].abuf.answers[0].name       # "version.bind"
+    result.responses[0].abuf.answers[0].klass      # None
+    result.responses[0].abuf.answers[0].rd_length  # None
+    result.responses[0].abuf.answers[0].type       # "TXT"
+    result.responses[0].abuf.answers[0].ttl        # None
+    result.responses[0].abuf.answers[0].data       # "Some RDATA value"
+
+Note also that ``Result.get()`` accepts ``parse_buf=`` as well:::
+
+    from ripe.atlas.sagan import Result
+    my_result = Result.get(
+        '<some result data including name, type, and rdata, but not ttl or class>',
+        parse_buf=False
+    )
+    result.responses[0].abuf.answers[0].name  # "version.bind"
+    ...
+
 
 .. _dns-header:
 
 Header
-------
+~~~~~~
 
 All of these properties conform to `RFC 1035`_, so we won't go into detail about
 them here.
@@ -266,7 +306,7 @@ id                     int
 .. _dns-question:
 
 Question
---------
+~~~~~~~~
 
 The question section of the response.
 
@@ -288,7 +328,7 @@ name                   str
 .. _dns-answer:
 
 Answer
-------
+~~~~~~
 
 The answer section of the response.
 
@@ -313,7 +353,7 @@ rd_length              int
 .. _dns-authority:
 
 Authority
----------
+~~~~~~~~~
 
 The authority section of the response.
 
@@ -338,7 +378,7 @@ rd_length              int
 .. _dns-additional:
 
 Additional
-----------
+~~~~~~~~~~
 
 The optional additional section of the response.
 
@@ -363,7 +403,7 @@ rd_length              int
 .. _dns-edns0:
 
 EDNS0
------
+~~~~~
 
 The optional EDNS0 section of the response.
 
@@ -384,7 +424,7 @@ options                list      A list of :ref:`dns-edns0-option` objects
 .. _dns-edns0-option:
 
 Option
-------
+......
 
 =====================  ========  ===================================================================================
 Property               Type      Explanation
