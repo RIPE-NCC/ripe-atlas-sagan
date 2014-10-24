@@ -499,6 +499,5 @@ def test_txt_with_class_in():
     assert(result.responses[0].abuf.answers[0].rd_length == 29)
     assert(result.responses[0].abuf.answers[0].type == "TXT")
     assert(result.responses[0].abuf.answers[0].ttl == 7984)
-    print(result.responses[0].abuf.raw_data)
     assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
 
