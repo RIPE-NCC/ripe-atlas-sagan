@@ -208,6 +208,10 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.2.9
+    * Fixed a bug in the abuf parser where a variable was being referenced by
+      never defined.
+    * Cleaned up some of the abuf parser to better conform to pep8.
 * 0.2.8
     * Fixed a bug where DNS `TXT` results with class `IN` were missing a
       `.data` value.
