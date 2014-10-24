@@ -141,7 +141,7 @@ class AbufParser(object):
         reqlen = struct.calcsize(fmt)
         strng = buf[offset:offset + reqlen]
         if len(strng) != reqlen:
-            e= ("_parse_header", offset, ('offset out of range: buf size = %d') % len(buf))
+            e= ("_parse_header", offset, 'offset out of range: buf size = %d' % len(buf))
             error.append(e)
             return None
         res = struct.unpack(fmt, strng)
@@ -190,7 +190,7 @@ class AbufParser(object):
         reqlen        = struct.calcsize(fmt)
         strng         = buf[offset:offset + reqlen]
         if len(strng) != reqlen:
-            e= ("_do_query", offset, ('offset out of range: buf size = %d') % len(buf))
+            e= ("_do_query", offset, 'offset out of range: buf size = %d' % len(buf))
             error.append(e)
             return None
         res           = struct.unpack(fmt, strng)
@@ -214,7 +214,7 @@ class AbufParser(object):
         reqlen         = struct.calcsize(fmt)
         dat            = buf[offset:offset + reqlen]
         if len(dat) != reqlen:
-            e= ("_do_rr", offset, ('offset out of range: buf size = %d') % len(buf))
+            e= ("_do_rr", offset, 'offset out of range: buf size = %d' % len(buf))
             error.append(e)
             return None
         res            = struct.unpack(fmt, dat)
@@ -247,7 +247,7 @@ class AbufParser(object):
                 reqlen = struct.calcsize(fmt)
                 dat    = rdata[o:o + reqlen]
                 if len(dat) != reqlen:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 res    = struct.unpack(fmt, dat)
@@ -277,7 +277,7 @@ class AbufParser(object):
                 fmt           = "!BBBB"
                 reqlen        = struct.calcsize(fmt)
                 if reqlen > len(rdata):
-                    e= ("_do_rr", rdata_offset, ('rdata too small: size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'rdata too small: size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Address'] = '.'.join(str(byte) for byte in struct.unpack(fmt, rdata))
@@ -285,7 +285,7 @@ class AbufParser(object):
                 fmt           = "!HHHHHHHH"
                 reqlen        = struct.calcsize(fmt)
                 if reqlen > len(rdata):
-                    e= ("_do_rr", rdata_offset, ('rdata too small: size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'rdata too small: size = %d' % len(rdata))
                     error.append(e)
                     return None
                 addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
@@ -301,21 +301,21 @@ class AbufParser(object):
                 fmtsz = struct.calcsize(fmt)
                 dat= rdata[:fmtsz]
                 if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Preference'] = struct.unpack(fmt, dat)[0]
                 rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, error)
             elif rr['Type'] == 'SOA':
                 offset_name= cls._do_name(buf, rdata_offset, error)
-                if offset_name == None:
-                        e= ("do_rr", rdata_offset, ('_do_name failed'))
+                if offset_name is None:
+                        e= ("do_rr", rdata_offset, '_do_name failed')
                         error.append(e)
                         return None
                 rr_offset, rr['MasterServerName'] = offset_name
                 offset_name = cls._do_name(buf, rr_offset, error)
-                if offset_name == None:
-                        e= ("do_rr", rr_offset, ('_do_name failed'))
+                if offset_name is None:
+                        e = ("do_rr", rr_offset, '_do_name failed')
                         error.append(e)
                         return None
                 rr_offset, rr['MaintainerName'] = offset_name
@@ -323,19 +323,18 @@ class AbufParser(object):
                 fmtsz = struct.calcsize(fmt)
                 dat= buf[rr_offset:rr_offset + fmtsz]
                 if len(dat) != fmtsz:
-                    e= ("_do_rr", rr_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rr_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
                         = struct.unpack(fmt, dat)
             elif rr['Type'] == 'DS':
-                digest_size = 0
 
                 fmt = '!HBB'
                 fmtsz = struct.calcsize(fmt)
                 dat= rdata[:fmtsz]
                 if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
@@ -346,28 +345,28 @@ class AbufParser(object):
                 fmtsz = struct.calcsize(fmt)
                 dat= rdata[:fmtsz]
                 if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
                         struct.unpack(fmt, dat)
                 rr['Key'] = ''.join(base64.encodestring(
                     rdata[struct.calcsize(fmt):]).split())
-	if rr['Type'] == 'TXT' and \
-		(rr['Class'] == "IN" or rr['Class'] == "CH"):
+        if rr['Type'] == 'TXT':
+            if rr['Class'] == "IN" or rr['Class'] == "CH":
                 fmt    = "!B"
                 reqlen = struct.calcsize(fmt)
                 strng    = rdata[:reqlen]
                 if len(strng) != reqlen:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 res    = struct.unpack(fmt, strng)
                 llen   = res[0]
                 o= reqlen
-                strng= rdata[o:o+llen]
+                strng = rdata[o:o+llen]
                 if len(strng) < llen:
-                    e= ("_do_rr", rdata_offset, ('offset out of range: rdata size = %d') % len(rdata))
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
                 rr['Data'] = strng
@@ -401,13 +400,13 @@ class AbufParser(object):
                 reqlen  = struct.calcsize(fmt)
                 strng   = buf[offset:offset + reqlen]
                 if len(strng) != reqlen:
-                    e= ("_do_name", offset, ('offset out of range: buf size = %d') % len(buf))
+                    e = ("_do_name", offset, 'offset out of range: buf size = %d' % len(buf))
                     error.append(e)
                     return None
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
                 n= cls._do_name(buf, poffset, error)
-                if n == None:
+                if n is None:
                     e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
                     error.append(e)
                     return None
