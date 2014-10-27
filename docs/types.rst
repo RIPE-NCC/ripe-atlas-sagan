@@ -247,7 +247,7 @@ values are all you need.
 
 For this case, Sagan supports passing ``parse_buf=False`` to the ``DnsResult``
 class.  If you opt for this method, the abuf will not be parsed, and any values
-not immediately available in the result will return ``None``.  For example:::
+not immediately available in the result will return ``None``.  For example::
 
 
     from ripe.atlas.sagan import DnsResult
@@ -262,7 +262,7 @@ not immediately available in the result will return ``None``.  For example:::
     result.responses[0].abuf.answers[0].ttl        # None
     result.responses[0].abuf.answers[0].data       # "Some RDATA value"
 
-Note also that ``Result.get()`` accepts ``parse_buf=`` as well:::
+Note also that ``Result.get()`` accepts ``parse_buf=`` as well::
 
     from ripe.atlas.sagan import Result
     my_result = Result.get(

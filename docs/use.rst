@@ -25,7 +25,7 @@ Basics
 ------
 
 To that end, the interface is pretty simple.  If you have a ping measurement
-result, then use the PingResult class to make use of the data:::
+result, then use the PingResult class to make use of the data::
 
     from ripe.atlas.sagan import PingResult
 
@@ -50,7 +50,7 @@ Plain Text Not Required
 It should be noted that while all of the examples here use a plain text string
 for our results, Sagan doesn't force you to pass in a string.  It's just as
 happy with a Python dict, the result of already running your result string
-through ``json.loads()``:::
+through ``json.loads()``::
 
     import json
     from ripe.atlas.sagan import PingResult
@@ -72,7 +72,7 @@ Agnostic Parsing
 
 There may be a case where you have code that's just expected to parse a result
 string, without knowing ahead of time what type of result it is.  For this we
-make use of the parent ``Result`` class' ``get()`` method:::
+make use of the parent ``Result`` class' ``get()`` method::
 
     from ripe.atlas.sagan import PingResult
 
@@ -104,7 +104,7 @@ inconsistencies gracefully.  You can decide just how gracefully however.
 Say for example you've got a result that looks alright, but the ``abuf`` value
 is damaged in some way rendering it unreadable.  You'll find that while the
 ``DnsResult`` object will not have a ``is_malformed=False``, the portion that is
-unreadable will be set to ``True``:::
+unreadable will be set to ``True``::
 
     from ripe.atlas.sagan import DnsResult
     my_result = DnsResult('your JSON blob')
@@ -115,7 +115,7 @@ unreadable will be set to ``True``:::
     my_result.responses[1].abuf.is_malformed  # False
 
 You can control what you'd like Sagan to do in these cases by setting
-``on_malformation=`` when parsing:::
+``on_malformation=`` when parsing::
 
     from ripe.atlas.sagan import DnsResult
 
@@ -178,7 +178,7 @@ and for each one, apply the parser to get the value you want.
 Say for example you want to get the ``checksum`` value for each result from
 measurement `#1012449`_.  To do this, we'll fetch the latest results from each
 probe via the ``measurement-latest`` API, and parse each one to get the
-checksum values:::
+checksum values::
 
     import requests
     from ripe.atlas.sagan import SslResult

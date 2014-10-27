@@ -44,7 +44,7 @@ aforementioned requirements.  Using pip is the recommended method.
 Using pip
 ---------
 
-The quickest and easiest way to install Sagan is to use ``pip``:::
+The quickest and easiest way to install Sagan is to use ``pip``::
 
     $ pip install ripe.atlas.sagan
 
@@ -55,7 +55,7 @@ From GitHub
 -----------
 
 If you're feeling a little more daring and want to use whatever is on GitHub,
-you can have pip install right from there:::
+you can have pip install right from there::
 
     $ pip install git+https://github.com/RIPE-NCC/ripe.atlas.sagan.git
 
@@ -80,6 +80,6 @@ Troubleshooting
 Some setups (like MacOS) have trouble with building the dependencies required
 for reading SSL certificates.  If you don't care about SSL stuff and only want
 to use sagan to say, parse traceroute or DNS results, then you can tell the
-installer to skip building ``pyOpenSSL`` by doing the following:::
+installer to skip building ``pyOpenSSL`` by doing the following::
 
      $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
