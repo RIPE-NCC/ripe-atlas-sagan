@@ -278,7 +278,6 @@ class Message(ValidationMixin):
         else:
             self._backfill_raw_data_from_result(response_data)
 
-        print(self.raw_data)
         self.header = None
         if "HEADER" in self.raw_data:
             self.header = Header(self.raw_data["HEADER"], **kwargs)
