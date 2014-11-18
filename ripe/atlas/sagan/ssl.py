@@ -52,16 +52,16 @@ class Certificate(ValidationMixin):
 
         if x509 and subject and issuer:
 
-            self.subject_cn  = subject.get("CN")
-            self.subject_o   = subject.get("O")
-            self.subject_c   = subject.get("C")
-            self.issuer_cn   = issuer.get("CN")
-            self.issuer_o    = issuer.get("O")
-            self.issuer_c    = issuer.get("C")
+            self.subject_cn  = self._string_from_dict_or_none(subject, b"CN")
+            self.subject_o   = self._string_from_dict_or_none(subject, b"O")
+            self.subject_c   = self._string_from_dict_or_none(subject, b"C")
+            self.issuer_cn   = self._string_from_dict_or_none(issuer, b"CN")
+            self.issuer_o    = self._string_from_dict_or_none(issuer, b"O")
+            self.issuer_c    = self._string_from_dict_or_none(issuer, b"C")
 
-            self.checksum_md5    = x509.digest("md5")
-            self.checksum_sha1   = x509.digest("sha1")
-            self.checksum_sha256 = x509.digest("sha256")
+            self.checksum_md5    = x509.digest("md5").decode()
+            self.checksum_sha1   = x509.digest("sha1").decode()
+            self.checksum_sha256 = x509.digest("sha256").decode()
 
             self.has_expired = bool(x509.has_expired())
 
@@ -109,7 +109,7 @@ class Certificate(ValidationMixin):
 
         try:
             self.valid_from = pytz.UTC.localize(datetime.strptime(
-                valid_from,
+                valid_from.decode(),
                 self.TIME_FORMAT
             ))
         except ValueError:
@@ -117,7 +117,7 @@ class Certificate(ValidationMixin):
 
         try:
             self.valid_until = pytz.UTC.localize(datetime.strptime(
-                valid_until,
+                valid_until.decode(),
                 self.TIME_FORMAT
             ))
         except ValueError:
@@ -153,6 +153,15 @@ class Certificate(ValidationMixin):
         if match.group(7) == "-":
             return r - delta
         return r + delta
+
+    @staticmethod
+    def _string_from_dict_or_none(dictionary, key):
+        """
+        Created to make nice with the Python3 problem.
+        """
+        if key not in dictionary:
+            return None
+        return dictionary[key].decode()
 
 
 class SslResult(Result):
