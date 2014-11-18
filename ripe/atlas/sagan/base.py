@@ -6,7 +6,7 @@ try:
     import ujson as json
 except ImportError:
     logging.warning(
-        "Use of the default json module is discouraged.  Instead, consider"
+        "Use of the default json module is discouraged.  Instead, consider "
         "using ujson, a much faster parser."
     )
     import json
