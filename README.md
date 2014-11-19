@@ -208,6 +208,12 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.4
+    * Added better Python3 support.  Tests all pass now for ping, traceroute,
+      ssl, and http measurements.
+    * Modified traceroute results to make use of `destination_ip_responded` and
+      `last_hop_responded`, deprecating `target_responded`.  See the docs for
+      details.
 * 0.3
     * Added support for making use of some of the pre-calculated values in DNS
       measurements so you don't have to parse the abuf if you don't need it.
