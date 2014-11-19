@@ -87,24 +87,25 @@ Traceroute
 Probably the largest result type, ``traceroute`` measurement results contain all
 of the properties :ref:`common to all measurements <common-attributes>` as well as the following:
 
-=====================  ========  ===================================================================================
-Property               Type      Explanation
-=====================  ========  ===================================================================================
-af                     int       The address family.  It's always either a ``4`` or a ``6``.
-destination_name       str       The string initially given as the target.  It can be an IP address or a domain name
-destination_address    str       An IP address represented as a string
-source_address         str       An IP address represented as a string
-end_time               datetime  The time at which the traceroute finished
-end_time_timestamp     int       A Unix timestamp for the ``end_time`` attribute
-paris_id               int
-size                   int       The packet size
-protocol               str       One of ``ICMP``, ``TCP``, ``UDP``
-hops                   list      A list of :ref:`traceroute-hop` objects
-total_hops             int       The total number of hops
-ip_path                list      A list of dicts containing the IPs at each hop. This is just for convenience as all of these values are accessible via the :ref:`traceroute-hop` and :ref:`traceroute-packet` objects.
-last_rtt               float     The RTT from the last successful hop
-target_responded       bool      Set to ``True`` if the target actually responded
-=====================  ========  ===================================================================================
+========================  ========  ===================================================================================
+Property                  Type      Explanation
+========================  ========  ===================================================================================
+af                        int       The address family.  It's always either a ``4`` or a ``6``.
+destination_name          str       The string initially given as the target.  It can be an IP address or a domain name
+destination_address       str       An IP address represented as a string
+source_address            str       An IP address represented as a string
+end_time                  datetime  The time at which the traceroute finished
+end_time_timestamp        int       A Unix timestamp for the ``end_time`` attribute
+paris_id                  int
+size                      int       The packet size
+protocol                  str       One of ``ICMP``, ``TCP``, ``UDP``
+hops                      list      A list of :ref:`traceroute-hop` objects
+total_hops                int       The total number of hops
+ip_path                   list      A list of dicts containing the IPs at each hop. This is just for convenience as all of these values are accessible via the :ref:`traceroute-hop` and :ref:`traceroute-packet` objects.
+last_rtt                  float     The RTT from the last successful hop
+destination_ip_responded  bool      Set to ``True`` if the last hop was a response from the destination IP
+last_hop_responded        bool      Set to ``True`` if the last hop was a response at all
+========================  ========  ===================================================================================
 
 
 .. _traceroute-hop:
