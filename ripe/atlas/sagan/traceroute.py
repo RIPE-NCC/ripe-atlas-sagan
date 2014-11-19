@@ -1,3 +1,5 @@
+import logging
+
 from IPy import IP
 
 from .base import Result, ValidationMixin
@@ -121,22 +123,48 @@ class TracerouteResult(Result):
         self.last_rtt   = None
         self._parse_hops(**kwargs)  # Sets hops, last_rtt, and total_hops
 
-        self._target_responded = None  # Used by target_responded() below
+        # Used by a few response tests below
+        self._destination_ip_responded = None
+        self._last_hop_responded       = None
 
     @property
     def target_responded(self):
+        logging.warning(
+            "The target_responded property is deprecated and will be removed "
+            "in future versions.  Instead, use destination_ip_responded."
+        )
+        return self.destination_ip_responded
 
-        if self._target_responded is not None:
-            return self._target_responded
+    @property
+    def destination_ip_responded(self):
 
-        self._target_responded = False
+        if self._destination_ip_responded is not None:
+            return self._destination_ip_responded
+
+        self._destination_ip_responded = False
         if self.hops and self.hops[-1].packets:
             destination_address = IP(self.destination_address)
             for packet in self.hops[-1].packets:
                 if packet.origin and destination_address == IP(packet.origin):
-                    self._target_responded = True
+                    self._destination_ip_responded = True
+                    break
 
-        return self.target_responded
+        return self.destination_ip_responded
+
+    @property
+    def last_hop_responded(self):
+
+        if self._last_hop_responded is not None:
+            return self._last_hop_responded
+
+        self._last_hop_responded = False
+        if self.hops and self.hops[-1].packets:
+            for packet in self.hops[-1].packets:
+                if packet.origin:
+                    self._last_hop_responded = True
+                    break
+
+        return self.last_hop_responded
 
     @property
     def end_time_timestamp(self):

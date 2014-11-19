@@ -252,7 +252,8 @@ def test_traceroute_4610():
     assert(result.protocol == TracerouteResult.PROTOCOL_UDP)
     assert(result.total_hops == 17)
     assert(result.last_rtt == 273.494)
-    assert(result.target_responded is False)
+    assert(result.destination_ip_responded is False)
+    assert(result.last_hop_responded is False)
     assert(result.ip_path[3][1] == "137.164.47.14")
     assert(result.hops[0].packets[0].destination_option_size is None)
     assert(result.hops[0].packets[0].hop_by_hop_option_size is None)
@@ -282,7 +283,8 @@ def test_traceroute_responding_target():
     assert(result.protocol == TracerouteResult.PROTOCOL_UDP)
     assert(result.total_hops == 20)
     assert(result.last_rtt == 217.103)
-    assert(result.target_responded is True)
+    assert(result.destination_ip_responded is True)
+    assert(result.last_hop_responded is True)
     assert(result.ip_path[3][1] == "68.85.214.113")
     assert(result.hops[0].packets[0].destination_option_size is None)
     assert(result.hops[0].packets[0].hop_by_hop_option_size is None)
@@ -303,18 +305,18 @@ def test_traceroute_error():
     result = Result.get('{"af":6,"dst_addr":"2001:6b0:e:3::1","dst_name":"2001:6b0:e:3:0:0:0:1","endtime":1399388948,"from":"","fw":4610,"group_id":1018508,"lts":107,"msm_id":1019825,"msm_name":"Traceroute","paris_id":5,"prb_id":82,"proto":"ICMP","result":[{"hop":1,"result":[{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2014.845,"size":88,"ttl":64},{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2995.839,"size":88,"ttl":64},{"err":"H","from":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","rtt":2998.491,"size":88,"ttl":64}]}],"size":40,"src_addr":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","timestamp":1399388940,"type":"traceroute"}')
     assert(result.total_hops == 1)
     assert(result.hops[0].index == 1)
-    assert(result.hops[0].packets[0].is_error)
+    assert(result.hops[0].packets[0].is_error is True)
     assert(result.hops[0].packets[0].error_message == Packet.ERROR_CONDITIONS["H"])
-    assert(result.hops[0].packets[1].is_error)
+    assert(result.hops[0].packets[1].is_error is True)
     assert(result.hops[0].packets[1].error_message == Packet.ERROR_CONDITIONS["H"])
-    assert(result.hops[0].packets[2].is_error)
+    assert(result.hops[0].packets[2].is_error is True)
     assert(result.hops[0].packets[2].error_message == Packet.ERROR_CONDITIONS["H"])
 
 def test_traceroute_error_unreachable():
     result = Result.get('{"af":6,"dst_addr":"2001:6b0:e:3::1","dst_name":"2001:6b0:e:3:0:0:0:1","endtime":1398180530,"from":"","fw":4610,"group_id":1018508,"lts":10065,"msm_id":1019825,"msm_name":"Traceroute","paris_id":14,"prb_id":82,"proto":"ICMP","result":[{"error":"connect failed: Network is unreachable","hop":1}],"size":40,"src_addr":"2001:67c:2e8:13:fad1:11ff:fea9:dd68","timestamp":1398180530,"type":"traceroute"}')
     assert(result.total_hops == 1)
     assert(result.hops[0].index == 1)
-    assert(result.hops[0].is_error)
+    assert(result.hops[0].is_error is True)
     assert(result.hops[0].error_message == "connect failed: Network is unreachable")
     assert(len(result.hops[0].packets) == 0)
 
@@ -336,3 +338,8 @@ def test_traceroute_v6_options():
 def test_traceroute_lts():
     result = Result.get('{"lts":2029,"size":40,"group_id":1000157,"from":"192.172.226.243","dst_name":"121.244.76.25","fw":4650,"proto":"UDP","af":4,"msm_name":"Traceroute","prb_id":319,"result":[{"result":[{"rtt":1.891,"ttl":254,"from":"192.172.226.252","size":28},{"rtt":34.727,"ttl":254,"from":"192.172.226.252","size":28},{"rtt":1.731,"ttl":254,"from":"192.172.226.252","size":28}],"hop":1},{"result":[{"rtt":1.726,"ttl":253,"from":"192.12.207.61","size":28},{"rtt":1.724,"ttl":253,"from":"192.12.207.61","size":28},{"rtt":1.72,"ttl":253,"from":"192.12.207.61","size":28}],"hop":2},{"result":[{"rtt":1.72,"ttl":253,"from":"137.164.23.129","size":28},{"rtt":1.735,"ttl":253,"from":"137.164.23.129","size":28},{"rtt":1.724,"ttl":253,"from":"137.164.23.129","size":28}],"hop":3},{"result":[{"rtt":13.136,"ttl":252,"from":"137.164.47.110","size":68},{"rtt":10.883,"ttl":252,"from":"137.164.47.110","size":68},{"rtt":13.087,"ttl":252,"from":"137.164.47.110","size":68}],"hop":4},{"result":[{"rtt":15.208,"ttl":251,"from":"137.164.46.57","size":68},{"rtt":12.571,"ttl":251,"from":"137.164.46.57","size":68},{"rtt":14.545,"ttl":251,"from":"137.164.46.57","size":68}],"hop":5},{"result":[{"rtt":11.037,"ttl":250,"from":"137.164.47.136","size":28},{"rtt":10.957,"ttl":250,"from":"137.164.47.136","size":28},{"rtt":11.011,"ttl":250,"from":"137.164.47.136","size":28}],"hop":6},{"result":[{"rtt":11.075,"ttl":249,"from":"4.59.48.177","size":28},{"rtt":11.032,"ttl":249,"from":"4.59.48.177","size":28},{"rtt":69.194,"ttl":249,"from":"4.59.48.177","size":28}],"hop":7},{"result":[{"rtt":11.25,"ttl":248,"from":"4.69.144.80","size":28},{"rtt":11.141,"ttl":248,"from":"4.69.144.80","size":28},{"rtt":11.177,"ttl":248,"from":"4.69.144.80","size":28}],"hop":8},{"result":[{"rtt":11.316,"ttl":247,"from":"4.68.62.118","size":28},{"rtt":11.243,"ttl":247,"from":"4.68.62.118","size":28},{"rtt":11.238,"ttl":247,"from":"4.68.62.118","size":28}],"hop":9},{"result":[{"rtt":37.808,"ttl":245,"from":"64.86.252.38","size":28},{"rtt":37.811,"ttl":245,"from":"64.86.252.38","size":28},{"rtt":37.768,"ttl":245,"from":"64.86.252.38","size":28}],"hop":10},{"result":[{"rtt":277.064,"ttl":232,"from":"66.198.144.2","size":28},{"rtt":276.963,"ttl":232,"from":"66.198.144.2","size":28},{"rtt":276.92,"ttl":232,"from":"66.198.144.2","size":28}],"hop":11},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":12},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":13},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":14},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":15},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":16},{"result":[{"x":"*"},{"x":"*"},{"x":"*"}],"hop":255}],"timestamp":1406561027,"src_addr":"192.172.226.243","paris_id":5,"endtime":1406561047,"type":"traceroute","dst_addr":"121.244.76.25","msm_id":1000157}')
     assert(result.seconds_since_sync == 2029)
+
+def test_traceroute_last_hop_responded_vs_destination_ip_responded():
+    result = Result.get('{"af":6,"dst_addr":"2a00:1450:4001:808::1010","dst_name":"2a00:1450:4001:808::1010","endtime":1414685936,"from":"2001:6c8:3f00:abe:280:a3ff:fe91:4252","fw":4660,"group_id":1772418,"lts":110,"msm_id":1772418,"msm_name":"Traceroute","paris_id":1,"prb_id":4978,"proto":"UDP","result":[{"hop":1,"result":[{"from":"2001:6c8:3f00:abe::1","rtt":2.399,"size":96,"ttl":63},{"from":"2001:6c8:3f00:abe::1","rtt":2.199,"size":96,"ttl":63},{"from":"2001:6c8:3f00:abe::1","rtt":2.136,"size":96,"ttl":63}]},{"hop":2,"result":[{"from":"2001:6c8:41:100:0:10:3:1","rtt":22.533,"size":96,"ttl":62},{"from":"2001:6c8:41:100:0:10:3:1","rtt":22.131,"size":96,"ttl":62},{"from":"2001:6c8:41:100:0:10:3:1","rtt":22.54,"size":96,"ttl":62}]},{"hop":3,"result":[{"from":"2001:6f0:40::3a","rtt":33.808,"size":96,"ttl":61},{"from":"2001:6f0:40::3a","rtt":33.815,"size":96,"ttl":61},{"from":"2001:6f0:40::3a","rtt":34.074,"size":96,"ttl":61}]},{"hop":4,"result":[{"from":"2001:6f0:81:100::6:2","rtt":34.335,"size":96,"ttl":60},{"from":"2001:6f0:81:100::6:2","rtt":34.33,"size":96,"ttl":60},{"from":"2001:6f0:81:100::6:2","rtt":34.135,"size":96,"ttl":60}]},{"hop":5,"result":[{"from":"2001:4860::1:0:26eb","rtt":34.559,"size":96,"ttl":59},{"from":"2001:4860::1:0:26eb","rtt":34.638,"size":96,"ttl":59},{"from":"2001:4860::1:0:26eb","rtt":49.453,"size":96,"ttl":59}]},{"hop":6,"result":[{"from":"2001:4860::8:0:4fc8","rtt":35.123,"size":96,"ttl":57},{"from":"2001:4860::8:0:4fc8","rtt":34.621,"size":96,"ttl":57},{"from":"2001:4860::8:0:4fc8","rtt":34.896,"size":96,"ttl":57}]},{"hop":7,"result":[{"from":"2001:4860::8:0:672e","rtt":49.557,"size":96,"ttl":56},{"from":"2001:4860::8:0:672e","rtt":50.057,"size":96,"ttl":56},{"from":"2001:4860::8:0:672e","rtt":50.39,"size":96,"ttl":56}]},{"hop":8,"result":[{"from":"2001:4860::8:0:5039","rtt":50.039,"size":96,"ttl":57},{"from":"2001:4860::8:0:5039","rtt":50.078,"size":96,"ttl":57},{"from":"2001:4860::8:0:5039","rtt":50.061,"size":96,"ttl":57}]},{"hop":9,"result":[{"from":"2001:4860::1:0:4ca2","rtt":52.175,"size":96,"ttl":59},{"from":"2001:4860::1:0:4ca2","rtt":58.49,"size":96,"ttl":59},{"from":"2001:4860::1:0:4ca2","rtt":55.845,"size":96,"ttl":59}]},{"hop":10,"result":[{"from":"2001:4860:0:1::6ef","rtt":50.311,"size":96,"ttl":58},{"x":"*"},{"x":"*"}]},{"hop":11,"result":[{"from":"2a00:1450:8000:3d::3","rtt":52.233,"size":96,"ttl":57},{"from":"2a00:1450:8000:3d::3","rtt":50.576,"size":96,"ttl":57},{"from":"2a00:1450:8000:3d::3","rtt":50.277,"size":96,"ttl":57}]}],"size":48,"src_addr":"2001:6c8:3f00:abe:280:a3ff:fe91:4252","timestamp":1414685926,"type":"traceroute"}')
+    assert(result.destination_ip_responded is False)
+    assert(result.last_hop_responded is True)
