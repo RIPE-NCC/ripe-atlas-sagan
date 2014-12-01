@@ -1,9 +1,13 @@
 from __future__ import absolute_import
 
 import base64
+import codecs
 import struct
 
+
 class AbufParser(object):
+
+    DNS_CTYPE= "UTF=8"
 
     @classmethod
     def parse(cls, buf, options=None):
@@ -339,7 +343,10 @@ class AbufParser(object):
                     return None
                 rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
                         struct.unpack(fmt, dat)
-                rr['DelegationKey'] = rdata[struct.calcsize(fmt):].encode('hex')
+                key= rdata[struct.calcsize(fmt):]
+                key_as_hex= codecs.getencoder('hex_codec')(key)[0]
+                key_as_hex_str= key_as_hex.decode(cls.DNS_CTYPE)
+                rr['DelegationKey'] = key_as_hex_str
             elif rr['Type'] == 'DNSKEY':
                 fmt = '!HBB'
                 fmtsz = struct.calcsize(fmt)
@@ -350,8 +357,10 @@ class AbufParser(object):
                     return None
                 rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
                         struct.unpack(fmt, dat)
-                rr['Key'] = ''.join(base64.encodestring(
-                    rdata[struct.calcsize(fmt):]).split())
+                key= rdata[struct.calcsize(fmt):]
+                key_as_base64= base64.encodestring(key)
+                key_as_base64_str= key_as_base64.decode(cls.DNS_CTYPE)
+                rr['Key'] = ''.join(key_as_base64_str.split())
         if rr['Type'] == 'TXT':
             if rr['Class'] == "IN" or rr['Class'] == "CH":
                 fmt    = "!B"
@@ -391,7 +400,7 @@ class AbufParser(object):
                 offset += 1
                 label  = buf[offset:offset + llen]
                 offset = offset + llen
-                label_as_str= label.decode("UTF-8")
+                label_as_str= label.decode(cls.DNS_CTYPE)
                 if name == '' or label_as_str != '':
                     name = name + label_as_str + '.'
                 if llen == 0:
