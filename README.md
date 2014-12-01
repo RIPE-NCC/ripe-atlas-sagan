@@ -64,7 +64,6 @@ print(my_result.af)
 6
 ```
 
-
 ### Which attributes are supported?
 
 Every result type has its own properties, with a few common between all types.
@@ -114,7 +113,6 @@ http_result.uri                     # A URL string
 http_result.responses               # A list of Response objects
 http_result.responses[0].body_size  # The size of the body of the first response
 ```
-
 
 ### "But... I'd rather my code explode when there's an error"
 
@@ -178,7 +176,6 @@ The stable version should always be in PyPi, so you can install it with `pip`:
 $ pip install ripe.atlas.sagan
 ```
 
-
 ### Troubleshooting
 
 Some setups (like MacOS) have trouble with building the dependencies required
@@ -190,13 +187,24 @@ installer to skip building ``pyOpenSSL`` by doing the following:
 $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
 ```
 
-
 ## Further Documentation
 
 Complete documentation can always be found on
 [the RIPE Atlas project page](https://atlas.ripe.net/docs/sagan/), and if you're
 not online, the project itself contains a `docs` directory -- everything you
 should need is in there.
+
+
+## Who's Responsible for This?
+
+Sagan is actively maintained by the RIPE NCC and primarily developed by
+[Daniel Quinn](https://github.com/danielquinn), while the abuf parser is mostly
+the responsibility of [Philip Homburg](https://github.com/philiphomburg) with an
+assist from Bert Wijnen and Rene Wilhelm who contributed to the original script.
+Additionally, big thanks go to [Chris Amin](https://github.com/chrisamin) and
+[John Bond](https://github.com/b4ldr) for finding and fixing stuff where they've
+run into problems.
+
 
 
 ## Colophon
@@ -208,6 +216,8 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.5
+    * Complete Python3 support!
 * 0.4
     * Added better Python3 support.  Tests all pass now for ping, traceroute,
       ssl, and http measurements.
@@ -283,4 +293,3 @@ decades reaching out to the public about the wonders of the cosmos?
 * 0.1.8
     * Broader support for SSL checksums.  We now make use of `md5` and `sha1`,
       as well as the original `sha256`.
-
