@@ -262,7 +262,9 @@ class AbufParser(object):
                 o += reqlen
                 if opt['OptionCode'] == edns0_opt_nsid:
                     opt['OptionName']      = 'NSID'
-                    opt[opt['OptionName']] = rdata[o:o + opt['OptionLength']]
+                    nsid= rdata[o:o + opt['OptionLength']]
+                    nsid_as_str= nsid.decode(cls.DNS_CTYPE)
+                    opt[opt['OptionName']] = nsid_as_str
 
                 o = o + opt['OptionLength']
                 edns0['Option'].append(opt)
@@ -374,11 +376,12 @@ class AbufParser(object):
                 llen   = res[0]
                 o= reqlen
                 strng = rdata[o:o+llen]
+                strng_as_str= strng.decode(cls.DNS_CTYPE)
                 if len(strng) < llen:
                     e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
-                rr['Data'] = strng
+                rr['Data'] = strng_as_str
 
         return offset, rr
 
