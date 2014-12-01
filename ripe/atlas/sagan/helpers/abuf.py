@@ -391,8 +391,9 @@ class AbufParser(object):
                 offset += 1
                 label  = buf[offset:offset + llen]
                 offset = offset + llen
-                if name == '' or label != '':
-                    name = name + label + '.'
+                label_as_str= label.decode("UTF-8")
+                if name == '' or label_as_str != '':
+                    name = name + label_as_str + '.'
                 if llen == 0:
                     break
             elif llen >= 0xC0:
