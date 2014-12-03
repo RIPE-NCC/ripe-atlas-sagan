@@ -21,9 +21,6 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 # Get the long description from README.md
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
-
-    long_description = description.read()
-
     setup(
         name=name,
         version=version,
@@ -32,7 +29,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
         include_package_data=True,
         license="GPLv3",
         description="A parser for RIPE Atlas measurement results",
-        long_description=long_description,
+        long_description=description.read(),
         url="https://github.com/RIPE-NCC/ripe.atlas.sagan",
         download_url="https://github.com/RIPE-NCC/ripe.atlas.sagan",
         author="Daniel Quinn",
