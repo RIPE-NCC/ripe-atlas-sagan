@@ -27,6 +27,8 @@ class NtpResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
+        self.rtt_median = None
+        self.offset_median = None
         self.af = self.ensure("af", int)
         self.destination_address = self.ensure("dst_addr", str)
         self.destination_name = self.ensure("dst_name", str)
@@ -42,14 +44,25 @@ class NtpResult(Result):
         self.stratum = self.ensure("stratum", int)
         self.version = self.ensure("version", int)
 
-        self.responses = []
+        self.packets = []
 
         if "result" not in self.raw_data:
             self._handle_malformation("No result value found")
             return
 
         for response in self.raw_data["result"]:
-            self.responses.append(Packet(response, **kwargs))
+            self.packets.append(Packet(response, **kwargs))
+
+        self._set_medians()
+
+    def _set_medians(self):
+        """Sets median values for rtt and offset of the result packets."""
+        rtts = sorted([p.rtt for p in self.packets if p.rtt is not None and p.dup is False])
+        self.rtt_median = self.calculate_median(rtts)
+        offsets = sorted(
+            [p.offset for p in self.packets if p.offset is not None and p.dup is False]
+        )
+        self.offset_median = self.calculate_median(offsets)
 
 
 __all__ = (

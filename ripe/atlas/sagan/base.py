@@ -225,6 +225,23 @@ class Result(ValidationMixin):
 
         raise ResultParseError("Unknown type value was found in the JSON input")
 
+    def calculate_median(self, given_list):
+        """Returns the median of values in the given list."""
+        median = None
+
+        if not given_list:
+            return median
+
+        given_list = sorted(given_list)
+        list_length = len(given_list)
+
+        if list_length % 2:
+            median = given_list[list_length / 2]
+        else:
+            median = (given_list[list_length / 2] + given_list[(list_length / 2) - 1]) / 2.0
+
+        return median
+
 
 __all__ = (
     "Result",
