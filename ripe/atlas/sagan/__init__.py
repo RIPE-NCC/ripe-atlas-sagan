@@ -15,6 +15,5 @@ __all__ = (
     "DnsResult",
     "SslResult",
     "HttpResult",
-    "version",
 )
 
