@@ -113,8 +113,12 @@ class PingResult(Result):
 
     def _set_median(self):
         packets = sorted([p.rtt for p in self.packets if p.rtt is not None and p.dup is False])
+        list_length = len(packets)
         if packets:
-            self.rtt_median = packets[int(round(len(packets) / 2.0) - 1)]
+            if list_length % 2:
+                self.rtt_median = packets[list_length / 2]
+            else:
+                self.rtt_median = (packets[list_length / 2] + packets[(list_length / 2) - 1]) / 2.0
 
 
 __all__ = (

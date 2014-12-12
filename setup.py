@@ -1,9 +1,9 @@
 import os
 from setuptools import setup
-from importlib import import_module
+
+exec(open("ripe/atlas/sagan/version.py").read())
 
 name = "ripe.atlas.sagan"
-version = import_module(name).__version__
 install_requires = [
     "arrow>=0.4.2",
     "python-dateutil>=2.2",
@@ -23,7 +23,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
     setup(
         name=name,
-        version=version,
+        version=__version__,
         packages=["ripe", "ripe.atlas", "ripe.atlas.sagan"],
         namespace_packages=["ripe", "ripe.atlas"],
         include_package_data=True,
