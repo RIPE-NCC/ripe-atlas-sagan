@@ -10,12 +10,12 @@ class Packet(ValidationMixin):
 
         self.raw_data = data
 
-        self.final_ts = self.ensure("final-ts", float)
+        self.final_timestamp = self.ensure("final-ts", float)
         self.offset = self.ensure("offset", float)
-        self.origin_ts = self.ensure("origin-ts", float)
-        self.receive_ts = self.ensure("receive-ts", float)
+        self.origin_timestamp = self.ensure("origin-ts", float)
+        self.receive_timestamp = self.ensure("receive-ts", float)
         self.rtt = self.ensure("rtt", float)
-        self.transmit_ts = self.ensure("transmit-ts", float)
+        self.transmit_timestamp = self.ensure("transmit-ts", float)
 
 
 class NtpResult(Result):
