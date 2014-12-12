@@ -18,5 +18,4 @@ __all__ = (
     "SslResult",
     "HttpResult",
     "NtpResult",
-    "version",
 )
