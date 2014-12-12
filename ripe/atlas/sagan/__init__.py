@@ -6,8 +6,7 @@ from .http import HttpResult
 from .ping import PingResult
 from .ssl import SslResult
 from .traceroute import TracerouteResult
-
-__version__ = "0.5.1"
+from .version import __version__
 
 __all__ = (
     "Result",
