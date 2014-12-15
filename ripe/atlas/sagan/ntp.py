@@ -1,4 +1,4 @@
-from .base import Result, ValidationMixin
+from .base import Result, ResultParseError, ValidationMixin
 
 
 class Packet(ValidationMixin):
@@ -9,13 +9,27 @@ class Packet(ValidationMixin):
         ValidationMixin.__init__(self, **kwargs)
 
         self.raw_data = data
+        self.rtt = None
+        self.offset = None
+
+        if "rtt" not in data:
+            return
+
+        try:
+            self.rtt = round(float(data["rtt"]), 3)
+        except (ValueError, TypeError):
+            raise ResultParseError(
+                'RTT "{rtt}" does not appear to be a float'.format(rtt=data["rtt"])
+            )
 
         self.final_timestamp = self.ensure("final-ts", float)
         self.offset = self.ensure("offset", float)
         self.origin_timestamp = self.ensure("origin-ts", float)
         self.receive_timestamp = self.ensure("receive-ts", float)
-        self.rtt = self.ensure("rtt", float)
         self.transmit_timestamp = self.ensure("transmit-ts", float)
+
+    def __str__(self):
+        return "{rtt}|{offset}".format(rtt=self.rtt, offset=self.offset)
 
 
 class NtpResult(Result):
@@ -30,17 +44,19 @@ class NtpResult(Result):
         self.rtt_median = None
         self.offset_median = None
         self.af = self.ensure("af", int)
+        self.protocol = self.ensure("proto", str)
         self.destination_address = self.ensure("dst_addr", str)
         self.destination_name = self.ensure("dst_name", str)
         self.source_address = self.ensure("src_addr", str)
         self.end_time = self.ensure("endtime",  "datetime")
-        self.li = self.ensure("li", str)
+        self.leap_second_indicator = self.ensure("li", str)
         self.mode = self.ensure("mode", str)
-        self.poll = self.ensure("poll", str)
+        self.poll = self.ensure("poll", int)
         self.precision = self.ensure("precision", float)
-        self.ref_id = self.ensure("ref-id", str)
+        self.reference_id = self.ensure("ref-id", str)
+        self.reference_time = self.ensure("ref-ts", float)
         self.root_delay = self.ensure("root-delay", int)
-        self.root_dispersion = self.ensure("root-dispersion", int)
+        self.root_dispersion = self.ensure("root-dispersion", float)
         self.stratum = self.ensure("stratum", int)
         self.version = self.ensure("version", int)
 
@@ -57,10 +73,10 @@ class NtpResult(Result):
 
     def _set_medians(self):
         """Sets median values for rtt and offset of the result packets."""
-        rtts = sorted([p.rtt for p in self.packets if p.rtt is not None and p.dup is False])
+        rtts = sorted([p.rtt for p in self.packets if p.rtt is not None])
         self.rtt_median = self.calculate_median(rtts)
         offsets = sorted(
-            [p.offset for p in self.packets if p.offset is not None and p.dup is False]
+            [p.offset for p in self.packets if p.offset is not None]
         )
         self.offset_median = self.calculate_median(offsets)
 
