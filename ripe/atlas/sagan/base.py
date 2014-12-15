@@ -236,9 +236,9 @@ class Result(ValidationMixin):
         list_length = len(given_list)
 
         if list_length % 2:
-            median = given_list[list_length / 2]
+            median = given_list[int(list_length / 2)]
         else:
-            median = (given_list[list_length / 2] + given_list[(list_length / 2) - 1]) / 2.0
+            median = (given_list[int(list_length / 2)] + given_list[int(list_length / 2) - 1]) / 2.0
 
         return median
 
