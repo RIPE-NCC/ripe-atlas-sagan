@@ -1,9 +1,10 @@
-from ripe.atlas.sagan import Result, ResultError
+from ripe.atlas.sagan import Result
 from ripe.atlas.sagan.ntp import NtpResult
+
 
 def test_ntp_valid():
     result = (
-        '{"af":4,"dst_addr":"193.0.0.229","dst_name":"193.0.0.229","from":"193.0.0.78","fw":4670,'
+        '{"af":4,"dst_addr":"193.0.0.229","dst_name":"atlas","from":"193.0.0.78","fw":4670,'
         '"group_id":1020237,"li":"no","lts":-1,"mode":"server","msm_id":1020237,"msm_name":"Ntp",'
         '"poll":1,"prb_id":71,"precision":0.0000019074,"proto":"UDP","ref-id":"GPS",'
         '"ref-ts":3627199357.7446351051,"result":['
@@ -22,5 +23,81 @@ def test_ntp_valid():
     assert(result.af == 4)
     assert(result.firmware == 4670)
     assert(result.destination_address == "193.0.0.229")
-    assert(result.destination_name == "193.0.0.229")
+    assert(result.destination_name == "atlas")
     assert(result.source_address == "10.0.2.12")
+    assert(result.origin == "193.0.0.78")
+    assert(result.leap_second_indicator == "no")
+    assert(result.mode == "server")
+    assert(result.poll == 1)
+    assert(result.precision == 1.9074e-06)
+    assert(result.protocol == "UDP")
+    assert(result.reference_id == "GPS")
+    assert(result.reference_time == 3627199357.7446351051)
+    assert(result.root_delay == 0)
+    assert(result.root_dispersion == 0.00140381)
+    assert(result.stratum == 1)
+    assert(result.version == 4)
+    assert(result.packets[0].final_timestamp == 3627199379.8182010651)
+    assert(result.packets[0].offset == -8.363271)
+    assert(result.packets[0].rtt == 0.022)
+    assert(result.packets[0].origin_timestamp == 3627199379.7962741852)
+    assert(result.packets[0].receive_timestamp == 3627199388.1704945564)
+    assert(result.packets[0].transmit_timestamp == 3627199388.170522213)
+    assert(result.rtt_median == 0.01)
+    assert(result.offset_median == -8.36871)
+
+
+def test_ntp_timeout():
+    result = (
+        '{ "msm_id":"1020235", "fw":4661, "lts":76, "timestamp":1418196642, "dst_name":"atlas", '
+        '"prb_id":71, "dst_addr":"193.0.6.139", "src_addr":"193.0.10.127", "proto":"UDP", "af": 4,'
+        '"from": "193.0.0.78", "type": "ntp", "result": '
+        '[ { "x":"*" }, { "x":"*" }, { "x":"*" } ] '
+        '}'
+    )
+    result = Result.get(result)
+    assert(isinstance(result, NtpResult))
+    assert(result.af == 4)
+    assert(result.firmware == 4661)
+    assert(result.destination_address == "193.0.6.139")
+    assert(result.destination_name == "atlas")
+    assert(result.source_address == "193.0.10.127")
+    assert(result.origin == "193.0.0.78")
+    assert(result.leap_second_indicator is None)
+    assert(result.stratum is None)
+    assert(result.rtt_median is None)
+    assert(result.offset_median is None)
+    assert(getattr(result.packets[0], "final_timestamp", None) is None)
+    assert(getattr(result.packets[0], "origin_timestamp", None) is None)
+    assert(getattr(result.packets[0], "transmit_timestamp", None) is None)
+    assert(getattr(result.packets[0], "receive_timestamp", None) is None)
+    assert(result.packets[0].offset is None)
+    assert(result.packets[0].rtt is None)
+
+
+def test_ntp_error():
+    result = (
+        '{ "msm_id":"1020235", "fw":4661, "lts":76, "timestamp":1418196642, "dst_name":"atlas", '
+        '"prb_id":71, "dst_addr":"193.0.6.139", "src_addr":"193.0.10.127", "proto":"UDP", "af": 4,'
+        '"from": "193.0.0.78", "type": "ntp", "result": '
+        '[ { "error":"error-example" }, { "error":"error-example" }, { "x":"*" } ] '
+        '}'
+    )
+    result = Result.get(result)
+    assert(isinstance(result, NtpResult))
+    assert(result.af == 4)
+    assert(result.firmware == 4661)
+    assert(result.destination_address == "193.0.6.139")
+    assert(result.destination_name == "atlas")
+    assert(result.source_address == "193.0.10.127")
+    assert(result.origin == "193.0.0.78")
+    assert(result.leap_second_indicator is None)
+    assert(result.stratum is None)
+    assert(result.rtt_median is None)
+    assert(result.offset_median is None)
+    assert(getattr(result.packets[0], "final_timestamp", None) is None)
+    assert(getattr(result.packets[0], "origin_timestamp", None) is None)
+    assert(getattr(result.packets[0], "transmit_timestamp", None) is None)
+    assert(getattr(result.packets[0], "receive_timestamp", None) is None)
+    assert(result.packets[0].offset is None)
+    assert(result.packets[0].rtt is None)
