@@ -527,3 +527,50 @@ response_time          float     Time, in seconds until response was received
 version                str       The HTTP version
 =====================  ========  ===================================================================================
 
+
+.. _ntp:
+
+NTP
+====
+
+NTP measurement results contain all of the properties
+:ref:`common to all measurements <common-attributes>` as well as the following:
+
+=====================  ========  ===================================================================================
+Property               Type      Explanation
+=====================  ========  ===================================================================================
+leap_second_indicator  str       Leap second indicator
+poll                   int       Poll interval
+precision              float
+protocol               str       ``UDP``
+reference_id           str       Reference id returned by server
+reference_time         float     The NTP time the server last contacted the reference time source
+root_delay             float     Round trip time from the server to the reference time source
+root_dispersion        float     Accuracy of server's clock
+stratum                int       How far in hops is server from reference time source
+version                int       The NTP version
+mode                   str       Ntp communication mode. Usually ``server``
+rtt_median             float     The median value of packets' rtt
+offset_median          float     The median value of the packets' offset
+packets                list      A list of ntp :ref:`ntp-packet` objects
+=====================  ========  ===================================================================================
+
+
+.. _ntp-packet:
+
+Response
+--------
+
+Each HTTP measurement result can contain multiple ``Response`` objects.
+
+=====================  ========  ===================================================================================
+Property               Type      Explanation
+=====================  ========  ===================================================================================
+raw_data               dict      The portion of the JSON that pertains to this response
+offset                 float     The NTP offset
+rtt                    float     The response time
+final_timestamp        float     The NTP time client received the response
+origin_timestamp       float     The NTP time client send packet to the server
+receive_timestamp      float     The NTP time server received the request
+transmit_timestamp     float     The NTP time server transmitted the response
+=====================  ========  ===================================================================================
