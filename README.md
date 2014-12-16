@@ -58,7 +58,7 @@ You can do the JSON-decoding yourself:
 from ripe.atlas.sagan import PingResult
 
 my_result = PingResult(
-    json.dumps("<result string from RIPE Atlas ping measurement>")
+    json.loads("<result string from RIPE Atlas ping measurement>")
 )
 
 print(my_result.rtt_median)
