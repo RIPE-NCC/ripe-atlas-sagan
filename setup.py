@@ -11,6 +11,8 @@ install_requires = [
     "IPy",
 ]
 
+tests_require = ["nose"]
+
 # pyOpenSSL support is flaky on some systems (I'm looking at you Apple)
 if "SAGAN_WITHOUT_SSL" not in os.environ:
     install_requires.append("pyOpenSSL>=0.12")
@@ -37,6 +39,8 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
         maintainer="Daniel Quinn",
         maintainer_email="dquinn@ripe.net",
         install_requires=install_requires,
+        tests_require=tests_require,
+        test_suite="nose.collector",
         scripts=[
             "scripts/parse_abuf"
         ],
