@@ -1,8 +1,7 @@
-# RIPE Atlas Sagan
+# RIPE Atlas Sagan [![Build Status](https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan.png?branch=master)](https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan)
 
-A parsing library for RIPE Atlas measurement results
+A parsing library for RIPE Atlas measurement results 
 
-[![Build Status](https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan.png?branch=master)](https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan)
 
 ## Why this exists
 
