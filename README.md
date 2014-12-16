@@ -167,7 +167,7 @@ As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
 * [arrow](https://pypi.python.org/pypi/arrow)
-* [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL) (Optional: see "Troubleshooting" below)
+* [pyOpenSSL](https://pypi.python.org/pypi/pyOpenSSL) (Optional: see "Troubleshooting" above)
 * [python-dateutil](https://pypi.python.org/pypi/python-dateutil)
 * [pytz](https://pypi.python.org/pypi/pytz)
 * [IPy](https://pypi.python.org/pypi/IPy/)
@@ -177,6 +177,25 @@ Additionally, we recommend that you also install
 JSON-decoding step considerably, and
 [sphinx](https://pypi.python.org/pypi/Sphinx) if you intend to build the
 documentation files for offline use.
+
+
+## Running Tests
+
+There's a full battery of tests for all measurement types, so if you've made
+changes and would like to submit a pull request, please run them (and update
+them!) before sending your request:
+
+```bash
+$ python setup.py test
+```
+
+You can also install `tox` to test everything in all of the supported Python
+versions:
+
+```bash
+$ pip install tox
+$ tox
+```
 
 
 ## Further Documentation
