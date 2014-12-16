@@ -1,7 +1,6 @@
 from ripe.atlas.sagan import Result
 from ripe.atlas.sagan.ntp import NtpResult
 
-
 def test_ntp_valid():
     result = (
         '{"af":4,"dst_addr":"193.0.0.229","dst_name":"atlas","from":"193.0.0.78","fw":4670,'
@@ -34,15 +33,19 @@ def test_ntp_valid():
     assert(result.reference_id == "GPS")
     assert(result.reference_time == 3627199357.7446351051)
     assert(result.root_delay == 0)
-    assert(result.root_dispersion == 0.00140381)
+    assert(round(result.root_dispersion, 8) == 0.00140381)
     assert(result.stratum == 1)
     assert(result.version == 4)
     assert(result.packets[0].final_timestamp == 3627199379.8182010651)
+    assert(result.packets[0].final_time.isoformat() == "2014-12-10T11:22:59.818201+00:00")
     assert(result.packets[0].offset == -8.363271)
     assert(result.packets[0].rtt == 0.022)
     assert(result.packets[0].origin_timestamp == 3627199379.7962741852)
-    assert(result.packets[0].receive_timestamp == 3627199388.1704945564)
-    assert(result.packets[0].transmit_timestamp == 3627199388.170522213)
+    assert(result.packets[0].origin_time.isoformat() == "2014-12-10T11:22:59.796274+00:00")
+    assert(result.packets[0].received_timestamp == 3627199388.1704945564)
+    assert(result.packets[0].received_time.isoformat() == "2014-12-10T11:23:08.170495+00:00")
+    assert(result.packets[0].transmitted_timestamp == 3627199388.170522213)
+    assert(result.packets[0].transmitted_time.isoformat() == "2014-12-10T11:23:08.170522+00:00")
     assert(result.rtt_median == 0.01)
     assert(result.offset_median == -8.36871)
 
@@ -68,9 +71,13 @@ def test_ntp_timeout():
     assert(result.rtt_median is None)
     assert(result.offset_median is None)
     assert(getattr(result.packets[0], "final_timestamp", None) is None)
+    assert(getattr(result.packets[0], "final_times", None) is None)
     assert(getattr(result.packets[0], "origin_timestamp", None) is None)
-    assert(getattr(result.packets[0], "transmit_timestamp", None) is None)
-    assert(getattr(result.packets[0], "receive_timestamp", None) is None)
+    assert(getattr(result.packets[0], "origin_time", None) is None)
+    assert(getattr(result.packets[0], "transmitted_timestamp", None) is None)
+    assert(getattr(result.packets[0], "transmitted_time", None) is None)
+    assert(getattr(result.packets[0], "received_timestamp", None) is None)
+    assert(getattr(result.packets[0], "received_time", None) is None)
     assert(result.packets[0].offset is None)
     assert(result.packets[0].rtt is None)
 
@@ -96,8 +103,12 @@ def test_ntp_error():
     assert(result.rtt_median is None)
     assert(result.offset_median is None)
     assert(getattr(result.packets[0], "final_timestamp", None) is None)
+    assert(getattr(result.packets[0], "final_time", None) is None)
     assert(getattr(result.packets[0], "origin_timestamp", None) is None)
-    assert(getattr(result.packets[0], "transmit_timestamp", None) is None)
-    assert(getattr(result.packets[0], "receive_timestamp", None) is None)
+    assert(getattr(result.packets[0], "origin_time", None) is None)
+    assert(getattr(result.packets[0], "transmitted_timestamp", None) is None)
+    assert(getattr(result.packets[0], "transmitted_time", None) is None)
+    assert(getattr(result.packets[0], "received_timestamp", None) is None)
+    assert(getattr(result.packets[0], "received_time", None) is None)
     assert(result.packets[0].offset is None)
     assert(result.packets[0].rtt is None)

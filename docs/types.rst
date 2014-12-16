@@ -563,14 +563,20 @@ Response
 
 Each HTTP measurement result can contain multiple ``Response`` objects.
 
-=====================  ========  ===================================================================================
-Property               Type      Explanation
-=====================  ========  ===================================================================================
-raw_data               dict      The portion of the JSON that pertains to this response
-offset                 float     The NTP offset
-rtt                    float     The response time
-final_timestamp        float     The NTP time client received the response
-origin_timestamp       float     The NTP time client send packet to the server
-receive_timestamp      float     The NTP time server received the request
-transmit_timestamp     float     The NTP time server transmitted the response
-=====================  ========  ===================================================================================
+========================  ========  ===================================================================================
+Property                  Type      Explanation
+========================  ========  ===================================================================================
+raw_data                  dict      The portion of the JSON that pertains to this response
+offset                    float     The NTP offset
+rtt                       float     The response time
+final_timestamp           float     A full-precision Unix timestamp for when the NTP client received the response
+origin_timestamp          float     A full-precision Unix timestamp for when the NTP client send packet to the server
+received_timestamp        float     A full-precision Unix timestamp for when the NTP server received the request
+transmitted_timestamp     float     A full-precision Unix timestamp for when the NTP server transmitted the response
+final_time                datetime  A Python datetime object with limited precision[1] based on ``final_timestamp``
+origin_time               datetime  A Python datetime object with limited precision[1] based on ``origin_timestamp``
+received_time             datetime  A Python datetime object with limited precision[1] based on ``received_timestamp``
+transmitted_time          datetime  A Python datetime object with limited precision[1] based on ``transmitted_timestamp``
+========================  ========  ===================================================================================
+
+.. [1] Python ``datetime`` objects are limited to 6 decimal places of precision.

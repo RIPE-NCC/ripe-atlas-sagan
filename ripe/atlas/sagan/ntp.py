@@ -1,8 +1,16 @@
+import arrow
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 from .base import Result, ResultParseError, ValidationMixin
 
 
 class Packet(ValidationMixin):
-    """Model for data structure of each packet for a NTP result."""
+    """
+    Model for data structure of each packet for a NTP result.
+    """
+
+    NTP_EPOCH = datetime(1900, 1, 1)
 
     def __init__(self, data, **kwargs):
 
@@ -22,14 +30,53 @@ class Packet(ValidationMixin):
                 'RTT "{rtt}" does not appear to be a float'.format(rtt=data["rtt"])
             )
 
-        self.final_timestamp = self.ensure("final-ts", float)
-        self.offset = self.ensure("offset", float)
-        self.origin_timestamp = self.ensure("origin-ts", float)
-        self.receive_timestamp = self.ensure("receive-ts", float)
-        self.transmit_timestamp = self.ensure("transmit-ts", float)
+        self.offset                = self.ensure("offset",      float)
+        self.final_timestamp       = self.ensure("final-ts",    float)
+        self.origin_timestamp      = self.ensure("origin-ts",   float)
+        self.received_timestamp    = self.ensure("receive-ts",  float)
+        self.transmitted_timestamp = self.ensure("transmit-ts", float)
+
+        # Caching
+
+        self._final_time       = None
+        self._origin_time      = None
+        self._received_time    = None
+        self._transmitted_time = None
 
     def __str__(self):
         return "{rtt}|{offset}".format(rtt=self.rtt, offset=self.offset)
+
+    @property
+    def final_time(self):
+        if not self._final_time and self.final_timestamp:
+            self._final_time = arrow.get(
+                self.NTP_EPOCH + relativedelta(seconds=self.final_timestamp)
+            )
+        return self._final_time
+
+    @property
+    def origin_time(self):
+        if not self._origin_time and self.origin_timestamp:
+            self._origin_time = arrow.get(
+                self.NTP_EPOCH + relativedelta(seconds=self.origin_timestamp)
+            )
+        return self._origin_time
+
+    @property
+    def received_time(self):
+        if not self._received_time and self.received_timestamp:
+            self._received_time = arrow.get(
+                self.NTP_EPOCH + relativedelta(seconds=self.received_timestamp)
+            )
+        return self._received_time
+
+    @property
+    def transmitted_time(self):
+        if not self._transmitted_time and self.transmitted_timestamp:
+            self._transmitted_time = arrow.get(
+                self.NTP_EPOCH + relativedelta(seconds=self.transmitted_timestamp)
+            )
+        return self._transmitted_time
 
 
 class NtpResult(Result):
@@ -41,24 +88,25 @@ class NtpResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.rtt_median = None
-        self.offset_median = None
-        self.af = self.ensure("af", int)
-        self.protocol = self.ensure("proto", str)
-        self.destination_address = self.ensure("dst_addr", str)
-        self.destination_name = self.ensure("dst_name", str)
-        self.source_address = self.ensure("src_addr", str)
-        self.end_time = self.ensure("endtime",  "datetime")
-        self.leap_second_indicator = self.ensure("li", str)
-        self.mode = self.ensure("mode", str)
-        self.poll = self.ensure("poll", int)
-        self.precision = self.ensure("precision", float)
-        self.reference_id = self.ensure("ref-id", str)
-        self.reference_time = self.ensure("ref-ts", float)
-        self.root_delay = self.ensure("root-delay", int)
-        self.root_dispersion = self.ensure("root-dispersion", float)
-        self.stratum = self.ensure("stratum", int)
-        self.version = self.ensure("version", int)
+        self.rtt_median            = None
+        self.offset_median         = None
+
+        self.af                    = self.ensure("af",              int)
+        self.protocol              = self.ensure("proto",           str)
+        self.destination_address   = self.ensure("dst_addr",        str)
+        self.destination_name      = self.ensure("dst_name",        str)
+        self.source_address        = self.ensure("src_addr",        str)
+        self.end_time              = self.ensure("endtime",         "datetime")
+        self.leap_second_indicator = self.ensure("li",              str)
+        self.mode                  = self.ensure("mode",            str)
+        self.poll                  = self.ensure("poll",            int)
+        self.precision             = self.ensure("precision",       float)
+        self.reference_id          = self.ensure("ref-id",          str)
+        self.reference_time        = self.ensure("ref-ts",          float)
+        self.root_delay            = self.ensure("root-delay",      int)
+        self.root_dispersion       = self.ensure("root-dispersion", float)
+        self.stratum               = self.ensure("stratum",         int)
+        self.version               = self.ensure("version",         int)
 
         self.packets = []
 
@@ -72,7 +120,10 @@ class NtpResult(Result):
         self._set_medians()
 
     def _set_medians(self):
-        """Sets median values for rtt and offset of the result packets."""
+        """
+        Sets median values for rtt and the offset of result packets.
+        """
+
         rtts = sorted([p.rtt for p in self.packets if p.rtt is not None])
         self.rtt_median = self.calculate_median(rtts)
         offsets = sorted(
