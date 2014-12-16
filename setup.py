@@ -1,13 +1,14 @@
 import os
 from setuptools import setup
 
+__version__ = None
 exec(open("ripe/atlas/sagan/version.py").read())
 
 name = "ripe.atlas.sagan"
 install_requires = [
-    "arrow>=0.4.2",
-    "python-dateutil>=2.2",
-    "pytz>=2014.2",
+    "arrow",
+    "python-dateutil",
+    "pytz",
     "IPy",
 ]
 
@@ -15,8 +16,7 @@ tests_require = ["nose"]
 
 # pyOpenSSL support is flaky on some systems (I'm looking at you Apple)
 if "SAGAN_WITHOUT_SSL" not in os.environ:
-    install_requires.append("pyOpenSSL>=0.12")
-    install_requires.append("pyOpenSSL<0.14")
+    install_requires.append("pyOpenSSL>=0.12,<0.14")
 
 # Allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
@@ -24,7 +24,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 # Get the long description from README.md
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
     setup(
-        name=name,
+        name="ripe.atlas.sagan",
         version=__version__,
         packages=["ripe", "ripe.atlas", "ripe.atlas.sagan"],
         namespace_packages=["ripe", "ripe.atlas"],
@@ -40,6 +40,10 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
         maintainer_email="dquinn@ripe.net",
         install_requires=install_requires,
         tests_require=tests_require,
+        extras_require={
+            "fast": ["ujson"],
+            "doc": ["sphinx"]
+        },
         test_suite="nose.collector",
         scripts=[
             "scripts/parse_abuf"
@@ -50,6 +54,9 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
             "Programming Language :: Python",
             "Programming Language :: Python :: 2.6",
             "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3.1",
+            "Programming Language :: Python :: 3.2",
+            "Programming Language :: Python :: 3.3",
             "Topic :: Internet :: WWW/HTTP",
         ],
     )
