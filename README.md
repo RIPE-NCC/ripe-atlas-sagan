@@ -24,6 +24,13 @@ The stable version should always be in PyPi, so you can install it with `pip`:
 $ pip install ripe.atlas.sagan
 ```
 
+Better yet, make sure you get ujson and sphinx installed with it:
+
+```bash
+$ pip install ripe.atlas.sagan[fast,doc]
+```
+
+
 ### Troubleshooting
 
 Some setups (like MacOS) have trouble with building the dependencies required
@@ -34,6 +41,7 @@ installer to skip building ``pyOpenSSL`` by doing the following:
 ```bash
 $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
 ```
+
 
 ## Quickstart: How To Use It
 
