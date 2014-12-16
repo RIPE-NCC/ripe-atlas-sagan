@@ -58,7 +58,7 @@ class PingResult(Result):
         self.af                  = self.ensure("af",       int)
         self.duplicates          = self.ensure("dup",      int)
         self.rtt_average         = self.ensure("avg",      float)
-        self.rtt_median          = None  # Redefined in self._set_median()
+        self.rtt_median          = None  # Redefined in self._set_rtt_median()
         self.rtt_max             = self.ensure("max",      float)
         self.rtt_min             = self.ensure("min",      float)
         self.packets_sent        = self.ensure("sent",     int)
@@ -94,7 +94,7 @@ class PingResult(Result):
             self.rtt_average = round(self.rtt_average, 3)
 
         self._parse_packets(**kwargs)
-        self._set_median()
+        self._set_rtt_median()
 
     def _parse_packets(self, **kwargs):
 
@@ -111,15 +111,9 @@ class PingResult(Result):
                 )
             )
 
-    def _set_median(self):
+    def _set_rtt_median(self):
         packets = sorted([p.rtt for p in self.packets if p.rtt is not None and p.dup is False])
-        list_length = len(packets)
-        if packets:
-            if list_length % 2:
-                self.rtt_median = packets[list_length / 2]
-            else:
-                self.rtt_median = (packets[list_length / 2] + packets[(list_length / 2) - 1]) / 2.0
-
+        self.rtt_median = self.calculate_median(packets)
 
 __all__ = (
     "PingResult",

@@ -6,6 +6,8 @@ from .http import HttpResult
 from .ping import PingResult
 from .ssl import SslResult
 from .traceroute import TracerouteResult
+from .ntp import NtpResult
+
 from .version import __version__
 
 __all__ = (
@@ -15,5 +17,5 @@ __all__ = (
     "DnsResult",
     "SslResult",
     "HttpResult",
+    "NtpResult",
 )
-
