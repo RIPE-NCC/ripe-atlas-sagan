@@ -201,7 +201,9 @@ Sagan is actively maintained by the RIPE NCC and primarily developed by
 [Daniel Quinn](https://github.com/danielquinn), while the abuf parser is mostly
 the responsibility of [Philip Homburg](https://github.com/philiphomburg) with an
 assist from Bert Wijnen and Rene Wilhelm who contributed to the original script.
-Additionally, big thanks go to [Chris Amin](https://github.com/chrisamin) and
+[Andreas Stirkos](https://github.com/astrikos) did the bulk of the work on NTP
+measurements and fixt a few bugs, and big thanks go to
+[Chris Amin](https://github.com/chrisamin) and
 [John Bond](https://github.com/b4ldr) for finding and fixing stuff where they've
 run into problems.
 
@@ -216,6 +218,9 @@ decades reaching out to the public about the wonders of the cosmos?
 
 ## Changelog
 
+* 0.6
+    * Support for NTP measurements
+    * Fixes for how we calculate median values
 * 0.5
     * Complete Python3 support!
 * 0.4
