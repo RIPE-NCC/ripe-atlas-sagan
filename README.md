@@ -229,6 +229,6 @@ run into problems.
 
 ## Colophon
 
-But why *Sagan*?  The RIPE Atlas team decided to name all of its modules after
+But why [*Sagan*](https://en.wikipedia.org/wiki/Carl_Sagan)?  The RIPE Atlas team decided to name all of its modules after
 explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
