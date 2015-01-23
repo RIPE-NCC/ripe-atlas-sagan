@@ -46,7 +46,11 @@ def test_ntp_valid():
     assert(result.packets[0].received_time.isoformat() == "2014-12-10T11:23:08.170495+00:00")
     assert(result.packets[0].transmitted_timestamp == 3627199388.170522213)
     assert(result.packets[0].transmitted_time.isoformat() == "2014-12-10T11:23:08.170522+00:00")
+    assert(result.rtt_min == 0.002)
+    assert(result.rtt_max == 0.022)
     assert(result.rtt_median == 0.01)
+    assert(result.offset_min == -8.372775)
+    assert(result.offset_max == -8.363271)
     assert(result.offset_median == -8.36871)
 
 

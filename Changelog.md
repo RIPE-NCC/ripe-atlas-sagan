@@ -1,5 +1,7 @@
 # Changelog
 
+* 0.6.1
+    * Added `rtt_min`, `rtt_max`, `offset_min`, and `offset_max` to `NTPResult`
 * 0.6.0
     * Support for NTP measurements
     * Fixes for how we calculate median values

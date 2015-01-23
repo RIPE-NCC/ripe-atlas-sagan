@@ -89,7 +89,11 @@ class NtpResult(Result):
         Result.__init__(self, data, **kwargs)
 
         self.rtt_median            = None
+        self.rtt_min               = None
+        self.rtt_max               = None
         self.offset_median         = None
+        self.offset_min            = None
+        self.offset_max            = None
 
         self.af                    = self.ensure("af",              int)
         self.protocol              = self.ensure("proto",           str)
@@ -117,19 +121,26 @@ class NtpResult(Result):
         for response in self.raw_data["result"]:
             self.packets.append(Packet(response, **kwargs))
 
-        self._set_medians()
+        self._set_medians_and_extremes()
 
-    def _set_medians(self):
+    def _set_medians_and_extremes(self):
         """
         Sets median values for rtt and the offset of result packets.
         """
 
         rtts = sorted([p.rtt for p in self.packets if p.rtt is not None])
-        self.rtt_median = self.calculate_median(rtts)
+        if rtts:
+            self.rtt_min = rtts[0]
+            self.rtt_max = rtts[-1]
+            self.rtt_median = self.calculate_median(rtts)
+
         offsets = sorted(
             [p.offset for p in self.packets if p.offset is not None]
         )
-        self.offset_median = self.calculate_median(offsets)
+        if offsets:
+            self.offset_min = offsets[0]
+            self.offset_max = offsets[-1]
+            self.offset_median = self.calculate_median(offsets)
 
 
 __all__ = (
