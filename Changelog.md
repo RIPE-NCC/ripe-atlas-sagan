@@ -1,5 +1,8 @@
 # Changelog
 
+* 0.6.2
+    * Added [pierky](https://github.com/pierky)'s fix to fix AD and CD flags
+      parsing in DNS Header
 * 0.6.1
     * Added `rtt_min`, `rtt_max`, `offset_min`, and `offset_max` to `NTPResult`
 * 0.6.0
