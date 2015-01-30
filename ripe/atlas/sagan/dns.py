@@ -24,8 +24,8 @@ class Header(ValidationMixin):
         self.opcode      = self.ensure("OpCode",     str)
         self.ra          = self.ensure("RA",         bool)
         self.z           = self.ensure("Z",          int)
-        self.cd          = self.ensure("AD",         bool)
-        self.ad          = self.ensure("CD",         bool)
+        self.ad          = self.ensure("AD",         bool)
+        self.cd          = self.ensure("CD",         bool)
         self.id          = self.ensure("ID",         int)
 
     def __str__(self):
