@@ -1,5 +1,7 @@
 # Changelog
 
+* 0.6.3
+    * Fixed a bug in how Sagan deals with inappropriate firmware versions
 * 0.6.2
     * Added [pierky](https://github.com/pierky)'s fix to fix AD and CD flags
       parsing in DNS Header

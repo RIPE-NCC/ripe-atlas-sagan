@@ -81,8 +81,7 @@ class PingResult(Result):
             self.destination_address = self.ensure("addr", str)
             self.destination_name = self.ensure("name", str)
             self.packet_size = None
-
-        if 0 < self.firmware < 4570 and self.protocol == self.PROTOCOL_ICMP:
+        elif 0 < self.firmware < 4570 and self.protocol == self.PROTOCOL_ICMP:
             self.packet_size -= 8
 
         if self.af is None and self.destination_address:
