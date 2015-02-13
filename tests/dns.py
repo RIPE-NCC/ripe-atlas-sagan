@@ -491,15 +491,15 @@ def test_dnskeyanswer():
 def test_rrsiganswer():
     result = Result.get('{"af":4,"dst_addr":"193.0.9.5","from":"188.134.80.2","fw":4670,"group_id":1863527,"lts":164,"msm_id":1863527,"msm_name":"Tdig","prb_id":10221,"proto":"UDP","result":{"ANCOUNT":2,"ARCOUNT":1,"ID":43644,"NSCOUNT":0,"QDCOUNT":1,"abuf":"qnyEAAABAAIAAAABA3d3dwRyaXBlA25ldAAAAQABwAwAAQABAABUYAAEwQAGi8AMAC4AAQAAVGAAnAABBQMAAFRgVQF0I1TZ2RP39gRyaXBlA25ldAAKTSpMfJr47JtCHrIXQlklDB4CoLtux0tTGbfOUYCL1XBcbCU9mRj9WHd52gkyDqPYT6IFF6i56xYAxidn1/9o2Ou+X2PGTt0L/Fb+Ht1CN3exboitJq2FnIC1jKUcJIWF3VcLg5AwLkOklifPJqAeeHL98BOZ4IdNC/jDSNHbRAAAKRAAAACAAAAA","rt":15.705,"size":225},"src_addr":"10.250.10.104","timestamp":1423566533,"type":"dns"}')
     assert(isinstance(result.responses[0].abuf.answers[1], RRSigAnswer))
-    assert(result.responses[0].abuf.answers[1].typecovered == 'A')
+    assert(result.responses[0].abuf.answers[1].type_covered == 'A')
     assert(result.responses[0].abuf.answers[1].algorithm == 5)
     assert(result.responses[0].abuf.answers[1].labels == 3)
-    assert(result.responses[0].abuf.answers[1].originalttl == 21600)
-    assert(result.responses[0].abuf.answers[1].signatureexpiration ==
+    assert(result.responses[0].abuf.answers[1].original_ttl == 21600)
+    assert(result.responses[0].abuf.answers[1].signature_expiration ==
     1426158627)
-    assert(result.responses[0].abuf.answers[1].signatureinception == 1423563027)
-    assert(result.responses[0].abuf.answers[1].keytag == 63478)
-    assert(result.responses[0].abuf.answers[1].signername == 'ripe.net.')
+    assert(result.responses[0].abuf.answers[1].signature_inception == 1423563027)
+    assert(result.responses[0].abuf.answers[1].key_tag == 63478)
+    assert(result.responses[0].abuf.answers[1].signer_name == 'ripe.net.')
     assert(result.responses[0].abuf.answers[1].signature ==
     'Ck0qTHya+OybQh6yF0JZJQweAqC7bsdLUxm3zlGAi9VwXGwlPZkY/Vh3edoJMg6j2E+iBReouesWAMYnZ9f/aNjrvl9jxk7dC/xW/h7dQjd3sW6IrSathZyAtYylHCSFhd1XC4OQMC5DpJYnzyagHnhy/fATmeCHTQv4w0jR20Q=')
 

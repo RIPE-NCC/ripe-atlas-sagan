@@ -228,23 +228,23 @@ class TxtAnswer(Answer):
 class RRSigAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.typecovered            = self.ensure("TypeCovered",        str)
+        self.type_covered           = self.ensure("TypeCovered",        str)
         self.algorithm              = self.ensure("Algorithm",          int)
         self.labels                 = self.ensure("Labels",             int)
-        self.originalttl            = self.ensure("OriginalTTL",        int)
-        self.signatureexpiration    = self.ensure("SignatureExpiration",int)
-        self.signatureinception     = self.ensure("SignatureInception", int)
-        self.keytag                 = self.ensure("KeyTag",             int)
-        self.signername             = self.ensure("SignerName",         str)
+        self.original_ttl           = self.ensure("OriginalTTL",        int)
+        self.signature_expiration   = self.ensure("SignatureExpiration",int)
+        self.signature_inception    = self.ensure("SignatureInception", int)
+        self.key_tag                = self.ensure("KeyTag",             int)
+        self.signer_name            = self.ensure("SignerName",         str)
         self.signature              = self.ensure("Signature",          str)
 
     def __str__(self):
-        return "%s %s %s %s %s %s %s %s %s" % (
-            self.typecovered, self.algorithm, self.labels,
-            self.originalttl,
-            self.signatureexpiration,
-            self.signatureinception,
-            self.keytag, self.signername, self.signature )
+        return "{} {} {} {} {} {} {} {} {}".format(
+            self.type_covered, self.algorithm, self.labels,
+            self.original_ttl,
+            self.signature_expiration,
+            self.signature_inception,
+            self.key_tag, self.signer_name, self.signature )
 
 class Authority(ValidationMixin):
 
