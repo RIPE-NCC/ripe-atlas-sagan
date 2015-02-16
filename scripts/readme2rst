@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#
+# GitHub likes markdown, and Pypi likes RestructuredText.  This was the
+# easiest way to harmonise both.
+#
+
+project_dir="$(dirname $0)/.."
+
+source="${project_dir}/README.md"
+target="${project_dir}/README.rst"
+
+pandoc --from=markdown --to=rst --output=- ${source} \
+  | sed -e 's/ |Build Status|$//' \
+  | sed -e 's/^===============================$/================/' > ${target}
+
