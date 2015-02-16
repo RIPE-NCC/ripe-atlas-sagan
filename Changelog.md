@@ -1,5 +1,8 @@
 # Changelog
 
+* 0.7
+    * Added [pierky](https://github.com/pierky)'s new `RRSigAnswer` class to
+      the dns parser.
 * 0.6.3
     * Fixed a bug in how Sagan deals with inappropriate firmware versions
 * 0.6.2
