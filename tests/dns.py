@@ -367,8 +367,8 @@ def test_error_timeout():
     result = Result.get(broken_result)
     assert(result.is_error is True)
     try:
-        result = Result.get(broken_result, on_error=Result.ACTION_FAIL)
-        assert(False)
+        Result.get(broken_result, on_error=Result.ACTION_FAIL)
+        assert False
     except ResultError as e:
         assert(str(e) == "Timeout: 5000")
 
@@ -495,13 +495,11 @@ def test_rrsiganswer():
     assert(result.responses[0].abuf.answers[1].algorithm == 5)
     assert(result.responses[0].abuf.answers[1].labels == 3)
     assert(result.responses[0].abuf.answers[1].original_ttl == 21600)
-    assert(result.responses[0].abuf.answers[1].signature_expiration ==
-    1426158627)
+    assert(result.responses[0].abuf.answers[1].signature_expiration == 1426158627)
     assert(result.responses[0].abuf.answers[1].signature_inception == 1423563027)
     assert(result.responses[0].abuf.answers[1].key_tag == 63478)
     assert(result.responses[0].abuf.answers[1].signer_name == 'ripe.net.')
-    assert(result.responses[0].abuf.answers[1].signature ==
-    'Ck0qTHya+OybQh6yF0JZJQweAqC7bsdLUxm3zlGAi9VwXGwlPZkY/Vh3edoJMg6j2E+iBReouesWAMYnZ9f/aNjrvl9jxk7dC/xW/h7dQjd3sW6IrSathZyAtYylHCSFhd1XC4OQMC5DpJYnzyagHnhy/fATmeCHTQv4w0jR20Q=')
+    assert(result.responses[0].abuf.answers[1].signature == 'Ck0qTHya+OybQh6yF0JZJQweAqC7bsdLUxm3zlGAi9VwXGwlPZkY/Vh3edoJMg6j2E+iBReouesWAMYnZ9f/aNjrvl9jxk7dC/xW/h7dQjd3sW6IrSathZyAtYylHCSFhd1XC4OQMC5DpJYnzyagHnhy/fATmeCHTQv4w0jR20Q=')
 
 def test_dns_lts():
     result = Result.get('{"lts":161,"from":"46.17.16.18","msm_id":1004041,"timestamp":1406560725,"fw":4650,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":778,"result":{"abuf":"vb2EAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaooA==","rt":36.661,"NSCOUNT":0,"QDCOUNT":1,"ID":48573,"ARCOUNT":0,"ANCOUNT":1,"size":43},"result-rt":36.661,"src_addr":"192.168.1.12","type":"dns","dst_addr":"193.227.234.53"}')
