@@ -363,6 +363,33 @@ class AbufParser(object):
                 key_as_base64= base64.encodestring(key)
                 key_as_base64_str= key_as_base64.decode(cls.DNS_CTYPE)
                 rr['Key'] = ''.join(key_as_base64_str.split())
+            elif rr['Type'] == 'RRSIG':
+                # https://tools.ietf.org/html/rfc4034#section-3.1
+
+                """ The RDATA for an RRSIG RR consists of a 2 octet Type
+                Covered field, a 1 octet Algorithm field, a 1 octet Labels
+                field, a 4 octet Original  TTL field, a 4 octet Signature
+                Expiration field, a 4 octet Signature Inception field, a 2
+                octet Key tag, the Signer's Name field, and the Signature
+                field. """
+
+                fmt = "!HBBIIIH"
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['TypeCovered'], rr['Algorithm'], rr['Labels'], rr['OriginalTTL'], rr['SignatureExpiration'], rr['SignatureInception'], rr['KeyTag'] = struct.unpack(fmt, dat)
+                rr['TypeCovered'] = cls._type_to_text( rr['TypeCovered'] )
+
+                signature_offset, rr['SignerName'] = cls._do_name( rdata, fmtsz, error)
+
+                sig= rdata[signature_offset:]
+                sig_as_base64= base64.encodestring(sig)
+                sig_as_base64_str= sig_as_base64.decode(cls.DNS_CTYPE)
+                rr['Signature'] = ''.join(sig_as_base64_str.split())
+
         if rr['Type'] == 'TXT':
             if rr['Class'] == "IN" or rr['Class'] == "CH":
                 fmt    = "!B"

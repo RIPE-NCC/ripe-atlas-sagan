@@ -225,6 +225,26 @@ class TxtAnswer(Answer):
         Answer.__init__(self, data, **kwargs)
         self.data = self.ensure("Data", str)
 
+class RRSigAnswer(Answer):
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.type_covered           = self.ensure("TypeCovered",        str)
+        self.algorithm              = self.ensure("Algorithm",          int)
+        self.labels                 = self.ensure("Labels",             int)
+        self.original_ttl           = self.ensure("OriginalTTL",        int)
+        self.signature_expiration   = self.ensure("SignatureExpiration",int)
+        self.signature_inception    = self.ensure("SignatureInception", int)
+        self.key_tag                = self.ensure("KeyTag",             int)
+        self.signer_name            = self.ensure("SignerName",         str)
+        self.signature              = self.ensure("Signature",          str)
+
+    def __str__(self):
+        return "{} {} {} {} {} {} {} {} {}".format(
+            self.type_covered, self.algorithm, self.labels,
+            self.original_ttl,
+            self.signature_expiration,
+            self.signature_inception,
+            self.key_tag, self.signer_name, self.signature )
 
 class Authority(ValidationMixin):
 
@@ -298,6 +318,7 @@ class Message(ValidationMixin):
             "DS":     DsAnswer,
             "DNSKEY": DnskeyAnswer,
             "TXT":    TxtAnswer,
+            "RRSIG":  RRSigAnswer,
         }
 
         if "EDNS0" in self.raw_data:
