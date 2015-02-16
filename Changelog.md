@@ -1,5 +1,7 @@
 # Changelog
 
+* 0.7.1
+    * Changed `README.md` to `README.rst` to play nice with pypi.
 * 0.7
     * Added [pierky](https://github.com/pierky)'s new `RRSigAnswer` class to
       the dns parser.
