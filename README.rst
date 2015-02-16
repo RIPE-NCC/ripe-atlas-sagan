@@ -6,23 +6,20 @@ A parsing library for RIPE Atlas measurement results
 Why this exists
 ---------------
 
-RIPE Atlas generates a **lot** of data, and the format of that data
-changes over time. Often you want to do something simple like fetch the
-median RTT for each measurement result between date ``X`` and date
-``Y``. Unfortunately, there are are dozens of edge cases to account for
-while parsing the JSON, like the format of errors and firmware upgrades
-that changed the format entirely.
+RIPE Atlas generates a **lot** of data, and the format of that data changes over
+time. Often you want to do something simple like fetch the median RTT for each
+measurement result between date ``X`` and date ``Y``. Unfortunately, there are
+dozens of edge cases to account for while parsing the JSON, like the format of
+errors and firmware upgrades that changed the format entirely.
 
-To make this easier for our users (and for ourselves), we wrote an easy
-to use parser that's smart enough to figure out the best course of
-action for each result, and return to you a useful, native Python
-object.
+To make this easier for our users (and for ourselves), we wrote an easy to use
+parser that's smart enough to figure out the best course of action for each
+result, and return to you a useful, native Python object.
 
 How to install
 --------------
 
-The stable version should always be in PyPi, so you can install it with
-``pip``:
+The stable version should always be in PyPi, so you can install it with ``pip``:
 
 .. code:: bash
 
@@ -37,11 +34,10 @@ Better yet, make sure you get ujson and sphinx installed with it:
 Troubleshooting
 ~~~~~~~~~~~~~~~
 
-Some setups (like MacOS) have trouble with building the dependencies
-required for reading SSL certificates. If you don't care about SSL stuff
-and only want to use sagan to say, parse traceroute or DNS results, then
-you can tell the installer to skip building ``pyOpenSSL`` by doing the
-following:
+Some setups (like MacOS) have trouble with building the dependencies required
+for reading SSL certificates. If you don't care about SSL stuff and only want to
+use sagan to say, parse traceroute or DNS results, then you can tell the
+installer to skip building ``pyOpenSSL`` by doing the following:
 
 .. code:: bash
 
@@ -50,8 +46,7 @@ following:
 Quickstart: How To Use It
 -------------------------
 
-You can parse a result in a few ways. You can just pass the JSON-encoded
-string:
+You can parse a result in a few ways. You can just pass the JSON-encoded string:
 
 .. code:: python
 
@@ -81,8 +76,8 @@ You can do the JSON-decoding yourself:
     print(my_result.af)
     6
 
-You can let the parser guess the right type for you, though this incurs
-a small performance penalty:
+You can let the parser guess the right type for you, though this incurs a small
+performance penalty:
 
 .. code:: python
 
@@ -99,10 +94,10 @@ a small performance penalty:
 What it supports
 ----------------
 
-Essentially, we tried to support everything. If you pass in a DNS result
-string, the parser will return a ``DNSResult`` object, which contains a
-list of ``Response``\ s, each with an ``abuf`` property, as well as all
-of the information in that abuf: header, question, answer, etc.
+Essentially, we tried to support everything. If you pass in a DNS result string,
+the parser will return a ``DNSResult`` object, which contains a list of
+``Response``'s, each with an ``abuf`` property, as well as all of the
+information in that abuf: header, question, answer, etc.
 
 .. code:: python
 
@@ -112,15 +107,13 @@ of the information in that abuf: header, question, answer, etc.
     my_dns_result.responses[0].abuf  # The entire string
     my_dns_result.responses[0].abuf.header.arcount  # Decoded from the abuf
 
-We do the same sort of thing for SSL measurements, traceroutes,
-everything. We try to save you the effort of sorting through whatever is
-in the result.
+We do the same sort of thing for SSL measurements, traceroutes, everything. We
+try to save you the effort of sorting through whatever is in the result.
 
 Which attributes are supported?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Every result type has its own properties, with a few common between all
-types.
+Every result type has its own properties, with a few common between all types.
 
 Specifically, these attributes exist on all ``*Result`` objects:
 
@@ -133,9 +126,9 @@ Specifically, these attributes exist on all ``*Result`` objects:
 -  ``is_error`` Set to ``True`` if an error was found
 
 Additionally, each of the result types have their own properties, like
-``packet_size``, ``responses``, ``certificates``, etc. You can take a
-look at the classes themselves, or just look at the tests if you're
-curious. But to get you started, here are some examples:
+``packet_size``, ``responses``, ``certificates``, etc. You can take a look at
+the classes themselves, or just look at the tests if you're curious. But to get
+you started, here are some examples:
 
 .. code:: python
 
@@ -179,35 +172,32 @@ curious. But to get you started, here are some examples:
 What it requires
 ----------------
 
-As you might have guessed, with all of this magic going on under the
-hood, there are a few dependencies:
+As you might have guessed, with all of this magic going on under the hood, there
+are a few dependencies:
 
--  `arrow <https://pypi.python.org/pypi/arrow>`__
--  `pyOpenSSL <https://pypi.python.org/pypi/pyOpenSSL>`__ (Optional: see
-   "Troubleshooting" above)
--  `python-dateutil <https://pypi.python.org/pypi/python-dateutil>`__
--  `pytz <https://pypi.python.org/pypi/pytz>`__
--  `IPy <https://pypi.python.org/pypi/IPy/>`__
+-  `arrow`_
+-  `pyOpenSSL`_ (Optional: see "Troubleshooting" above)
+-  `python-dateutil`_
+-  `pytz`_
+-  `IPy`_
 
-Additionally, we recommend that you also install
-`ujson <https://pypi.python.org/pypi/ujson>`__ as it will speed up the
-JSON-decoding step considerably, and
-`sphinx <https://pypi.python.org/pypi/Sphinx>`__ if you intend to build
-the documentation files for offline use.
+Additionally, we recommend that you also install `ujson`_ as it will speed up
+the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
+documentation files for offline use.
 
 Running Tests
 -------------
 
-There's a full battery of tests for all measurement types, so if you've
-made changes and would like to submit a pull request, please run them
-(and update them!) before sending your request:
+There's a full battery of tests for all measurement types, so if you've made
+changes and would like to submit a pull request, please run them (and update
+them!) before sending your request:
 
 .. code:: bash
 
     $ python setup.py test
 
-You can also install ``tox`` to test everything in all of the supported
-Python versions:
+You can also install ``tox`` to test everything in all of the supported Python
+versions:
 
 .. code:: bash
 
@@ -217,32 +207,44 @@ Python versions:
 Further Documentation
 ---------------------
 
-Complete documentation can always be found on `the RIPE Atlas project
-page <https://atlas.ripe.net/docs/sagan/>`__, and if you're not online,
-the project itself contains a ``docs`` directory -- everything you
-should need is in there.
+Complete documentation can always be found on `the RIPE Atlas project page`_,
+and if you're not online, the project itself contains a ``docs`` directory --
+everything you should need is in there.
+
 
 Who's Responsible for This?
 ---------------------------
 
-Sagan is actively maintained by the RIPE NCC and primarily developed by
-`Daniel Quinn <https://github.com/danielquinn>`__, while the abuf parser
-is mostly the responsibility of `Philip
-Homburg <https://github.com/philiphomburg>`__ with an assist from Bert
-Wijnen and Rene Wilhelm who contributed to the original script. `Andreas
-Stirkos <https://github.com/astrikos>`__ did the bulk of the work on NTP
-measurements and fixt a few bugs, and big thanks go to `Chris
-Amin <https://github.com/chrisamin>`__ and `John
-Bond <https://github.com/b4ldr>`__ for finding and fixing stuff where
-they've run into problems.
+Sagan is actively maintained by the RIPE NCC and primarily developed by `Daniel
+Quinn`_, while the abuf parser is mostly the responsibility of `Philip Homburg`_
+with an assist from Bert Wijnen and Rene Wilhelm who contributed to the original
+script. `Andreas Stirkos`_ did the bulk of the work on NTP measurements and
+fixed a few bugs, and big thanks go to `Chris Amin`_, `John Bond`_, and
+`Pier Carlo Chiodi`_ for finding and fixing stuff where they've run into
+problems.
+
 
 Colophon
 --------
 
-But why `*Sagan* <https://en.wikipedia.org/wiki/Carl_Sagan>`__? The RIPE
-Atlas team decided to name all of its modules after explorers, and what
-better name for a parser than that of the man who spent decades reaching
-out to the public about the wonders of the cosmos?
+But why "`Sagan`_"? The RIPE Atlas team decided to name all of its modules after
+explorers, and what better name for a parser than that of the man who spent
+decades reaching out to the public about the wonders of the cosmos?
 
+.. _arrow: https://pypi.python.org/pypi/arrow
+.. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL
+.. _python-dateutil: https://pypi.python.org/pypi/python-dateutil
+.. _pytz: https://pypi.python.org/pypi/pytz
+.. _IPy: https://pypi.python.org/pypi/IPy/
+.. _ujson: https://pypi.python.org/pypi/ujson
+.. _sphinx: https://pypi.python.org/pypi/Sphinx
+.. _the RIPE Atlas project page: https://atlas.ripe.net/docs/sagan/
+.. _Daniel Quinn: https://github.com/danielquinn
+.. _Philip Homburg: https://github.com/philiphomburg
+.. _Andreas Stirkos: https://github.com/astrikos
+.. _Chris Amin: https://github.com/chrisamin
+.. _John Bond: https://github.com/b4ldr
+.. _Pier Carlo Chiodi: https://github.com/pierky
+.. _Sagan: https://en.wikipedia.org/wiki/Carl_Sagan
 .. |Build Status| image:: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan.png?branch=master
    :target: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan
