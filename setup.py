@@ -22,7 +22,7 @@ if "SAGAN_WITHOUT_SSL" not in os.environ:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 # Get the long description from README.md
-with open(os.path.join(os.path.dirname(__file__), "README.md")) as description:
+with open(os.path.join(os.path.dirname(__file__), "README.rst")) as description:
     setup(
         name="ripe.atlas.sagan",
         version=__version__,
