@@ -90,7 +90,7 @@ type up front.  Note that this does incur a small performance penalty however.
 
 .. _use-errors-and-malformations:
 
-Erorrs & Malformations
+Errors & Malformations
 ----------------------
 
 RIPE Atlas, like the Internet is never 100% what you'd expect.  Sometimes your
