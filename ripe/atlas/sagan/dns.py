@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import base64
+import collections
 
 from .base import Result, ValidationMixin
 from .helpers.abuf import AbufParser
@@ -30,6 +31,18 @@ class Header(ValidationMixin):
 
     def __str__(self):
         return "Header: " + self.return_code
+
+    @property
+    def flags(self):
+        Flags = collections.namedtuple('Flags', 'qr aa tc rd ra z ad cd')
+        return Flags(qr=self.qr, aa=self.aa, tc=self.tc, rd=self.rd,
+                     ra=self.ra, z=self.z, ad=self.ad, cd=self.cd)
+
+    @property
+    def sections(self):
+        Sections = collections.namedtuple('Sections', 'QDCOUNT ANCOUNT NSCOUNT ARCOUNT')
+        return Sections(QDCOUNT=self.QDCOUNT, ANCOUNT=self.ANCOUNT,
+                        NSCOUNT=self.NSCOUNT, ARCOUNT=self.ARCOUNT)
 
     @property
     def is_authoritative(self):
