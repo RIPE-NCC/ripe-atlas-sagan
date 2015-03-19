@@ -41,8 +41,8 @@ class Header(ValidationMixin):
     @property
     def sections(self):
         Sections = collections.namedtuple('Sections', 'QDCOUNT ANCOUNT NSCOUNT ARCOUNT')
-        return Sections(QDCOUNT=self.QDCOUNT, ANCOUNT=self.ANCOUNT,
-                        NSCOUNT=self.NSCOUNT, ARCOUNT=self.ARCOUNT)
+        return Sections(QDCOUNT=self.qdcount, ANCOUNT=self.ancount,
+                        NSCOUNT=self.nscount, ARCOUNT=self.arcount)
 
     @property
     def is_authoritative(self):
