@@ -34,13 +34,13 @@ class Header(ValidationMixin):
 
     @property
     def flags(self):
-        Flags = collections.namedtuple('Flags', 'qr aa tc rd ra z ad cd')
+        Flags = collections.namedtuple('Flags', ('qr', 'aa', 'tc', 'rd', 'ra', 'z', 'ad', 'cd'))
         return Flags(qr=self.qr, aa=self.aa, tc=self.tc, rd=self.rd,
                      ra=self.ra, z=self.z, ad=self.ad, cd=self.cd)
 
     @property
     def sections(self):
-        Sections = collections.namedtuple('Sections', 'QDCOUNT ANCOUNT NSCOUNT ARCOUNT')
+        Sections = collections.namedtuple('Sections', ('QDCOUNT', 'ANCOUNT', 'NSCOUNT', 'ARCOUNT'))
         return Sections(QDCOUNT=self.qdcount, ANCOUNT=self.ancount,
                         NSCOUNT=self.nscount, ARCOUNT=self.arcount)
 
