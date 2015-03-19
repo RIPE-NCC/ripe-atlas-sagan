@@ -1,5 +1,8 @@
 # Changelog
 
+* 0.8.0
+    * Added [iortiz](https://github.com/iortiz)'s patch for flags and `flags`
+      and `sections` properties on DNS `Answer` objects.
 * 0.7.1
     * Changed `README.md` to `README.rst` to play nice with pypi.
 * 0.7
