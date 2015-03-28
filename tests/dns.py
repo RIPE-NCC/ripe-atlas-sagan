@@ -1,3 +1,4 @@
+from collections import namedtuple
 from ripe.atlas.sagan import Result, ResultError
 from ripe.atlas.sagan.dns import (
     DnsResult, Edns0, AAnswer, AaaaAnswer, NsAnswer, CnameAnswer, MxAnswer,
@@ -522,3 +523,13 @@ def test_unparsed_abuf():
     assert(result.responses[0].abuf.answers[0].type == "TXT")
     assert(result.responses[0].abuf.answers[0].ttl is None)
     assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
+
+def test_flags():
+    result = Result.get('{"from":"2001:67c:2e8:11::c100:136c","msm_id":1663540,"fw":4620,"af":6,"timestamp":1403091608,"proto":"UDP","dst_addr":"2001:41d0:1:4874::1","prb_id":6012,"result":{"abuf":"1jKEAAABAAEAAgADCnBvc3RtYXN0ZXICZnIAABwAAcAMABwAAQAAASwAECABQdAAAUh0AAAAAAAAAAHADAACAAEAAAEsAAYDbnMxwAzADAACAAEAAAEsAAYDbnMywAzARwABAAEAAAEsAARXYtl0wEcAHAABAAABLAAQIAFB0AABSHQAAAAAAAAAAcBZAAEAAQAAASwABFzzEZ8=","rt":8.656,"NSCOUNT":2,"QDCOUNT":1,"ANCOUNT":1,"ARCOUNT":3,"ID":54834,"size":155},"result-rt":8.656,"src_addr":"2001:67c:2e8:11::c100:136c","group_id":1663540,"type":"dns","msm_name":"Tdig","name":"2001:41d0:1:4874:0:0:0:1"}')
+    Flags = namedtuple("Flags", ("qr", "aa", "tc", "rd", "ra", "z", "ad", "cd"))
+    assert(result.responses[0].abuf.header.flags == Flags(qr=True, aa=True, tc=False, rd=False, ra=False, z=0, ad=False, cd=False))
+
+def test_sections():
+    result = Result.get('{"from":"2001:67c:2e8:11::c100:136c","msm_id":1663540,"fw":4620,"af":6,"timestamp":1403091608,"proto":"UDP","dst_addr":"2001:41d0:1:4874::1","prb_id":6012,"result":{"abuf":"1jKEAAABAAEAAgADCnBvc3RtYXN0ZXICZnIAABwAAcAMABwAAQAAASwAECABQdAAAUh0AAAAAAAAAAHADAACAAEAAAEsAAYDbnMxwAzADAACAAEAAAEsAAYDbnMywAzARwABAAEAAAEsAARXYtl0wEcAHAABAAABLAAQIAFB0AABSHQAAAAAAAAAAcBZAAEAAQAAASwABFzzEZ8=","rt":8.656,"NSCOUNT":2,"QDCOUNT":1,"ANCOUNT":1,"ARCOUNT":3,"ID":54834,"size":155},"result-rt":8.656,"src_addr":"2001:67c:2e8:11::c100:136c","group_id":1663540,"type":"dns","msm_name":"Tdig","name":"2001:41d0:1:4874:0:0:0:1"}')
+    Sections = namedtuple("Sections", ("QDCOUNT", "ANCOUNT", "NSCOUNT", "ARCOUNT"))
+    assert(result.responses[0].abuf.header.sections == Sections(QDCOUNT=1, ANCOUNT=1, NSCOUNT=2, ARCOUNT=3))
