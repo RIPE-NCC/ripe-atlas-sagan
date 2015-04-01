@@ -199,7 +199,7 @@ checksum values::
         print(parsed_result.get_checksum_chain())
 
 
-.. _#1012449: https://atlas.ripe.net/atlas/udm.html?msm_id=1012449
+.. _#1012449: https://atlas.ripe.net/measurements/1012449/
 
 
 .. _examples-types:
