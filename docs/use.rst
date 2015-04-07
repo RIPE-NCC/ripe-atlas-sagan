@@ -21,6 +21,15 @@ be able to pass in the JSON string and immediately get usable Python objects.
 
 .. _use-basics:
 
+Important Note
+--------------
+
+The one thing that tends to confuse people when first trying out Sagan is that
+this library operates on **single measurement results**, and not a list of
+results.  If you have a list of results (for example, the output of the
+measurement results API), then you must loop over those results and pass each
+result to Sagan for parsing.
+
 Basics
 ------
 
