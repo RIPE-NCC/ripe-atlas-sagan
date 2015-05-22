@@ -290,7 +290,7 @@ Property               Type      Explanation
 raw_data               dict      The portion of the parsed abuf that represents this section
 aa                     bool
 qr                     bool
-nscount                int
+nscount                int       Otherwise known as the namserver count or authority count.
 qdcount                int
 ancount                int
 tc                     bool
