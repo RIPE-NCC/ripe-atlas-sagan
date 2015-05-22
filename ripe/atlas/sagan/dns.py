@@ -56,6 +56,9 @@ class Header(ValidationMixin):
 
     @property
     def nameserver_count(self):
+        """
+        Otherwise known as the NSCOUNT or the authority_count.
+        """
         return self.nscount
 
     @property
