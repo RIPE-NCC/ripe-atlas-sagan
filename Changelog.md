@@ -1,5 +1,7 @@
 # Changelog
 
+* 0.8.1
+    * Minor fix to make all `Result` objects properly JSON serialisable.
 * 0.8.0
     * Added [iortiz](https://github.com/iortiz)'s patch for flags and `flags`
       and `sections` properties on DNS `Answer` objects.
