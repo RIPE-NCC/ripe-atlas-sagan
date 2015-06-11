@@ -48,12 +48,12 @@ class DictionaryLikeMixin(object):
     def keys(self):
         return [p for p in dir(self) if self._is_property_name(p)]
 
-    @staticmethod
-    def _is_property_name(p):
+    def _is_property_name(self, p):
         if not p.startswith("_"):
             if p not in ("keys",):
                 if not p.upper() == p:
-                    return True
+                    if not callable(getattr(self, p)):
+                        return True
         return False
 
 
