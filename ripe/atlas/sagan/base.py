@@ -26,41 +26,13 @@ class ResultError(Exception):
     pass
 
 
-class DictionaryLikeMixin(object):
-    """
-    Python 2.x and 3.x handle the creation of dictionary-like objects
-    differently.  If we write it this way, it works for both.
-    """
-
-    def __len__(self):
-        return len(self.keys())
-
-    def __iter__(self):
-        for key in self.keys():
-            yield getattr(self, key)
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def __setitem__(self, key, item):
-        setattr(self, key, item)
-
-    def keys(self):
-        return [p for p in dir(self) if self._is_property_name(p)]
-
-    def _is_property_name(self, p):
-        if not p.startswith("_"):
-            if p not in ("keys",):
-                if not p.upper() == p:
-                    if not callable(getattr(self, p)):
-                        return True
-        return False
-
-
-class ValidationMixin(DictionaryLikeMixin):
+class ParsingDict(object):
     """
     A handy container for methods we use for validation in the various result
     classes.
+
+    Note that Python 2.x and 3.x handle the creation of dictionary-like objects
+    differently.  If we write it this way, it works for both.
     """
 
     ACTION_IGNORE = 1
@@ -81,14 +53,28 @@ class ValidationMixin(DictionaryLikeMixin):
 
     def __init__(self, **kwargs):
 
-        DictionaryLikeMixin.__init__(self)
-
-        self._on_error     = kwargs.pop("on_error", self.ACTION_WARN)
-        self.is_error      = False
+        self._on_error = kwargs.pop("on_error", self.ACTION_WARN)
+        self.is_error = False
         self.error_message = None
 
         self._on_malformation = kwargs.pop("on_malformation", self.ACTION_WARN)
-        self.is_malformed     = False
+        self.is_malformed = False
+
+    def __len__(self):
+        return len(self.keys())
+
+    def __iter__(self):
+        for key in self.keys():
+            yield getattr(self, key)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, item):
+        setattr(self, key, item)
+
+    def keys(self):
+        return [p for p in dir(self) if self._is_property_name(p)]
 
     def ensure(self, key, kind, default=None):
         try:
@@ -128,8 +114,16 @@ class ValidationMixin(DictionaryLikeMixin):
         self.is_error = True
         self.error_message = message
 
+    def _is_property_name(self, p):
+        if not p.startswith("_"):
+            if p not in ("keys",):
+                if not p.upper() == p:
+                    if not callable(getattr(self, p)):
+                        return True
+        return False
 
-class Result(ValidationMixin):
+
+class Result(ParsingDict):
     """
     The parent class for all measurement result classes.  Subclass this to
     handle parsing a new measurement type, or use .get() to let this class
@@ -138,7 +132,7 @@ class Result(ValidationMixin):
 
     def __init__(self, data, *args, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
         if isinstance(data, compat_basestring):

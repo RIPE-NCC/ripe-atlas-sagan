@@ -2,9 +2,9 @@ import logging
 
 from IPy import IP
 
-from .base import Result, ValidationMixin
+from .base import Result, ParsingDict
 
-class IcmpHeader(ValidationMixin):
+class IcmpHeader(ParsingDict):
     """
     But why did we stop here?  Why not go all the way and define subclasses for
     each object and for `mpls`?  it comes down to a question of complexity vs.
@@ -18,7 +18,7 @@ class IcmpHeader(ValidationMixin):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
 
@@ -27,7 +27,7 @@ class IcmpHeader(ValidationMixin):
         self.objects = self.ensure("obj",     list)
 
 
-class Packet(ValidationMixin):
+class Packet(ParsingDict):
 
     ERROR_CONDITIONS = {
         "N": "Network unreachable",
@@ -39,7 +39,7 @@ class Packet(ValidationMixin):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
 
@@ -70,11 +70,11 @@ class Packet(ValidationMixin):
         return self.origin
 
 
-class Hop(ValidationMixin):
+class Hop(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
 

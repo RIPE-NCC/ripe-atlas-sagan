@@ -1,10 +1,10 @@
-from .base import Result, ValidationMixin
+from .base import Result, ParsingDict
 
-class Response(ValidationMixin):
+class Response(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data            = data
         self.af                  = self.ensure("af",       int)

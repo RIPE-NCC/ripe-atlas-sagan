@@ -3,14 +3,14 @@ from __future__ import absolute_import
 import base64
 from collections import namedtuple
 
-from .base import Result, ValidationMixin
+from .base import Result, ParsingDict
 from .helpers.abuf import AbufParser
 
-class Header(ValidationMixin):
+class Header(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data    = data
         self.aa          = self.ensure("AA",         bool)
@@ -98,11 +98,11 @@ class Header(ValidationMixin):
         return self.aa
 
 
-class Option(ValidationMixin):
+class Option(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
         self.nsid   = self.ensure("NSID",         str)
@@ -111,11 +111,11 @@ class Option(ValidationMixin):
         self.name   = self.ensure("OptionName",   str)
 
 
-class Edns0(ValidationMixin):
+class Edns0(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
         self.extended_return_code = self.ensure("ExtendedReturnCode", int)
@@ -132,11 +132,11 @@ class Edns0(ValidationMixin):
                     self.options.append(Option(option))
 
 
-class Question(ValidationMixin):
+class Question(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
         self.klass    = self.ensure("Qclass", str)
@@ -144,11 +144,11 @@ class Question(ValidationMixin):
         self.name     = self.ensure("Qname",  str)
 
 
-class Answer(ValidationMixin):
+class Answer(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.name      = self.ensure("Name",     str)
@@ -269,11 +269,11 @@ class RRSigAnswer(Answer):
         )
 
 
-class Authority(ValidationMixin):
+class Authority(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.klass     = self.ensure("Class",    int)
@@ -288,11 +288,11 @@ class Authority(ValidationMixin):
         return self.rd_length
 
 
-class Additional(ValidationMixin):
+class Additional(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data  = data
         self.address   = self.ensure("Address",  str)
@@ -307,11 +307,11 @@ class Additional(ValidationMixin):
         return self.rd_length
 
 
-class Message(ValidationMixin):
+class Message(ParsingDict):
 
     def __init__(self, message, response_data, parse_buf=True, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self._string_representation = message
         self.raw_data = {}
@@ -420,12 +420,12 @@ class Message(ValidationMixin):
                     self.raw_data["AnswerSection"].append(temporary)
 
 
-class Response(ValidationMixin):
+class Response(ParsingDict):
 
     def __init__(self, data, af=None, destination=None, source=None,
                  protocol=None, part_of_set=True, parse_buf=True, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
 

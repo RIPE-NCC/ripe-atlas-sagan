@@ -13,9 +13,9 @@ except ImportError:
         "certificate measurement results"
     )
 
-from .base import Result, ResultParseError, ValidationMixin
+from .base import Result, ResultParseError, ParsingDict
 
-class Certificate(ValidationMixin):
+class Certificate(ParsingDict):
 
     TIME_FORMAT = "%Y%m%d%H%M%SZ"
     TIME_REGEX = re.compile(
@@ -24,7 +24,7 @@ class Certificate(ValidationMixin):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data    = data
         self.subject_cn  = None

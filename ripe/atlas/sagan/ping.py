@@ -1,10 +1,10 @@
-from .base import Result, ResultParseError, ValidationMixin
+from .base import Result, ResultParseError, ParsingDict
 
-class Packet(ValidationMixin):
+class Packet(ParsingDict):
 
     def __init__(self, data, default_ttl, default_source_address, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.rtt = None
         self.dup = False

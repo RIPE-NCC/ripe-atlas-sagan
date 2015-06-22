@@ -2,10 +2,10 @@ import arrow
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from .base import Result, ResultParseError, ValidationMixin
+from .base import Result, ResultParseError, ParsingDict
 
 
-class Packet(ValidationMixin):
+class Packet(ParsingDict):
     """
     Model for data structure of each packet for a NTP result.
     """
@@ -14,7 +14,7 @@ class Packet(ValidationMixin):
 
     def __init__(self, data, **kwargs):
 
-        ValidationMixin.__init__(self, **kwargs)
+        ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
         self.rtt = None
