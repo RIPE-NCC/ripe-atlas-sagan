@@ -26,18 +26,18 @@ class Certificate(ParsingDict):
 
         ParsingDict.__init__(self, **kwargs)
 
-        self.raw_data    = data
-        self.subject_cn  = None
-        self.subject_o   = None
-        self.subject_c   = None
-        self.issuer_cn   = None
-        self.issuer_o    = None
-        self.issuer_c    = None
-        self.valid_from  = None
+        self.raw_data = data
+        self.subject_cn = None
+        self.subject_o = None
+        self.subject_c = None
+        self.issuer_cn = None
+        self.issuer_o = None
+        self.issuer_c = None
+        self.valid_from = None
         self.valid_until = None
 
-        self.checksum_md5    = None
-        self.checksum_sha1   = None
+        self.checksum_md5 = None
+        self.checksum_sha1 = None
         self.checksum_sha256 = None
 
         self.has_expired = None
@@ -48,24 +48,24 @@ class Certificate(ParsingDict):
             data.replace("\\/", "/").replace("\n\n", "\n")
         )
         subject = dict(x509.get_subject().get_components())
-        issuer  = dict(x509.get_issuer().get_components())
+        issuer = dict(x509.get_issuer().get_components())
 
         if x509 and subject and issuer:
 
-            self.subject_cn  = self._string_from_dict_or_none(subject, b"CN")
-            self.subject_o   = self._string_from_dict_or_none(subject, b"O")
-            self.subject_c   = self._string_from_dict_or_none(subject, b"C")
-            self.issuer_cn   = self._string_from_dict_or_none(issuer, b"CN")
-            self.issuer_o    = self._string_from_dict_or_none(issuer, b"O")
-            self.issuer_c    = self._string_from_dict_or_none(issuer, b"C")
+            self.subject_cn = self._string_from_dict_or_none(subject, b"CN")
+            self.subject_o = self._string_from_dict_or_none(subject, b"O")
+            self.subject_c = self._string_from_dict_or_none(subject, b"C")
+            self.issuer_cn = self._string_from_dict_or_none(issuer, b"CN")
+            self.issuer_o = self._string_from_dict_or_none(issuer, b"O")
+            self.issuer_c = self._string_from_dict_or_none(issuer, b"C")
 
-            self.checksum_md5    = x509.digest("md5").decode()
-            self.checksum_sha1   = x509.digest("sha1").decode()
+            self.checksum_md5 = x509.digest("md5").decode()
+            self.checksum_sha1 = x509.digest("sha1").decode()
             self.checksum_sha256 = x509.digest("sha256").decode()
 
             self.has_expired = bool(x509.has_expired())
 
-            self.valid_from  = None
+            self.valid_from = None
             self.valid_until = None
             self._process_validation_times(x509)
 
@@ -104,7 +104,7 @@ class Certificate(ParsingDict):
         to be done.
         """
 
-        valid_from  = x509.get_notBefore()
+        valid_from = x509.get_notBefore()
         valid_until = x509.get_notAfter()
 
         try:
@@ -113,7 +113,7 @@ class Certificate(ParsingDict):
                 self.TIME_FORMAT
             ))
         except ValueError:
-            self.valid_from  = self._process_nonstandard_time(valid_from)
+            self.valid_from = self._process_nonstandard_time(valid_from)
 
         try:
             self.valid_until = pytz.UTC.localize(datetime.strptime(
@@ -170,15 +170,15 @@ class SslResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af                  = self.ensure("af",       int)
+        self.af = self.ensure("af", int)
         self.destination_address = self.ensure("dst_addr", str)
-        self.destination_name    = self.ensure("dst_name", str)
-        self.source_address      = self.ensure("src_addr", str)
-        self.port                = self.ensure("dst_port", int)
-        self.method              = self.ensure("method",   str)
-        self.version             = self.ensure("ver",      str)
-        self.response_time       = self.ensure("rt",       float)
-        self.time_to_connect     = self.ensure("ttc",      float)
+        self.destination_name = self.ensure("dst_name", str)
+        self.source_address = self.ensure("src_addr", str)
+        self.port = self.ensure("dst_port", int)
+        self.method = self.ensure("method", str)
+        self.version = self.ensure("ver", str)
+        self.response_time = self.ensure("rt", float)
+        self.time_to_connect = self.ensure("ttc", float)
 
         self.certificates = []
         self.is_self_signed = False

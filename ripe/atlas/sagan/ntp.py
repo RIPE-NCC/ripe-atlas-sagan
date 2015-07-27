@@ -27,20 +27,21 @@ class Packet(ParsingDict):
             self.rtt = round(float(data["rtt"]), 3)
         except (ValueError, TypeError):
             raise ResultParseError(
-                'RTT "{rtt}" does not appear to be a float'.format(rtt=data["rtt"])
+                'RTT "{rtt}" does not appear to be a float'.format(
+                    rtt=data["rtt"])
             )
 
-        self.offset                = self.ensure("offset",      float)
-        self.final_timestamp       = self.ensure("final-ts",    float)
-        self.origin_timestamp      = self.ensure("origin-ts",   float)
-        self.received_timestamp    = self.ensure("receive-ts",  float)
+        self.offset = self.ensure("offset", float)
+        self.final_timestamp = self.ensure("final-ts", float)
+        self.origin_timestamp = self.ensure("origin-ts", float)
+        self.received_timestamp = self.ensure("receive-ts", float)
         self.transmitted_timestamp = self.ensure("transmit-ts", float)
 
         # Caching
 
-        self._final_time       = None
-        self._origin_time      = None
-        self._received_time    = None
+        self._final_time = None
+        self._origin_time = None
+        self._received_time = None
         self._transmitted_time = None
 
     def __str__(self):
@@ -74,7 +75,8 @@ class Packet(ParsingDict):
     def transmitted_time(self):
         if not self._transmitted_time and self.transmitted_timestamp:
             self._transmitted_time = arrow.get(
-                self.NTP_EPOCH + relativedelta(seconds=self.transmitted_timestamp)
+                self.NTP_EPOCH + relativedelta(
+                    seconds=self.transmitted_timestamp)
             )
         return self._transmitted_time
 
@@ -88,29 +90,29 @@ class NtpResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.rtt_median            = None
-        self.rtt_min               = None
-        self.rtt_max               = None
-        self.offset_median         = None
-        self.offset_min            = None
-        self.offset_max            = None
+        self.rtt_median = None
+        self.rtt_min = None
+        self.rtt_max = None
+        self.offset_median = None
+        self.offset_min = None
+        self.offset_max = None
 
-        self.af                    = self.ensure("af",              int)
-        self.protocol              = self.ensure("proto",           str)
-        self.destination_address   = self.ensure("dst_addr",        str)
-        self.destination_name      = self.ensure("dst_name",        str)
-        self.source_address        = self.ensure("src_addr",        str)
-        self.end_time              = self.ensure("endtime",         "datetime")
-        self.leap_second_indicator = self.ensure("li",              str)
-        self.mode                  = self.ensure("mode",            str)
-        self.poll                  = self.ensure("poll",            int)
-        self.precision             = self.ensure("precision",       float)
-        self.reference_id          = self.ensure("ref-id",          str)
-        self.reference_time        = self.ensure("ref-ts",          float)
-        self.root_delay            = self.ensure("root-delay",      int)
-        self.root_dispersion       = self.ensure("root-dispersion", float)
-        self.stratum               = self.ensure("stratum",         int)
-        self.version               = self.ensure("version",         int)
+        self.af = self.ensure("af", int)
+        self.protocol = self.ensure("proto", str)
+        self.destination_address = self.ensure("dst_addr", str)
+        self.destination_name = self.ensure("dst_name", str)
+        self.source_address = self.ensure("src_addr", str)
+        self.end_time = self.ensure("endtime", "datetime")
+        self.leap_second_indicator = self.ensure("li", str)
+        self.mode = self.ensure("mode", str)
+        self.poll = self.ensure("poll", int)
+        self.precision = self.ensure("precision", float)
+        self.reference_id = self.ensure("ref-id", str)
+        self.reference_time = self.ensure("ref-ts", float)
+        self.root_delay = self.ensure("root-delay", int)
+        self.root_dispersion = self.ensure("root-dispersion", float)
+        self.stratum = self.ensure("stratum", int)
+        self.version = self.ensure("version", int)
 
         self.packets = []
 

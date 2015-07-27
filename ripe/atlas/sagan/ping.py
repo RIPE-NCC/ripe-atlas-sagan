@@ -55,18 +55,18 @@ class PingResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af                  = self.ensure("af",       int)
-        self.duplicates          = self.ensure("dup",      int)
-        self.rtt_average         = self.ensure("avg",      float)
-        self.rtt_median          = None  # Redefined in self._set_rtt_median()
-        self.rtt_max             = self.ensure("max",      float)
-        self.rtt_min             = self.ensure("min",      float)
-        self.packets_sent        = self.ensure("sent",     int)
-        self.packets_received    = self.ensure("rcvd",     int)
-        self.packet_size         = self.ensure("size",     int)
-        self.destination_name    = self.ensure("dst_name", str)
+        self.af = self.ensure("af", int)
+        self.duplicates = self.ensure("dup", int)
+        self.rtt_average = self.ensure("avg", float)
+        self.rtt_max = self.ensure("max", float)
+        self.rtt_min = self.ensure("min", float)
+        self.packets_sent = self.ensure("sent", int)
+        self.packets_received = self.ensure("rcvd", int)
+        self.packet_size = self.ensure("size", int)
+        self.destination_name = self.ensure("dst_name", str)
         self.destination_address = self.ensure("dst_addr", str)
-        self.step                = self.ensure("step",     int)
+        self.step = self.ensure("step", int)
+        self.rtt_median = None  # Redefined in self._set_rtt_median()
         self.packets = []
 
         if self.rtt_average < 0:
@@ -111,7 +111,9 @@ class PingResult(Result):
             )
 
     def _set_rtt_median(self):
-        packets = sorted([p.rtt for p in self.packets if p.rtt is not None and p.dup is False])
+        packets = sorted([
+            p.rtt for p in self.packets if p.rtt is not None and p.dup is False
+        ])
         self.rtt_median = self.calculate_median(packets)
 
 __all__ = (

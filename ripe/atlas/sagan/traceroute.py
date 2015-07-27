@@ -43,15 +43,15 @@ class Packet(ParsingDict):
 
         self.raw_data = data
 
-        self.origin                  = self.ensure("from",       str)
-        self.rtt                     = self.ensure("rtt",        float)
-        self.size                    = self.ensure("size",       int)
-        self.ttl                     = self.ensure("ttl",        int)
-        self.mtu                     = self.ensure("mtu",        int)
+        self.origin = self.ensure("from", str)
+        self.rtt = self.ensure("rtt", float)
+        self.size = self.ensure("size", int)
+        self.ttl = self.ensure("ttl", int)
+        self.mtu = self.ensure("mtu", int)
         self.destination_option_size = self.ensure("dstoptsize", int)
-        self.hop_by_hop_option_size  = self.ensure("hbhoptsize", int)
-        self.arrived_late_by         = self.ensure("late",       int, 0)
-        self.internal_ttl            = self.ensure("ittl",       int, 1)
+        self.hop_by_hop_option_size = self.ensure("hbhoptsize", int)
+        self.arrived_late_by = self.ensure("late", int, 0)
+        self.internal_ttl = self.ensure("ittl", int, 1)
 
         if self.rtt:
             self.rtt = round(self.rtt, 3)
@@ -105,27 +105,27 @@ class TracerouteResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.af                  = self.ensure("af", int)
+        self.af = self.ensure("af", int)
         self.destination_address = self.ensure("dst_addr", str)
-        self.destination_name    = self.ensure("dst_name", str)
-        self.source_address      = self.ensure("src_addr", str)
-        self.end_time            = self.ensure("endtime",  "datetime")
-        self.paris_id            = self.ensure("paris_id", int)
-        self.size                = self.ensure("size",     int)
+        self.destination_name = self.ensure("dst_name", str)
+        self.source_address = self.ensure("src_addr", str)
+        self.end_time = self.ensure("endtime", "datetime")
+        self.paris_id = self.ensure("paris_id", int)
+        self.size = self.ensure("size", int)
 
         if 0 < self.firmware < 4460:
             self.af = self.ensure("pf", int)
 
         self.protocol = self.clean_protocol(self.ensure("proto", str))
 
-        self.hops       = []
+        self.hops = []
         self.total_hops = 0
-        self.last_rtt   = None
+        self.last_rtt = None
         self._parse_hops(**kwargs)  # Sets hops, last_rtt, and total_hops
 
         # Used by a few response tests below
         self._destination_ip_responded = None
-        self._last_hop_responded       = None
+        self._last_hop_responded = None
 
     @property
     def target_responded(self):

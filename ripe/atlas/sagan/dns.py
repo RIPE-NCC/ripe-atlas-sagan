@@ -12,35 +12,37 @@ class Header(ParsingDict):
 
         ParsingDict.__init__(self, **kwargs)
 
-        self.raw_data    = data
-        self.aa          = self.ensure("AA",         bool)
-        self.qr          = self.ensure("QR",         bool)
-        self.nscount     = self.ensure("NSCOUNT",    int)
-        self.qdcount     = self.ensure("QDCOUNT",    int)
-        self.ancount     = self.ensure("ANCOUNT",    int)
-        self.tc          = self.ensure("TC",         bool)
-        self.rd          = self.ensure("RD",         bool)
-        self.arcount     = self.ensure("ARCOUNT",    int)
+        self.raw_data = data
+        self.aa = self.ensure("AA", bool)
+        self.qr = self.ensure("QR", bool)
+        self.nscount = self.ensure("NSCOUNT", int)
+        self.qdcount = self.ensure("QDCOUNT", int)
+        self.ancount = self.ensure("ANCOUNT", int)
+        self.tc = self.ensure("TC", bool)
+        self.rd = self.ensure("RD", bool)
+        self.arcount = self.ensure("ARCOUNT", int)
         self.return_code = self.ensure("ReturnCode", str)
-        self.opcode      = self.ensure("OpCode",     str)
-        self.ra          = self.ensure("RA",         bool)
-        self.z           = self.ensure("Z",          int)
-        self.ad          = self.ensure("AD",         bool)
-        self.cd          = self.ensure("CD",         bool)
-        self.id          = self.ensure("ID",         int)
+        self.opcode = self.ensure("OpCode", str)
+        self.ra = self.ensure("RA", bool)
+        self.z = self.ensure("Z", int)
+        self.ad = self.ensure("AD", bool)
+        self.cd = self.ensure("CD", bool)
+        self.id = self.ensure("ID", int)
 
     def __str__(self):
         return "Header: " + self.return_code
 
     @property
     def flags(self):
-        Flags = namedtuple("Flags", ("qr", "aa", "tc", "rd", "ra", "z", "ad", "cd"))
+        Flags = namedtuple(
+            "Flags", ("qr", "aa", "tc", "rd", "ra", "z", "ad", "cd"))
         return Flags(qr=self.qr, aa=self.aa, tc=self.tc, rd=self.rd,
                      ra=self.ra, z=self.z, ad=self.ad, cd=self.cd)
 
     @property
     def sections(self):
-        Sections = namedtuple("Sections", ("QDCOUNT", "ANCOUNT", "NSCOUNT", "ARCOUNT"))
+        Sections = namedtuple(
+            "Sections", ("QDCOUNT", "ANCOUNT", "NSCOUNT", "ARCOUNT"))
         return Sections(QDCOUNT=self.qdcount, ANCOUNT=self.ancount,
                         NSCOUNT=self.nscount, ARCOUNT=self.arcount)
 
@@ -105,10 +107,10 @@ class Option(ParsingDict):
         ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
-        self.nsid   = self.ensure("NSID",         str)
-        self.code   = self.ensure("OptionCode",   int)
+        self.nsid = self.ensure("NSID", str)
+        self.code = self.ensure("OptionCode", int)
         self.length = self.ensure("OptionLength", int)
-        self.name   = self.ensure("OptionName",   str)
+        self.name = self.ensure("OptionName", str)
 
 
 class Edns0(ParsingDict):
@@ -119,11 +121,11 @@ class Edns0(ParsingDict):
 
         self.raw_data = data
         self.extended_return_code = self.ensure("ExtendedReturnCode", int)
-        self.name                 = self.ensure("Name",               str)
-        self.type                 = self.ensure("Type",               str)
-        self.udp_size             = self.ensure("UDPsize",            int)
-        self.version              = self.ensure("Version",            int)
-        self.z                    = self.ensure("Z",                  int)
+        self.name = self.ensure("Name", str)
+        self.type = self.ensure("Type", str)
+        self.udp_size = self.ensure("UDPsize", int)
+        self.version = self.ensure("Version", int)
+        self.z = self.ensure("Z", int)
 
         self.options = []
         if "Option" in self.raw_data:
@@ -139,9 +141,9 @@ class Question(ParsingDict):
         ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
-        self.klass    = self.ensure("Qclass", str)
-        self.type     = self.ensure("Qtype",  str)
-        self.name     = self.ensure("Qname",  str)
+        self.klass = self.ensure("Qclass", str)
+        self.type = self.ensure("Qtype", str)
+        self.name = self.ensure("Qname", str)
 
 
 class Answer(ParsingDict):
@@ -150,11 +152,11 @@ class Answer(ParsingDict):
 
         ParsingDict.__init__(self, **kwargs)
 
-        self.raw_data  = data
-        self.name      = self.ensure("Name",     str)
-        self.ttl       = self.ensure("TTL",      int)
-        self.type      = self.ensure("Type",     str)
-        self.klass     = self.ensure("Class",    str)
+        self.raw_data = data
+        self.name = self.ensure("Name", str)
+        self.ttl = self.ensure("TTL", int)
+        self.type = self.ensure("Type", str)
+        self.klass = self.ensure("Class", str)
         self.rd_length = self.ensure("RDlength", int)
 
     @property
@@ -185,7 +187,7 @@ class CnameAnswer(NsAnswer):
 class MxAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.preference     = self.ensure("Preference",    int)
+        self.preference = self.ensure("Preference", int)
         self.mail_exchanger = self.ensure("MailExchanger", str)
 
 
@@ -193,13 +195,13 @@ class SoaAnswer(Answer):
 
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.mname    = self.ensure("MasterServerName", str)
-        self.rname    = self.ensure("MaintainerName",   str)
-        self.serial   = self.ensure("Serial",           int)
-        self.refresh  = self.ensure("Refresh",          int)
-        self.retry    = self.ensure("Retry",            int)
-        self.expire   = self.ensure("Expire",           int)
-        self.minimum  = self.ensure("NegativeTtl",      int)
+        self.mname = self.ensure("MasterServerName", str)
+        self.rname = self.ensure("MaintainerName", str)
+        self.serial = self.ensure("Serial", int)
+        self.refresh = self.ensure("Refresh", int)
+        self.retry = self.ensure("Retry", int)
+        self.expire = self.ensure("Expire", int)
+        self.minimum = self.ensure("NegativeTtl", int)
 
     @property
     def master_server_name(self):
@@ -221,19 +223,19 @@ class SoaAnswer(Answer):
 class DsAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.tag            = self.ensure("Tag",           int)
-        self.algorithm      = self.ensure("Algorithm",     int)
-        self.digest_type    = self.ensure("DigestType",    int)
+        self.tag = self.ensure("Tag", int)
+        self.algorithm = self.ensure("Algorithm", int)
+        self.digest_type = self.ensure("DigestType", int)
         self.delegation_key = self.ensure("DelegationKey", str)
 
 
 class DnskeyAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.flags       = self.ensure("Flags",     int)
-        self.algorithm   = self.ensure("Algorithm", int)
-        self.protocol    = self.ensure("Protocol",  int)
-        self.key         = self.ensure("Key",       str)
+        self.flags = self.ensure("Flags", int)
+        self.algorithm = self.ensure("Algorithm", int)
+        self.protocol = self.ensure("Protocol", int)
+        self.key = self.ensure("Key", str)
 
 
 class TxtAnswer(Answer):
@@ -245,15 +247,15 @@ class TxtAnswer(Answer):
 class RRSigAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
-        self.type_covered         = self.ensure("TypeCovered",        str)
-        self.algorithm            = self.ensure("Algorithm",          int)
-        self.labels               = self.ensure("Labels",             int)
-        self.original_ttl         = self.ensure("OriginalTTL",        int)
+        self.type_covered = self.ensure("TypeCovered", str)
+        self.algorithm = self.ensure("Algorithm", int)
+        self.labels = self.ensure("Labels", int)
+        self.original_ttl = self.ensure("OriginalTTL", int)
         self.signature_expiration = self.ensure("SignatureExpiration",int)
-        self.signature_inception  = self.ensure("SignatureInception", int)
-        self.key_tag              = self.ensure("KeyTag",             int)
-        self.signer_name          = self.ensure("SignerName",         str)
-        self.signature            = self.ensure("Signature",          str)
+        self.signature_inception = self.ensure("SignatureInception", int)
+        self.key_tag = self.ensure("KeyTag", int)
+        self.signer_name = self.ensure("SignerName", str)
+        self.signature = self.ensure("Signature", str)
 
     def __str__(self):
         return "{} {} {} {} {} {} {} {} {}".format(
@@ -275,13 +277,13 @@ class Authority(ParsingDict):
 
         ParsingDict.__init__(self, **kwargs)
 
-        self.raw_data  = data
-        self.klass     = self.ensure("Class",    int)
-        self.name      = self.ensure("Name",     str)
+        self.raw_data = data
+        self.klass = self.ensure("Class", int)
+        self.name = self.ensure("Name", str)
+        self.ttl = self.ensure("TTL", int)
+        self.target = self.ensure("Target", str)
+        self.type = self.ensure("Type", str)
         self.rd_length = self.ensure("RDlength", int)
-        self.ttl       = self.ensure("TTL",      int)
-        self.target    = self.ensure("Target",   str)
-        self.type      = self.ensure("Type",     str)
 
     @property
     def resource_data_length(self):
@@ -294,13 +296,13 @@ class Additional(ParsingDict):
 
         ParsingDict.__init__(self, **kwargs)
 
-        self.raw_data  = data
-        self.address   = self.ensure("Address",  str)
-        self.klass     = self.ensure("Class",    str)
-        self.name      = self.ensure("Name",     str)
+        self.raw_data = data
+        self.address = self.ensure("Address", str)
+        self.klass = self.ensure("Class", str)
+        self.name = self.ensure("Name", str)
+        self.ttl = self.ensure("TTL", int)
+        self.type = self.ensure("Type", str)
         self.rd_length = self.ensure("RDlength", int)
-        self.ttl       = self.ensure("TTL",      int)
-        self.type      = self.ensure("Type",     str)
 
     @property
     def resource_data_length(self):
@@ -325,9 +327,9 @@ class Message(ParsingDict):
         if "HEADER" in self.raw_data:
             self.header = Header(self.raw_data["HEADER"], **kwargs)
 
-        self.edns0       = None
-        self.questions   = []
-        self.answers     = []
+        self.edns0 = None
+        self.questions = []
+        self.answers = []
         self.authorities = []
         self.additionals = []
 
@@ -399,8 +401,9 @@ class Message(ParsingDict):
 
         # Answers
         if "answers" in response_data and response_data["answers"]:
-            self.raw_data["AnswerSection"] = []
-            # The names used in the result don't align to those used in the abuf parser
+
+            # The names used in the result don't align to those used in the abuf
+            # parser
             name_map = {
                 "TTL":      "TTL",
                 "TYPE":     "Type",
@@ -411,6 +414,8 @@ class Message(ParsingDict):
                 "SERIAL":   "Serial",
                 "RDLENGTH": "RDlength",
             }
+
+            self.raw_data["AnswerSection"] = []
             for answer in response_data["answers"]:
                 temporary = {}
                 for k, v in name_map.items():
@@ -429,10 +434,10 @@ class Response(ParsingDict):
 
         self.raw_data = data
 
-        self.af                  = self.ensure("af",       int, af)
+        self.af = self.ensure("af", int, af)
         self.destination_address = self.ensure("dst_addr", str, destination)
-        self.source_address      = self.ensure("src_addr", str, source)
-        self.protocol            = self.ensure("proto",    str, protocol)
+        self.source_address = self.ensure("src_addr", str, source)
+        self.protocol = self.ensure("proto", str, protocol)
 
         self.response_id = None
 
@@ -507,9 +512,9 @@ class DnsResult(Result):
         self.responses = []
         self.responses_total = None
 
-        af                  = self.ensure("af",       int)
-        protocol            = self.ensure("proto",    str)
-        source_address      = self.ensure("src_addr", str)
+        af = self.ensure("af", int)
+        protocol = self.ensure("proto", str)
+        source_address = self.ensure("src_addr", str)
         destination_address = self.ensure("dst_addr", str)
 
         if 0 < self.firmware < 4460:
