@@ -26,6 +26,22 @@ class ResultError(Exception):
     pass
 
 
+class Json(object):
+    """
+    ujson, while impressive, is not a drop-in replacement for json as it doesn't
+    respect the various keyword arguments permitted in the default json parser.
+    As a workaround for this, we have our own class that defines its own
+    .loads() method, so we can check for whichever we're using and adjust the
+    arguments accordingly.
+    """
+
+    @staticmethod
+    def loads(*args, **kwargs):
+        if json.__name__ == "ujson":
+            return json.loads(*args, **kwargs)
+        return json.loads(strict=False, *args, **kwargs)
+
+
 class ParsingDict(object):
     """
     A handy container for methods we use for validation in the various result
@@ -136,7 +152,7 @@ class Result(ParsingDict):
 
         self.raw_data = data
         if isinstance(data, compat_basestring):
-            self.raw_data = json.loads(data)
+            self.raw_data = Json.loads(data)
 
         for key in ("timestamp", "msm_id", "prb_id", "fw", "type"):
             if key not in self.raw_data:
@@ -179,7 +195,6 @@ class Result(ParsingDict):
     def created_timestamp(self):
         return self.created.timestamp
 
-
     @classmethod
     def get(cls, data, **kwargs):
         """
@@ -191,7 +206,7 @@ class Result(ParsingDict):
 
         raw_data = data
         if isinstance(data, compat_basestring):
-            raw_data = json.loads(data)
+            raw_data = Json.loads(data)
 
         try:
             kind = raw_data["type"].lower()

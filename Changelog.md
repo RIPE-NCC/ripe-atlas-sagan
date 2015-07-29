@@ -1,5 +1,9 @@
 # Changelog
 
+* 0.8.2
+    * Fixed a bug related to non-ascii characters in SSL certificate data.
+    * Added a wrapper for json loaders to handle differences between ujson and
+      the default json module.
 * 0.8.1
     * Minor fix to make all `Result` objects properly JSON serialisable.
 * 0.8.0

@@ -161,7 +161,7 @@ class Certificate(ParsingDict):
         """
         if key not in dictionary:
             return None
-        return dictionary[key].decode()
+        return dictionary[key].decode("UTF-8")
 
 
 class SslResult(Result):
