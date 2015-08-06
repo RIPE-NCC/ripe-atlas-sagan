@@ -399,7 +399,12 @@ class AbufParser(object):
                 rr['TypeCovered'], rr['Algorithm'], rr['Labels'], rr['OriginalTTL'], rr['SignatureExpiration'], rr['SignatureInception'], rr['KeyTag'] = struct.unpack(fmt, dat)
                 rr['TypeCovered'] = cls._type_to_text( rr['TypeCovered'] )
 
-                signature_offset, rr['SignerName'] = cls._do_name( rdata, fmtsz, error)
+                res = cls._do_name(rdata, fmtsz, error)
+                if res is None:
+                    e = ("_do_rr", offset, "_do_name failed")
+                    error.append(e)
+                    return None
+                signature_offset, rr['SignerName'] = res
 
                 sig= rdata[signature_offset:]
                 sig_as_base64= base64.encodestring(sig)
