@@ -1,5 +1,12 @@
 # Changelog
 
+* 1.0.0
+    * **Breaking Change**: the `data` property of the `TxtAnswer` class was
+      changed from a string to a list of strings.  This is a correction from
+      our own past deviation from the RFC, so we thought it best to conform as
+      part of the move to 1.0.0
+    * Fixed a bug where non-ascii characters in DNS TXT answers resulted in an
+      exception.
 * 0.8.2
     * Fixed a bug related to non-ascii characters in SSL certificate data.
     * Added a wrapper for json loaders to handle differences between ujson and

@@ -350,6 +350,147 @@ address                str       An IP address
 rd_length              int
 =====================  ========  ===================================================================================
 
+There is a different sub-class of ``Answer`` for every DNS answer type.  These
+are all briefly outlined below.
+
+
+.. _dns-answer-a:
+
+AAnswer & AAAAAnswer
+....................
+
+Both of these classes have only one additional property to their parent
+``Answer`` class: ``address``.
+
+=====================  ========  ====================
+Property               Type      Explanation
+=====================  ========  ====================
+answer                 str       The address response
+=====================  ========  ====================
+
+
+.. _dns-answer-ns:
+
+NsAnswer & CnameAnswer
+......................
+
+Both of these subclasses only have one additional property: ``target``.
+
+=====================  ========  =========================
+Property               Type      Explanation
+=====================  ========  =========================
+target                 str       The address of the target
+=====================  ========  =========================
+
+
+.. _dns-answer-mx:
+
+MxAnswer
+........
+
+=====================  ========  =========================
+Property               Type      Explanation
+=====================  ========  =========================
+preference             int       The preference number
+mail_exchanger         str       The exchanger name
+=====================  ========  =========================
+
+
+.. _dns-answer-soa:
+
+SoaAnswer
+.........
+
+There are a lot of additional properties for SOA answers, as well as a few
+aliases for people who like human-readable names.
+
+=====================  ========  =========================
+Property               Type      Explanation
+=====================  ========  =========================
+mname                  str       The master server name
+rname                  str       The maintainer name
+serial                 int
+refresh                int
+retry                  int
+expire                 int
+minimum                int       The negative TTL
+master_server_name     str       An alias for ``mname``
+maintainer_name        str       An alias for ``rname``
+negative_ttl           str       An alias for ``minimum``
+nxdomain               str       An alias for ``minimum``
+=====================  ========  =========================
+
+
+.. _dns-answer-ds:
+
+DsAnswer
+........
+
+=====================  ========
+Property               Type
+=====================  ========
+tag                    int
+algorithm              int
+digest_type            int
+delegation_key         str
+=====================  ========
+
+
+.. _dns-answer-dnskey:
+
+DnskeyAnswer
+............
+
+=====================  ========
+Property               Type
+=====================  ========
+flags                  int
+algorithm              int
+protocol               int
+key                    str
+=====================  ========
+
+
+.. _dns-answer-txt:
+
+TxtAnswer
+.........
+
+A class for DNS TXT responses, ``TxtAnswer`` has all of the properties of an
+``Answer`` class, but with two additional properties:
+
+=====================  ========  =========================================================================================================
+Property               Type      Explanation
+=====================  ========  =========================================================================================================
+data                   list      The response text, represented as a list of strings, though in most cases, the list has only one element.
+data_string            str       The string representation of ``data``, joining all elements of the list with a space.
+=====================  ========  =========================================================================================================
+
+
+.. _dns-answer-rrsig:
+
+RRSigAnswer
+...........
+
+=====================  ========
+Property               Type
+=====================  ========
+type_covered           str
+algorithm              int
+labels                 int
+original_ttl           int
+signature_expiration   int
+signature_inception    int
+key_tag                int
+signer_name            str
+signature              str
+=====================  ========
+
+Note that ``RRsigAnswer``s have a special string representation, where the
+values of ``type_covered``, ``algorithm``, ``labels``, ``original_ttl``,
+``signature_expiration``, ``signature_inception``, ``key_tag``, ``signer_name`,
+and ``signature`` are all concatenated with spaces.
+
 
 .. _dns-authority:
 

@@ -1,9 +1,13 @@
+import base64
+
 from collections import namedtuple
+
 from ripe.atlas.sagan import Result, ResultError
 from ripe.atlas.sagan.dns import (
     DnsResult, Edns0, AAnswer, AaaaAnswer, NsAnswer, CnameAnswer, MxAnswer,
     SoaAnswer, DsAnswer, DnskeyAnswer, RRSigAnswer
 )
+from ripe.atlas.sagan.helpers.abuf import AbufParser
 
 def test_dns_4460():
     result = Result.get('{"af":4,"dst_addr":"193.227.234.53","from":"217.172.81.146","fw":4460,"msm_id":1004041,"prb_id":184,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":0,"ID":39825,"NSCOUNT":0,"QDCOUNT":1,"abuf":"m5GEAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaoZA==","answers":[{"RDLENGTH":4,"TYPE":1}],"rt":45.305,"size":43},"timestamp":1347765990,"type":"dns"}')
@@ -508,12 +512,14 @@ def test_dns_lts():
 
 def test_txt_with_class_in():
     result = Result.get('{"msm_id": 10209, "fw": 4660, "timestamp": 1413417973, "prb_id": 4232, "result": {"abuf": "nfCAgAABAAEAAAAAB3ZlcnNpb24EYmluZAAAEAADwAwAEAABAAAfMAAdHFBvd2VyRE5TIFJlY3Vyc29yIDMuNS4yICRJZCQ=", "rt": 298.828, "size": 71, "ARCOUNT": 0, "NSCOUNT": 0, "QDCOUNT": 1, "ANCOUNT": 1, "answers": [{"TYPE": "TXT", "NAME": "version.bind", "RDATA": "PowerDNS Recursor 3.5.2 $Id$"}], "ID": 40432}, "src_addr": "10.0.3.6", "msm_name": "Tdig", "lts": 71, "from": "89.179.73.12", "proto": "UDP", "af": 4, "type": "dns", "dst_addr": "198.41.0.4"}')
+    print(result.responses[0].abuf.answers[0].raw_data)
     assert(result.responses[0].abuf.answers[0].name == "version.bind.")
     assert(result.responses[0].abuf.answers[0].klass == "IN")
     assert(result.responses[0].abuf.answers[0].rd_length == 29)
     assert(result.responses[0].abuf.answers[0].type == "TXT")
     assert(result.responses[0].abuf.answers[0].ttl == 7984)
-    assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
+    assert(len(result.responses[0].abuf.answers[0].data) == 1)
+    assert(result.responses[0].abuf.answers[0].data[0] == "PowerDNS Recursor 3.5.2 $Id$")
 
 def test_unparsed_abuf():
     result = Result.get('{"msm_id": 10209, "fw": 4660, "timestamp": 1413417973, "prb_id": 4232, "result": {"abuf": "nfCAgAABAAEAAAAAB3ZlcnNpb24EYmluZAAAEAADwAwAEAABAAAfMAAdHFBvd2VyRE5TIFJlY3Vyc29yIDMuNS4yICRJZCQ=", "rt": 298.828, "size": 71, "ARCOUNT": 0, "NSCOUNT": 0, "QDCOUNT": 1, "ANCOUNT": 1, "answers": [{"TYPE": "TXT", "NAME": "version.bind", "RDATA": "PowerDNS Recursor 3.5.2 $Id$"}], "ID": 40432}, "src_addr": "10.0.3.6", "msm_name": "Tdig", "lts": 71, "from": "89.179.73.12", "proto": "UDP", "af": 4, "type": "dns", "dst_addr": "198.41.0.4"}', parse_buf=False)
@@ -522,7 +528,18 @@ def test_unparsed_abuf():
     assert(result.responses[0].abuf.answers[0].rd_length is None)
     assert(result.responses[0].abuf.answers[0].type == "TXT")
     assert(result.responses[0].abuf.answers[0].ttl is None)
-    assert(result.responses[0].abuf.answers[0].data == "PowerDNS Recursor 3.5.2 $Id$")
+    assert(len(result.responses[0].abuf.answers[0].data) == 1)
+    assert(result.responses[0].abuf.answers[0].data[0] == "PowerDNS Recursor 3.5.2 $Id$")
+
+def test_unparsed_abuf_with_txt_list():
+    result = Result.get('{"msm_id": 10209, "fw": 4660, "timestamp": 1413417973, "prb_id": 4232, "result": {"abuf": "nfCAgAABAAEAAAAAB3ZlcnNpb24EYmluZAAAEAADwAwAEAABAAAfMAAdHFBvd2VyRE5TIFJlY3Vyc29yIDMuNS4yICRJZCQ=", "rt": 298.828, "size": 71, "ARCOUNT": 0, "NSCOUNT": 0, "QDCOUNT": 1, "ANCOUNT": 1, "answers": [{"TYPE": "TXT", "NAME": "version.bind", "RDATA": ["PowerDNS Recursor 3.5.2 $Id$"]}], "ID": 40432}, "src_addr": "10.0.3.6", "msm_name": "Tdig", "lts": 71, "from": "89.179.73.12", "proto": "UDP", "af": 4, "type": "dns", "dst_addr": "198.41.0.4"}', parse_buf=False)
+    assert(result.responses[0].abuf.answers[0].name == "version.bind")
+    assert(result.responses[0].abuf.answers[0].klass is None)
+    assert(result.responses[0].abuf.answers[0].rd_length is None)
+    assert(result.responses[0].abuf.answers[0].type == "TXT")
+    assert(result.responses[0].abuf.answers[0].ttl is None)
+    assert(len(result.responses[0].abuf.answers[0].data) == 1)
+    assert(result.responses[0].abuf.answers[0].data[0] == "PowerDNS Recursor 3.5.2 $Id$")
 
 def test_flags():
     result = Result.get('{"from":"2001:67c:2e8:11::c100:136c","msm_id":1663540,"fw":4620,"af":6,"timestamp":1403091608,"proto":"UDP","dst_addr":"2001:41d0:1:4874::1","prb_id":6012,"result":{"abuf":"1jKEAAABAAEAAgADCnBvc3RtYXN0ZXICZnIAABwAAcAMABwAAQAAASwAECABQdAAAUh0AAAAAAAAAAHADAACAAEAAAEsAAYDbnMxwAzADAACAAEAAAEsAAYDbnMywAzARwABAAEAAAEsAARXYtl0wEcAHAABAAABLAAQIAFB0AABSHQAAAAAAAAAAcBZAAEAAQAAASwABFzzEZ8=","rt":8.656,"NSCOUNT":2,"QDCOUNT":1,"ANCOUNT":1,"ARCOUNT":3,"ID":54834,"size":155},"result-rt":8.656,"src_addr":"2001:67c:2e8:11::c100:136c","group_id":1663540,"type":"dns","msm_name":"Tdig","name":"2001:41d0:1:4874:0:0:0:1"}')
@@ -533,3 +550,14 @@ def test_sections():
     result = Result.get('{"from":"2001:67c:2e8:11::c100:136c","msm_id":1663540,"fw":4620,"af":6,"timestamp":1403091608,"proto":"UDP","dst_addr":"2001:41d0:1:4874::1","prb_id":6012,"result":{"abuf":"1jKEAAABAAEAAgADCnBvc3RtYXN0ZXICZnIAABwAAcAMABwAAQAAASwAECABQdAAAUh0AAAAAAAAAAHADAACAAEAAAEsAAYDbnMxwAzADAACAAEAAAEsAAYDbnMywAzARwABAAEAAAEsAARXYtl0wEcAHAABAAABLAAQIAFB0AABSHQAAAAAAAAAAcBZAAEAAQAAASwABFzzEZ8=","rt":8.656,"NSCOUNT":2,"QDCOUNT":1,"ANCOUNT":1,"ARCOUNT":3,"ID":54834,"size":155},"result-rt":8.656,"src_addr":"2001:67c:2e8:11::c100:136c","group_id":1663540,"type":"dns","msm_name":"Tdig","name":"2001:41d0:1:4874:0:0:0:1"}')
     Sections = namedtuple("Sections", ("QDCOUNT", "ANCOUNT", "NSCOUNT", "ARCOUNT"))
     assert(result.responses[0].abuf.header.sections == Sections(QDCOUNT=1, ANCOUNT=1, NSCOUNT=2, ARCOUNT=3))
+
+def test_non_ascii_in_abuf():
+    result = Result.get('{"lts":136,"from":"83.163.117.153","msm_id":1020268,"fw":4670,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":96,"result":{"abuf":"sPKEAAABAAEAAQACB2RyYWdvbnMEYWlveQJldQAAEAABB2RyYWdvbnMEYWlveQJldQAAEAABAAAOEAATEkhlcmUgYmUg\/yBkcmFnb25zIcApAAIAAQAADhAABgNuczHAKcBbAAEAAQAADhAABIIlDyPAWwAcAAEAAA4QABAgAQiIEEQAEAKgyf\/+nxep","rt":33.973,"NSCOUNT":1,"QDCOUNT":1,"answers":[{"TYPE":"TXT","NAME":"dragons.aioy.eu","RDATA":"Here be \u00ff dragons!"}],"ID":45298,"ARCOUNT":2,"ANCOUNT":1,"size":141},"timestamp":1422535611,"src_addr":"10.0.1.61","group_id":1020268,"type":"dns","dst_addr":"130.37.15.35"}')
+    assert(len(result.responses[0].abuf.answers) == 1)
+    assert(len(result.responses[0].abuf.answers[0].data) == 1)
+    assert(result.responses[0].abuf.answers[0].data[0] == "Here be \\255 dragons!")
+
+def test_quotes_in_multiline_txt_record():
+    result = Result.get('{"lts":136,"from":"83.163.117.153","msm_id":1020268,"fw":4670,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":96,"result":{"abuf":"sPKEAAABAAEAAgACB2RyYWdvbnMEYWlveQJldQAAEAABB2RyYWdvbnMEYWlveQJldQAAEAABAAAOEABPJUhlcmUgYmUg/yBkcmFnb25zISBXaXRoIFwgYW5kICIgYW5kIH8IYXMgd2VsbC4fVGhyb3dpbmcgaW4ggCBmb3IgZ29vZCBtZWFzdXJlLsApAAIAAQAADhAABgNuczHAKcApAAIAAQAADhAABgNuczLAKcCXAAEAAQAADhAABIIlDyPAqQAcAAEAAA4QABAgAQRw0WoAEAKgyf/+nxep","rt":33.973,"NSCOUNT":1,"QDCOUNT":1,"answers":[{"TYPE":"TXT","NAME":"dragons.aioy.eu","RDATA":"Here be \u00ff dragons!"}],"ID":45298,"ARCOUNT":2,"ANCOUNT":1,"size":141},"timestamp":1422535611,"src_addr":"10.0.1.61","group_id":1020268,"type":"dns","dst_addr":"130.37.15.35"}')
+    print(result.responses[0].abuf.answers[0].as_string)
+    print(result.responses[0].abuf.answers[0].klass)

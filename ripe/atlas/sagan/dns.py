@@ -239,9 +239,22 @@ class DnskeyAnswer(Answer):
 
 
 class TxtAnswer(Answer):
+
     def __init__(self, data, **kwargs):
+
         Answer.__init__(self, data, **kwargs)
-        self.data = self.ensure("Data", str)
+
+        self.data = []
+        if "Data" in self.raw_data:
+            if isinstance(self.raw_data["Data"], list):
+                self.data = []
+                for s in self.raw_data["Data"]:
+                    if isinstance(s, basestring):
+                        self.data.append(s)
+
+    @property
+    def data_string(self):
+        return " ".join(self.data)
 
 
 class RRSigAnswer(Answer):
@@ -417,10 +430,19 @@ class Message(ParsingDict):
 
             self.raw_data["AnswerSection"] = []
             for answer in response_data["answers"]:
+
                 temporary = {}
+
                 for k, v in name_map.items():
                     if k in answer:
                         temporary[v] = answer[k]
+
+                # Special case where some older txt entires are strings and not
+                # a list
+                if temporary.get("Type") == "TXT":
+                    if isinstance(temporary.get("Data"), basestring):
+                        temporary["Data"] = [temporary["Data"]]
+
                 if temporary:
                     self.raw_data["AnswerSection"].append(temporary)
 
