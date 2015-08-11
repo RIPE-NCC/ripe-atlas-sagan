@@ -204,6 +204,19 @@ class AbufParser(object):
         return offset + reqlen, qry
 
     @classmethod
+    def _clean_up_string(self, strng):
+        result=''
+        strng=bytearray(strng)
+        for o in strng:
+            if o < ord(' ') or o > ord('~'):
+                result += ("\\%03d" % o)
+            elif o == ord('"') or o == ord('\\'):
+                result += "\\" + chr(o)
+            else:
+                result += chr(o)
+        return result
+
+    @classmethod
     def _do_rr(cls, buf, offset, error):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
         rr             = {}
@@ -383,7 +396,12 @@ class AbufParser(object):
                 rr['TypeCovered'], rr['Algorithm'], rr['Labels'], rr['OriginalTTL'], rr['SignatureExpiration'], rr['SignatureInception'], rr['KeyTag'] = struct.unpack(fmt, dat)
                 rr['TypeCovered'] = cls._type_to_text( rr['TypeCovered'] )
 
-                signature_offset, rr['SignerName'] = cls._do_name( rdata, fmtsz, error)
+                res = cls._do_name(rdata, fmtsz, error)
+                if res is None:
+                    e = ("_do_rr", offset, "_do_name failed")
+                    error.append(e)
+                    return None
+                signature_offset, rr['SignerName'] = res
 
                 sig= rdata[signature_offset:]
                 sig_as_base64= base64.encodestring(sig)
@@ -394,21 +412,29 @@ class AbufParser(object):
             if rr['Class'] == "IN" or rr['Class'] == "CH":
                 fmt    = "!B"
                 reqlen = struct.calcsize(fmt)
-                strng    = rdata[:reqlen]
-                if len(strng) != reqlen:
-                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
-                    error.append(e)
-                    return None
-                res    = struct.unpack(fmt, strng)
-                llen   = res[0]
-                o= reqlen
-                strng = rdata[o:o+llen]
-                strng_as_str= strng.decode(cls.DNS_CTYPE)
-                if len(strng) < llen:
-                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
-                    error.append(e)
-                    return None
-                rr['Data'] = strng_as_str
+                o= 0
+                rr['Data'] = []
+                while o < len(rdata):
+                        strng = rdata[o:o+reqlen]
+                        if len(strng) != reqlen:
+                            e= ("_do_rr", rdata_offset,
+                                'offset out of range: rdata size = %d' %
+                                len(rdata))
+                            error.append(e)
+                            return None
+                        res = struct.unpack(fmt, strng)
+                        llen = res[0]
+                        o += reqlen
+                        strng = rdata[o:o+llen]
+                        if len(strng) < llen:
+                            e= ("_do_rr", rdata_offset,
+                                'offset out of range: rdata size = %d' %
+                                len(rdata))
+                            error.append(e)
+                            return None
+                        strng = cls._clean_up_string(strng)
+                        rr['Data'].append(strng)
+                        o += llen
 
         return offset, rr
 
