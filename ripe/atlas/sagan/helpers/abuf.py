@@ -373,7 +373,7 @@ class AbufParser(object):
                 rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
                         struct.unpack(fmt, dat)
                 key= rdata[struct.calcsize(fmt):]
-                key_as_base64= base64.encodestring(key)
+                key_as_base64 = cls._encodebytes(key)
                 key_as_base64_str= key_as_base64.decode(cls.DNS_CTYPE)
                 rr['Key'] = ''.join(key_as_base64_str.split())
             elif rr['Type'] == 'RRSIG':
@@ -404,7 +404,7 @@ class AbufParser(object):
                 signature_offset, rr['SignerName'] = res
 
                 sig= rdata[signature_offset:]
-                sig_as_base64= base64.encodestring(sig)
+                sig_as_base64 = cls._encodebytes(sig)
                 sig_as_base64_str= sig_as_base64.decode(cls.DNS_CTYPE)
                 rr['Signature'] = ''.join(sig_as_base64_str.split())
 
@@ -484,6 +484,17 @@ class AbufParser(object):
                 return None
 
         return offset, name
+
+    @staticmethod
+    def _encodebytes(s):
+        """
+        A wrapper to take care of the deprecation of base64.encodestring() in
+        Python 3.
+        """
+        try:
+            return base64.encodebytes(s)  # 3
+        except AttributeError:
+            return base64.encodestring(s)  # 2
 
 
 __all__ = (

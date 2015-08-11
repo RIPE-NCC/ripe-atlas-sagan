@@ -1,6 +1,8 @@
 import arrow
 import logging
 
+from .helpers.compatibility import string
+
 # Try to use ujson if it's available
 try:
     import ujson as json
@@ -10,12 +12,6 @@ except ImportError:
         "using ujson, a much faster parser."
     )
     import json
-
-# Hack for Python2/3
-try:
-    compat_basestring = basestring  # Python2
-except NameError:
-    compat_basestring = str  # Python3
 
 
 class ResultParseError(Exception):
@@ -151,7 +147,7 @@ class Result(ParsingDict):
         ParsingDict.__init__(self, **kwargs)
 
         self.raw_data = data
-        if isinstance(data, compat_basestring):
+        if isinstance(data, string):
             self.raw_data = Json.loads(data)
 
         for key in ("timestamp", "msm_id", "prb_id", "fw", "type"):
@@ -205,7 +201,7 @@ class Result(ParsingDict):
         """
 
         raw_data = data
-        if isinstance(data, compat_basestring):
+        if isinstance(data, string):
             raw_data = Json.loads(data)
 
         try:

@@ -4,7 +4,9 @@ import base64
 from collections import namedtuple
 
 from .base import Result, ParsingDict
-from .helpers.abuf import AbufParser
+from .helpers import abuf
+from .helpers import compatibility
+
 
 class Header(ParsingDict):
 
@@ -249,7 +251,7 @@ class TxtAnswer(Answer):
             if isinstance(self.raw_data["Data"], list):
                 self.data = []
                 for s in self.raw_data["Data"]:
-                    if isinstance(s, basestring):
+                    if isinstance(s, compatibility.string):
                         self.data.append(s)
 
     @property
@@ -391,7 +393,7 @@ class Message(ParsingDict):
     def _parse_buf(self, message):
 
         try:
-            self.raw_data = AbufParser.parse(base64.b64decode(message))
+            self.raw_data = abuf.AbufParser.parse(base64.b64decode(message))
         except Exception as e:
             self.raw_data = {}
             self._handle_malformation(
@@ -440,7 +442,7 @@ class Message(ParsingDict):
                 # Special case where some older txt entires are strings and not
                 # a list
                 if temporary.get("Type") == "TXT":
-                    if isinstance(temporary.get("Data"), basestring):
+                    if isinstance(temporary.get("Data"), compatibility.string):
                         temporary["Data"] = [temporary["Data"]]
 
                 if temporary:
