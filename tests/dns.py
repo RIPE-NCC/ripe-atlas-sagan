@@ -559,5 +559,9 @@ def test_non_ascii_in_abuf():
 
 def test_quotes_in_multiline_txt_record():
     result = Result.get('{"lts":136,"from":"83.163.117.153","msm_id":1020268,"fw":4670,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":96,"result":{"abuf":"sPKEAAABAAEAAgACB2RyYWdvbnMEYWlveQJldQAAEAABB2RyYWdvbnMEYWlveQJldQAAEAABAAAOEABPJUhlcmUgYmUg/yBkcmFnb25zISBXaXRoIFwgYW5kICIgYW5kIH8IYXMgd2VsbC4fVGhyb3dpbmcgaW4ggCBmb3IgZ29vZCBtZWFzdXJlLsApAAIAAQAADhAABgNuczHAKcApAAIAAQAADhAABgNuczLAKcCXAAEAAQAADhAABIIlDyPAqQAcAAEAAA4QABAgAQRw0WoAEAKgyf/+nxep","rt":33.973,"NSCOUNT":1,"QDCOUNT":1,"answers":[{"TYPE":"TXT","NAME":"dragons.aioy.eu","RDATA":"Here be \u00ff dragons!"}],"ID":45298,"ARCOUNT":2,"ANCOUNT":1,"size":141},"timestamp":1422535611,"src_addr":"10.0.1.61","group_id":1020268,"type":"dns","dst_addr":"130.37.15.35"}')
-    print(result.responses[0].abuf.answers[0].as_string)
-    print(result.responses[0].abuf.answers[0].klass)
+    assert result.responses[0].abuf.answers[0].data == [
+        "Here be \\255 dragons! With \\\\ and \\\" and \\127",
+        "as well.",
+        "Throwing in \\128 for good measure."
+    ]
+    assert result.responses[0].abuf.answers[0].data_string == "Here be \\255 dragons! With \\\\ and \\\" and \\127 as well. Throwing in \\128 for good measure."
