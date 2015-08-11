@@ -207,10 +207,7 @@ class AbufParser(object):
     def _clean_up_string(self, strng):
         result=''
         strng=bytearray(strng)
-        print(repr(strng))
         for o in strng:
-            print(repr(o))
-            print(repr(' '))
             if o < ord(' ') or o > ord('~'):
                 result += ("\\%03d" % o)
             elif o == ord('"') or o == ord('\\'):
