@@ -148,7 +148,7 @@ class Question(ParsingDict):
         self.name = self.ensure("Qname", str)
 
     def __str__(self):
-        return ";{}\t\t\t{}\t{}".format(self.name, self.klass, self.type)
+        return ";{:30}  {:<5}  {:5}".format(self.name, self.klass, self.type)
 
 
 class Answer(ParsingDict):
@@ -176,7 +176,7 @@ class AAnswer(Answer):
         self.address = self.ensure("Address", str)
 
     def __str__(self):
-        return "{}\t\t{}\t{}\t{}\t{}\n".format(
+        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
             self.name,
             self.ttl,
             self.klass,
@@ -313,6 +313,15 @@ class Authority(ParsingDict):
         self.type = self.ensure("Type", str)
         self.rd_length = self.ensure("RDlength", int)
 
+    def __str__(self):
+        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
+            self.name,
+            self.ttl,
+            self.klass or "",
+            self.type,
+            self.target
+        )
+
     @property
     def resource_data_length(self):
         return self.rd_length
@@ -331,6 +340,15 @@ class Additional(ParsingDict):
         self.ttl = self.ensure("TTL", int)
         self.type = self.ensure("Type", str)
         self.rd_length = self.ensure("RDlength", int)
+
+    def __str__(self):
+        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type,
+            self.address
+        )
 
     @property
     def resource_data_length(self):
