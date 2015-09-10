@@ -1,5 +1,6 @@
 import logging
 
+from calendar import timegm
 from IPy import IP
 
 from .base import Result, ParsingDict
@@ -168,7 +169,7 @@ class TracerouteResult(Result):
 
     @property
     def end_time_timestamp(self):
-        return self.end_time.timestamp
+        return timegm(self.end_time.timetuple())
 
     @property
     def ip_path(self):

@@ -1,6 +1,6 @@
-import arrow
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from pytz import UTC
 
 from .base import Result, ResultParseError, ParsingDict
 
@@ -10,7 +10,7 @@ class Packet(ParsingDict):
     Model for data structure of each packet for a NTP result.
     """
 
-    NTP_EPOCH = datetime(1900, 1, 1)
+    NTP_EPOCH = datetime(1900, 1, 1, tzinfo=UTC)
 
     def __init__(self, data, **kwargs):
 
@@ -50,34 +50,29 @@ class Packet(ParsingDict):
     @property
     def final_time(self):
         if not self._final_time and self.final_timestamp:
-            self._final_time = arrow.get(
-                self.NTP_EPOCH + relativedelta(seconds=self.final_timestamp)
-            )
+            self._final_time = self.NTP_EPOCH + relativedelta(
+                seconds=self.final_timestamp)
         return self._final_time
 
     @property
     def origin_time(self):
         if not self._origin_time and self.origin_timestamp:
-            self._origin_time = arrow.get(
-                self.NTP_EPOCH + relativedelta(seconds=self.origin_timestamp)
-            )
+            self._origin_time = self.NTP_EPOCH + relativedelta(
+                seconds=self.origin_timestamp)
         return self._origin_time
 
     @property
     def received_time(self):
         if not self._received_time and self.received_timestamp:
-            self._received_time = arrow.get(
-                self.NTP_EPOCH + relativedelta(seconds=self.received_timestamp)
-            )
+            self._received_time = self.NTP_EPOCH + relativedelta(
+                seconds=self.received_timestamp)
         return self._received_time
 
     @property
     def transmitted_time(self):
         if not self._transmitted_time and self.transmitted_timestamp:
-            self._transmitted_time = arrow.get(
-                self.NTP_EPOCH + relativedelta(
+            self._transmitted_time = self.NTP_EPOCH + relativedelta(
                     seconds=self.transmitted_timestamp)
-            )
         return self._transmitted_time
 
 

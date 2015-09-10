@@ -1,6 +1,7 @@
 from ripe.atlas.sagan import Result
 from ripe.atlas.sagan.ping import PingResult, Packet
 
+
 def test_ping_0():
     result = Result.get('{"avg":"58.042","dst_addr":"62.2.16.12","dup":"0","fw":0,"max":"58.272","min":"57.876","msm_id":1000192,"prb_id":677,"rcvd":"3","sent":"3","src_addr":"78.128.9.202","timestamp":1328019792,"type":"ping"}')
     assert(result.af == 4)
@@ -24,6 +25,7 @@ def test_ping_0():
     assert(result.created.isoformat() == "2012-01-31T14:23:12+00:00")
     assert(result.packets == [])
 
+
 def test_ping_1():
     result = Result.get('{"addr":"62.2.16.12","avg":124.572,"dup":0,"from":"194.85.27.7","fw":1,"max":125.44499999999999,"min":123.89400000000001,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":165,"rcvd":3,"sent":3,"size":56,"timestamp":1340523908,"type":"ping"}')
     assert(result.af == 4)
@@ -46,6 +48,7 @@ def test_ping_1():
     assert(result.step is None)
     assert(result.created.isoformat() == "2012-06-24T07:45:08+00:00")
     assert(result.packets == [])
+
 
 def test_ping_4460():
     result = Result.get('{"addr":"62.2.16.12","af":4,"avg":48.388333333333328,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"188.194.234.136","fw":4460,"max":56.948999999999998,"min":43.869999999999997,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":270,"proto":"ICMP","rcvd":3,"result":[{"rtt":43.869999999999997},{"rtt":56.948999999999998},{"rtt":44.345999999999997}],"sent":3,"size":20,"src_addr":"192.168.178.21","timestamp":1340524626,"ttl":52,"type":"ping"}')
@@ -81,6 +84,7 @@ def test_ping_4460():
     assert(result.packets[1].source_address == "192.168.178.21")
     assert(result.packets[2].source_address == "192.168.178.21")
 
+
 def test_ping_4470():
     result = Result.get('{"addr":"62.2.16.12","af":4,"avg":195.649,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"194.85.27.7","fw":4470,"max":197.79300000000001,"min":193.059,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":165,"proto":"ICMP","rcvd":3,"result":[{"rtt":196.095},{"rtt":197.79300000000001},{"rtt":193.059}],"sent":3,"size":20,"src_addr":"192.168.3.8","timestamp":1344514151,"ttl":46,"type":"ping"}')
     assert(result.af == 4)
@@ -114,6 +118,7 @@ def test_ping_4470():
     assert(result.packets[0].source_address == "192.168.3.8")
     assert(result.packets[1].source_address == "192.168.3.8")
     assert(result.packets[2].source_address == "192.168.3.8")
+
 
 def test_ping_4480():
     result = Result.get('{"addr":"62.2.16.12","af":4,"avg":95.756666666666661,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"194.85.27.7","fw":4480,"max":96.147999999999996,"min":95.388999999999996,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":165,"proto":"ICMP","rcvd":3,"result":[{"rtt":95.733000000000004},{"rtt":96.147999999999996},{"rtt":95.388999999999996}],"sent":3,"size":20,"src_addr":"192.168.3.8","timestamp":1349776268,"ttl":46,"type":"ping"}')
@@ -149,6 +154,7 @@ def test_ping_4480():
     assert(result.packets[1].source_address == "192.168.3.8")
     assert(result.packets[2].source_address == "192.168.3.8")
 
+
 def test_ping_4500():
     result = Result.get('{"addr":"62.2.16.12","af":4,"avg":30.114666666666665,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"80.56.151.3","fw":4500,"max":30.344999999999999,"min":29.960999999999999,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":202,"proto":"ICMP","rcvd":3,"result":[{"rtt":30.038},{"rtt":29.960999999999999},{"rtt":30.344999999999999}],"sent":3,"size":20,"src_addr":"192.168.1.229","timestamp":1361244431,"ttl":55,"type":"ping"}')
     assert(result.af == 4)
@@ -182,6 +188,7 @@ def test_ping_4500():
     assert(result.packets[0].source_address == "192.168.1.229")
     assert(result.packets[1].source_address == "192.168.1.229")
     assert(result.packets[2].source_address == "192.168.1.229")
+
 
 def test_ping_4520():
     result = Result.get('{"addr":"62.2.16.12","af":4,"avg":67.420999999999992,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"194.85.27.7","fw":4520,"max":70.230999999999995,"min":65.974999999999994,"msm_id":1000192,"name":"hsi.cablecom.ch","prb_id":165,"proto":"ICMP","rcvd":3,"result":[{"rtt":70.230999999999995},{"rtt":65.974999999999994},{"rtt":66.057000000000002}],"sent":3,"size":20,"src_addr":"192.168.3.8","timestamp":1365379380,"ttl":47,"type":"ping"}')
@@ -217,6 +224,7 @@ def test_ping_4520():
     assert(result.packets[1].source_address == "192.168.3.8")
     assert(result.packets[2].source_address == "192.168.3.8")
 
+
 def test_ping_4550():
     result = Result.get('{"af":4,"avg":27.300999999999998,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"80.56.151.3","fw":4550,"lts":365,"max":27.300999999999998,"min":27.300999999999998,"msm_id":1000192,"msm_name":"Ping","prb_id":202,"proto":"ICMP","rcvd":1,"result":[{"srcaddr":"192.168.1.229","x":"*"},{"x":"*"},{"rtt":27.300999999999998,"ttl":54}],"sent":3,"size":20,"src_addr":"192.168.1.229","step":360,"timestamp":1378271710,"ttl":54,"type":"ping"}')
     assert(result.af == 4)
@@ -250,6 +258,7 @@ def test_ping_4550():
     assert(result.packets[0].source_address == "192.168.1.229")
     assert(result.packets[1].source_address == "192.168.1.229")
     assert(result.packets[2].source_address == "192.168.1.229")
+
 
 def test_ping_4560():
     result = Result.get('{"af":4,"avg":36.887,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"62.195.143.53","fw":4560,"lts":36,"max":40.234000000000002,"min":34.747999999999998,"msm_id":1000192,"msm_name":"Ping","prb_id":202,"proto":"ICMP","rcvd":3,"result":[{"rtt":40.234000000000002},{"rtt":34.747999999999998,"srcaddr":"192.168.1.229"},{"rtt":35.679000000000002,"srcaddr":"192.168.1.229"}],"sent":3,"size":20,"src_addr":"192.168.1.229","step":360,"timestamp":1380586151,"ttl":54,"type":"ping"}')
@@ -285,6 +294,7 @@ def test_ping_4560():
     assert(result.packets[1].source_address == "192.168.1.229")
     assert(result.packets[2].source_address == "192.168.1.229")
 
+
 def test_ping_4570():
     result = Result.get('{"af":4,"avg":36.608333333333327,"dst_addr":"62.2.16.12","dst_name":"hsi.cablecom.ch","dup":0,"from":"62.195.143.53","fw":4570,"lts":-1,"max":36.741,"min":36.423999999999999,"msm_id":1000192,"msm_name":"Ping","prb_id":202,"proto":"ICMP","rcvd":3,"result":[{"rtt":36.741},{"rtt":36.659999999999997},{"rtt":36.423999999999999}],"sent":3,"size":12,"step":360,"timestamp":1384500425, "type":"ping"}')
     assert(result.af == 4)
@@ -319,6 +329,7 @@ def test_ping_4570():
     assert(result.packets[1].source_address is None)
     assert(result.packets[2].source_address is None)
 
+
 def test_ping_4600():
     result = Result.get('{"af":4,"avg":47.951999999999998,"dst_addr":"62.2.16.24","dst_name":"hsi.cablecom.ch","dup":0,"from":"188.195.183.141","fw":4600,"group_id":1000192,"lts":222,"max":48.990000000000002,"min":45.939,"msm_id":1000192,"msm_name":"Ping","prb_id":270,"proto":"ICMP","rcvd":3,"result":[{"rtt":45.939},{"rtt":48.927},{"rtt":48.990000000000002}],"sent":3,"size":12,"src_addr":"192.168.178.21","step":360,"timestamp":1392321470,"ttl":50,"type":"ping"}')
     assert(result.af == 4)
@@ -352,6 +363,7 @@ def test_ping_4600():
     assert(result.packets[0].source_address == "192.168.178.21")
     assert(result.packets[1].source_address == "192.168.178.21")
     assert(result.packets[2].source_address == "192.168.178.21")
+
 
 def test_ping_4610():
     result = Result.get('{"af":4,"avg":57.140666666666668,"dst_addr":"62.2.16.24","dst_name":"hsi.cablecom.ch","dup":0,"from":"188.195.181.120","fw":4610,"group_id":1000192,"lts":93,"max":63.213000000000001,"min":47.941000000000003,"msm_id":1000192,"msm_name":"Ping","prb_id":270,"proto":"ICMP","rcvd":3,"result":[{"rtt":63.213000000000001},{"rtt":47.941000000000003,"ttl":51},{"rtt":60.268000000000001,"ttl":50}],"sent":3,"size":12,"src_addr":"192.168.178.21","step":360,"timestamp":1395416383,"ttl":50,"type":"ping"}')
@@ -392,6 +404,7 @@ def test_ping_4610():
     assert(result.packets[1].source_address == "192.168.178.21")
     assert(result.packets[2].source_address == "192.168.178.21")
 
+
 def test_ping_duplicate():
     result = Result.get('{"af":4,"avg":27.768000000000001,"dst_addr":"62.2.16.24","dst_name":"hsi.cablecom.ch","dup":2,"from":"109.190.83.40","fw":4610,"lts":38,"max":27.768000000000001,"min":27.768000000000001,"msm_id":1000192,"msm_name":"Ping","prb_id":1216,"proto":"ICMP","rcvd":1,"result":[{"srcaddr":"192.168.103.130","x":"*"},{"dup":1,"rtt":36.454000000000001,"ttl":54},{"dup":1,"rtt":37.756},{"rtt":27.768000000000001}],"sent":2,"size":12,"src_addr":"192.168.103.130","step":360,"timestamp":1395277728,"ttl":54,"type":"ping"}')
     assert(result.af == 4)
@@ -430,6 +443,7 @@ def test_ping_duplicate():
     assert(result.packets[2].source_address == "192.168.103.130")
     assert(result.packets[3].source_address == "192.168.103.130")
 
+
 def test_ping_buggy():
     result = Result.get('{"af":4,"avg":-1,"dst_addr":"62.2.16.24","dst_name":"hsi.cablecom.ch","dup":2,"from":"62.195.143.53","fw":4600,"lts":130,"max":-1,"min":-1,"msm_id":1000192,"msm_name":"Ping","prb_id":202,"proto":"ICMP","rcvd":0,"result":[{"srcaddr":"192.168.1.229","x":"*"},{"dup":1,"rtt":1635.423,"ttl":55},{"dup":1,"rtt":1800.4939999999999}],"sent":1,"size":12,"src_addr":"192.168.1.229","step":360,"timestamp":1394745831,"ttl":55,"type":"ping"}')
     assert(result.af == 4)
@@ -450,6 +464,8 @@ def test_ping_buggy():
     assert(result.packets_sent == 1)
     assert(result.packet_size == 12)
     assert(result.step == 360)
+    print(result.created, type(result.created))
+    print(result.created.isoformat())
     assert(result.created.isoformat() == "2014-03-13T21:23:51+00:00")
     assert(result.packets[0].rtt is None)
     assert(result.packets[1].rtt == 1635.423)
@@ -463,6 +479,7 @@ def test_ping_buggy():
     assert(result.packets[0].source_address == "192.168.1.229")
     assert(result.packets[1].source_address == "192.168.1.229")
     assert(result.packets[2].source_address == "192.168.1.229")
+
 
 def test_ping_lts():
     result = Result.get('{"af":4,"prb_id":270,"result":[{"rtt":70.265},{"rtt":54.584,"ttl":51},{"rtt":52.875}],"ttl":51,"avg":59.2413333333,"size":12,"from":"188.193.157.75","proto":"ICMP","timestamp":1406561624,"dup":0,"type":"ping","sent":3,"msm_id":1000192,"fw":4650,"max":70.265,"step":360,"src_addr":"192.168.178.21","rcvd":3,"msm_name":"Ping","lts":76,"dst_name":"hsi.cablecom.ch","min":52.875,"group_id":1000192,"dst_addr":"62.2.16.24"}')

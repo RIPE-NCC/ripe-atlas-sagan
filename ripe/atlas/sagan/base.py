@@ -1,5 +1,6 @@
-import arrow
+import datetime
 import logging
+import pytz
 
 from .helpers.compatibility import string
 
@@ -7,10 +8,6 @@ from .helpers.compatibility import string
 try:
     import ujson as json
 except ImportError:
-    logging.warning(
-        "Use of the default json module is discouraged.  Instead, consider "
-        "using ujson, a much faster parser."
-    )
     import json
 
 
@@ -48,12 +45,12 @@ class ParsingDict(object):
     """
 
     ACTION_IGNORE = 1
-    ACTION_WARN   = 2
-    ACTION_FAIL   = 3
+    ACTION_WARN = 2
+    ACTION_FAIL = 3
 
     PROTOCOL_ICMP = "ICMP"
-    PROTOCOL_UDP  = "UDP"
-    PROTOCOL_TCP  = "TCP"
+    PROTOCOL_UDP = "UDP"
+    PROTOCOL_TCP = "TCP"
     PROTOCOL_MAP = {
         "ICMP": PROTOCOL_ICMP,
         "I":    PROTOCOL_ICMP,
@@ -91,9 +88,10 @@ class ParsingDict(object):
     def ensure(self, key, kind, default=None):
         try:
             if kind == "datetime":
-                return arrow.get(self.raw_data[key])
+                return datetime.datetime.fromtimestamp(
+                    self.raw_data[key], tz=pytz.UTC)
             return kind(self.raw_data[key])
-        except (TypeError, ValueError, KeyError, arrow.parser.ParserError):
+        except (TypeError, ValueError, KeyError):
             return default
 
     def clean_protocol(self, protocol):
@@ -158,12 +156,14 @@ class Result(ParsingDict):
                     )
                 )
 
-        self.created            = arrow.get(self.raw_data["timestamp"])
-        self.measurement_id     = self.ensure("msm_id", int)
-        self.probe_id           = self.ensure("prb_id", int)
-        self.firmware           = self.ensure("fw",     int)
-        self.origin             = self.ensure("from",   str)
-        self.seconds_since_sync = self.ensure("lts",    int)
+        self.created = datetime.datetime.fromtimestamp(
+            self.raw_data["timestamp"], tz=pytz.UTC)
+
+        self.measurement_id = self.ensure("msm_id", int)
+        self.probe_id = self.ensure("prb_id", int)
+        self.firmware = self.ensure("fw", int)
+        self.origin = self.ensure("from", str)
+        self.seconds_since_sync = self.ensure("lts", int)
 
         # Handle the weird case where fw=0 and we don't know what to expect
         if self.firmware == 0:
@@ -230,7 +230,8 @@ class Result(ParsingDict):
 
         raise ResultParseError("Unknown type value was found in the JSON input")
 
-    def calculate_median(self, given_list):
+    @staticmethod
+    def calculate_median(given_list):
         """
         Returns the median of values in the given list.
         """

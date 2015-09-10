@@ -6,7 +6,6 @@ exec(open("ripe/atlas/sagan/version.py").read())
 
 name = "ripe.atlas.sagan"
 install_requires = [
-    "arrow",
     "python-dateutil",
     "pytz",
     "IPy",
