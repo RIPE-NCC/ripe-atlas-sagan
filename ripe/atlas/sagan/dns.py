@@ -147,6 +147,9 @@ class Question(ParsingDict):
         self.type = self.ensure("Qtype", str)
         self.name = self.ensure("Qname", str)
 
+    def __str__(self):
+        return ";{}\t\t\t{}\t{}".format(self.name, self.klass, self.type)
+
 
 class Answer(ParsingDict):
 
@@ -167,9 +170,19 @@ class Answer(ParsingDict):
 
 
 class AAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.address = self.ensure("Address", str)
+
+    def __str__(self):
+        return "{}\t\t{}\t{}\t{}\t{}\n".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type,
+            self.address
+        )
 
 
 class AaaaAnswer(AAnswer):
