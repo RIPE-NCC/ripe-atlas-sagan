@@ -170,6 +170,14 @@ class Answer(ParsingDict):
     def resource_data_length(self):
         return self.rd_length
 
+    def __str__(self):
+        return "{:22}  {:<7}  {:5}  {:5}".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type
+        )
+
 
 class AAnswer(Answer):
 
@@ -178,11 +186,8 @@ class AAnswer(Answer):
         self.address = self.ensure("Address", str)
 
     def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:5}  {}".format(
-            self.name,
-            self.ttl,
-            self.klass,
-            self.type,
+        return "{}  {}".format(
+            Answer.__str__(self),
             self.address
         )
 
@@ -192,16 +197,14 @@ class AaaaAnswer(AAnswer):
 
 
 class NsAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.target = self.ensure("Target", str)
 
     def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:5}  {}".format(
-            self.name,
-            self.ttl,
-            self.klass,
-            self.type,
+        return "{}  {}".format(
+            Answer.__str__(self),
             self.target
         )
 
@@ -230,11 +233,8 @@ class SoaAnswer(Answer):
         self.minimum = self.ensure("NegativeTtl", int)
 
     def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:5}  {} {} {} {} {} {} {}".format(
-            self.name,
-            self.ttl,
-            self.klass,
-            self.type,
+        return "{}  {} {} {} {} {} {} {}".format(
+            Answer.__str__(self),
             self.mname,
             self.rname,
             self.serial,
@@ -322,11 +322,8 @@ class RRSigAnswer(Answer):
         inception = datetime.fromtimestamp(
             self.signature_inception, tz=UTC).strftime(formatter)
 
-        return "{:22}  {:<7}  {:5}  {:5}  {} {} {} {} {} {} {} {} {}".format(
-            self.name,
-            self.ttl,
-            self.klass,
-            self.type,
+        return "{}  {} {} {} {} {} {} {} {} {}".format(
+            Answer.__str__(self),
             self.type_covered,
             self.algorithm,
             self.labels,
