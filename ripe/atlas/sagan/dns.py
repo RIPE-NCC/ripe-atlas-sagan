@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 import base64
 from collections import namedtuple
+from datetime import datetime
+from pytz import UTC
 
 from .base import Result, ParsingDict
 from .helpers import abuf
@@ -36,16 +38,16 @@ class Header(ParsingDict):
 
     @property
     def flags(self):
-        Flags = namedtuple(
+        flags = namedtuple(
             "Flags", ("qr", "aa", "tc", "rd", "ra", "z", "ad", "cd"))
-        return Flags(qr=self.qr, aa=self.aa, tc=self.tc, rd=self.rd,
+        return flags(qr=self.qr, aa=self.aa, tc=self.tc, rd=self.rd,
                      ra=self.ra, z=self.z, ad=self.ad, cd=self.cd)
 
     @property
     def sections(self):
-        Sections = namedtuple(
+        sections = namedtuple(
             "Sections", ("QDCOUNT", "ANCOUNT", "NSCOUNT", "ARCOUNT"))
-        return Sections(QDCOUNT=self.qdcount, ANCOUNT=self.ancount,
+        return sections(QDCOUNT=self.qdcount, ANCOUNT=self.ancount,
                         NSCOUNT=self.nscount, ARCOUNT=self.arcount)
 
     @property
@@ -176,7 +178,7 @@ class AAnswer(Answer):
         self.address = self.ensure("Address", str)
 
     def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
+        return "{:22}  {:<7}  {:5}  {:5}  {}".format(
             self.name,
             self.ttl,
             self.klass,
@@ -193,6 +195,15 @@ class NsAnswer(Answer):
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.target = self.ensure("Target", str)
+
+    def __str__(self):
+        return "{:22}  {:<7}  {:5}  {:5}  {}".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type,
+            self.target
+        )
 
 
 class CnameAnswer(NsAnswer):
@@ -217,6 +228,21 @@ class SoaAnswer(Answer):
         self.retry = self.ensure("Retry", int)
         self.expire = self.ensure("Expire", int)
         self.minimum = self.ensure("NegativeTtl", int)
+
+    def __str__(self):
+        return "{:22}  {:<7}  {:5}  {:5}  {} {} {} {} {} {} {}".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type,
+            self.mname,
+            self.rname,
+            self.serial,
+            self.refresh,
+            self.retry,
+            self.expire,
+            self.minimum
+        )
 
     @property
     def master_server_name(self):
@@ -273,89 +299,60 @@ class TxtAnswer(Answer):
 
 
 class RRSigAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.type_covered = self.ensure("TypeCovered", str)
         self.algorithm = self.ensure("Algorithm", int)
         self.labels = self.ensure("Labels", int)
         self.original_ttl = self.ensure("OriginalTTL", int)
-        self.signature_expiration = self.ensure("SignatureExpiration",int)
+        self.signature_expiration = self.ensure("SignatureExpiration", int)
         self.signature_inception = self.ensure("SignatureInception", int)
         self.key_tag = self.ensure("KeyTag", int)
         self.signer_name = self.ensure("SignerName", str)
         self.signature = self.ensure("Signature", str)
 
     def __str__(self):
-        return "{} {} {} {} {} {} {} {} {}".format(
+
+        formatter = "%Y%m%d%H%M%S"
+
+        expiration = datetime.fromtimestamp(
+            self.signature_expiration, tz=UTC).strftime(formatter)
+
+        inception = datetime.fromtimestamp(
+            self.signature_inception, tz=UTC).strftime(formatter)
+
+        return "{:22}  {:<7}  {:5}  {:5}  {} {} {} {} {} {} {} {} {}".format(
+            self.name,
+            self.ttl,
+            self.klass,
+            self.type,
             self.type_covered,
             self.algorithm,
             self.labels,
             self.original_ttl,
-            self.signature_expiration,
-            self.signature_inception,
+            expiration,
+            inception,
             self.key_tag,
             self.signer_name,
             self.signature
         )
 
 
-class Authority(ParsingDict):
-
-    def __init__(self, data, **kwargs):
-
-        ParsingDict.__init__(self, **kwargs)
-
-        self.raw_data = data
-        self.klass = self.ensure("Class", int)
-        self.name = self.ensure("Name", str)
-        self.ttl = self.ensure("TTL", int)
-        self.target = self.ensure("Target", str)
-        self.type = self.ensure("Type", str)
-        self.rd_length = self.ensure("RDlength", int)
-
-    def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
-            self.name,
-            self.ttl,
-            self.klass or "",
-            self.type,
-            self.target
-        )
-
-    @property
-    def resource_data_length(self):
-        return self.rd_length
-
-
-class Additional(ParsingDict):
-
-    def __init__(self, data, **kwargs):
-
-        ParsingDict.__init__(self, **kwargs)
-
-        self.raw_data = data
-        self.address = self.ensure("Address", str)
-        self.klass = self.ensure("Class", str)
-        self.name = self.ensure("Name", str)
-        self.ttl = self.ensure("TTL", int)
-        self.type = self.ensure("Type", str)
-        self.rd_length = self.ensure("RDlength", int)
-
-    def __str__(self):
-        return "{:22}  {:<7}  {:5}  {:4}  {}".format(
-            self.name,
-            self.ttl,
-            self.klass,
-            self.type,
-            self.address
-        )
-
-    @property
-    def resource_data_length(self):
-        return self.rd_length
-
-
 class Message(ParsingDict):
+
+    ANSWER_CLASSES = {
+        "A":      AAnswer,
+        "AAAA":   AaaaAnswer,
+        "NS":     NsAnswer,
+        "CNAME":  CnameAnswer,
+        "MX":     MxAnswer,
+        "SOA":    SoaAnswer,
+        "DS":     DsAnswer,
+        "DNSKEY": DnskeyAnswer,
+        "TXT":    TxtAnswer,
+        "RRSIG":  RRSigAnswer,
+    }
 
     def __init__(self, message, response_data, parse_buf=True, **kwargs):
 
@@ -379,19 +376,6 @@ class Message(ParsingDict):
         self.authorities = []
         self.additionals = []
 
-        answer_classes = {
-            "A":      AAnswer,
-            "AAAA":   AaaaAnswer,
-            "NS":     NsAnswer,
-            "CNAME":  CnameAnswer,
-            "MX":     MxAnswer,
-            "SOA":    SoaAnswer,
-            "DS":     DsAnswer,
-            "DNSKEY": DnskeyAnswer,
-            "TXT":    TxtAnswer,
-            "RRSIG":  RRSigAnswer,
-        }
-
         if "EDNS0" in self.raw_data:
             self.edns0 = Edns0(self.raw_data["EDNS0"], **kwargs)
 
@@ -399,27 +383,28 @@ class Message(ParsingDict):
             self.questions.append(Question(question, **kwargs))
 
         for answer in self.raw_data.get("AnswerSection", []):
-            answer_type = answer.get("Type")
-            if answer_type is None:
-                self._handle_malformation(
-                    "Answer has no parseable Type: {answer}".format(
-                        answer=answer
-                    )
-                )
-            answer_class = answer_classes.get(answer_type, Answer)
-            self.answers.append(answer_class(answer, **kwargs))
-
+            self._append_answer(answer, "answers", **kwargs)
         for authority in self.raw_data.get("AuthoritySection", []):
-            self.authorities.append(Authority(authority, **kwargs))
-
+            self._append_answer(authority, "authorities", **kwargs)
         for additional in self.raw_data.get("AdditionalSection", []):
-            self.additionals.append(Additional(additional, **kwargs))
+            self._append_answer(additional, "additionals", **kwargs)
 
     def __str__(self):
         return self._string_representation
 
     def __repr__(self):
         return str(self)
+
+    def _append_answer(self, answer, section, **kwargs):
+        answer_type = answer.get("Type")
+        if answer_type is None:
+            self._handle_malformation(
+                "Answer has no parseable Type: {answer}".format(
+                    answer=answer
+                )
+            )
+        answer_class = self.ANSWER_CLASSES.get(answer_type, Answer)
+        getattr(self, section).append(answer_class(answer, **kwargs))
 
     def _parse_buf(self, message):
 

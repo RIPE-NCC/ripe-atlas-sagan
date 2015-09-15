@@ -1,6 +1,8 @@
-import datetime
 import logging
 import pytz
+
+from calendar import timegm
+from datetime import datetime
 
 from .helpers.compatibility import string
 
@@ -88,7 +90,7 @@ class ParsingDict(object):
     def ensure(self, key, kind, default=None):
         try:
             if kind == "datetime":
-                return datetime.datetime.fromtimestamp(
+                return datetime.fromtimestamp(
                     self.raw_data[key], tz=pytz.UTC)
             return kind(self.raw_data[key])
         except (TypeError, ValueError, KeyError):
@@ -156,7 +158,7 @@ class Result(ParsingDict):
                     )
                 )
 
-        self.created = datetime.datetime.fromtimestamp(
+        self.created = datetime.fromtimestamp(
             self.raw_data["timestamp"], tz=pytz.UTC)
 
         self.measurement_id = self.ensure("msm_id", int)
@@ -189,7 +191,7 @@ class Result(ParsingDict):
 
     @property
     def created_timestamp(self):
-        return self.created.timestamp
+        return timegm(self.created.timetuple())
 
     @classmethod
     def get(cls, data, **kwargs):

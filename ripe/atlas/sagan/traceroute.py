@@ -5,6 +5,7 @@ from IPy import IP
 
 from .base import Result, ParsingDict
 
+
 class IcmpHeader(ParsingDict):
     """
     But why did we stop here?  Why not go all the way and define subclasses for

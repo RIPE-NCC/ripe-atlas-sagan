@@ -1,6 +1,8 @@
 # Changelog
 
 * 1.0.1
+    * **Breaking Change**: the `Authority` and `Additional` classes were
+      removed, replaced with the appropriate answer types.
     * In an effort to make Sagan (along with Cousteau and the toolkit) more
       portable, we dropped the requirement for the `arrow` package.
     * Added `__str__` definitions to some DNS classes for use with the toolkit.
