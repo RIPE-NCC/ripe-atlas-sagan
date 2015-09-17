@@ -492,54 +492,13 @@ values of ``type_covered``, ``algorithm``, ``labels``, ``original_ttl``,
 and ``signature`` are all concatenated with spaces.
 
 
-.. _dns-authority:
+.. _dns-answer-nsec:
 
-Authority
-~~~~~~~~~
+NsecAnswer
+..........
 
-The authority section of the response.
-
-  **NOTE**: In keeping with Python conventions, we use the propertyname
-  ``klass`` here instead of the more intuitive (and illegal in Python)
-  ``class``.  It may be confusing for non-Python programmers, but unfortunately
-  it's a limitation of the language.
-
-=====================  ========  ===================================================================================
-Property               Type      Explanation
-=====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents this section
-klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
-type                   str
-name                   str
-ttl                    int
-target                 str       An IP address
-rd_length              int
-=====================  ========  ===================================================================================
-
-
-.. _dns-additional:
-
-Additional
-~~~~~~~~~~
-
-The optional additional section of the response.
-
-  **NOTE**: In keeping with Python conventions, we use the propertyname
-  ``klass`` here instead of the more intuitive (and illegal in Python)
-  ``class``.  It may be confusing for non-Python programmers, but unfortunately
-  it's a limitation of the language.
-
-=====================  ========  ===================================================================================
-Property               Type      Explanation
-=====================  ========  ===================================================================================
-raw_data               dict      The portion of the parsed abuf that represents this section
-klass                  str       The ``CLASS`` value, spelt this way to conform to Python norms
-type                   str
-name                   str
-ttl                    int
-address                str       An IP address
-rd_length              int
-=====================  ========  ===================================================================================
+This answer type is not yet supported at the abuf parser level, so this class
+is limited to the properties of the parent ``Answer`` class.
 
 
 .. _dns-edns0:
