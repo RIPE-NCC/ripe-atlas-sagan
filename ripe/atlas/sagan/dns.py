@@ -214,10 +214,18 @@ class CnameAnswer(NsAnswer):
 
 
 class MxAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.preference = self.ensure("Preference", int)
         self.mail_exchanger = self.ensure("MailExchanger", str)
+
+    def __str__(self):
+        return "{}  {} {}".format(
+            Answer.__str__(self),
+            self.preference,
+            self.mail_exchanger
+        )
 
 
 class SoaAnswer(Answer):
@@ -262,6 +270,7 @@ class SoaAnswer(Answer):
 
 
 class DsAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.tag = self.ensure("Tag", int)
@@ -269,14 +278,33 @@ class DsAnswer(Answer):
         self.digest_type = self.ensure("DigestType", int)
         self.delegation_key = self.ensure("DelegationKey", str)
 
+    def __str__(self):
+        return "{}  {} {} {} {}".format(
+            Answer.__str__(self),
+            self.tag,
+            self.algorithm,
+            self.digest_type,
+            self.delegation_key
+        )
+
 
 class DnskeyAnswer(Answer):
+
     def __init__(self, data, **kwargs):
         Answer.__init__(self, data, **kwargs)
         self.flags = self.ensure("Flags", int)
         self.algorithm = self.ensure("Algorithm", int)
         self.protocol = self.ensure("Protocol", int)
         self.key = self.ensure("Key", str)
+
+    def __str__(self):
+        return "{}  {} {} {} {}".format(
+            Answer.__str__(self),
+            self.flags,
+            self.algorithm,
+            self.protocol,
+            self.key
+        )
 
 
 class TxtAnswer(Answer):
@@ -292,6 +320,9 @@ class TxtAnswer(Answer):
                 for s in self.raw_data["Data"]:
                     if isinstance(s, compatibility.string):
                         self.data.append(s)
+
+    def __str__(self):
+        return "{}  {} {} {} {}".format(Answer.__str__(self), self.data_string)
 
     @property
     def data_string(self):
@@ -336,6 +367,15 @@ class RRSigAnswer(Answer):
         )
 
 
+class NsecAnswer(Answer):
+    """
+    Parsing of these types of answers out of the abuf is not yet supported.
+    """
+
+    def __str__(self):
+        return "{}  ---- Not fully supported ----".format(Answer.__str__(self))
+
+
 class Message(ParsingDict):
 
     ANSWER_CLASSES = {
@@ -349,6 +389,7 @@ class Message(ParsingDict):
         "DNSKEY": DnskeyAnswer,
         "TXT":    TxtAnswer,
         "RRSIG":  RRSigAnswer,
+        "NSEC":   NsecAnswer,
     }
 
     def __init__(self, message, response_data, parse_buf=True, **kwargs):

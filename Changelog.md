@@ -1,11 +1,12 @@
 # Changelog
 
-* 1.0.1
+* 1.1.0
     * **Breaking Change**: the `Authority` and `Additional` classes were
       removed, replaced with the appropriate answer types.
+    * Added `__str__` definitions to DNS answer classes for use with the
+      toolkit.
     * In an effort to make Sagan (along with Cousteau and the toolkit) more
       portable, we dropped the requirement for the `arrow` package.
-    * Added `__str__` definitions to some DNS classes for use with the toolkit.
 * 1.0.0
     * **Breaking Change**: the `data` property of the `TxtAnswer` class was
       changed from a string to a list of strings.  This is a correction from
