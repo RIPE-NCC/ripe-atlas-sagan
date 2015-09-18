@@ -2,7 +2,12 @@
 
 * 1.1.0
     * **Breaking Change**: the `Authority` and `Additional` classes were
-      removed, replaced with the appropriate answer types.
+      removed, replaced with the appropriate answer types.  For the most part,
+      this change should be invisible, as the common properties are the same,
+      but if you were testing code against these class types, you should
+      consider this a breaking change.
+    * **Breaking Change**: The `__str__` format for DNS `RrsigAnswer` to conform
+      the output of a typical `dig` binary.
     * Added `__str__` definitions to DNS answer classes for use with the
       toolkit.
     * In an effort to make Sagan (along with Cousteau and the toolkit) more
