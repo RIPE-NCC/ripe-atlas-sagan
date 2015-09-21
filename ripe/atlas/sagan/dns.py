@@ -186,10 +186,7 @@ class AAnswer(Answer):
         self.address = self.ensure("Address", str)
 
     def __str__(self):
-        return "{}  {}".format(
-            Answer.__str__(self),
-            self.address
-        )
+        return "{}  {}".format(Answer.__str__(self), self.address)
 
 
 class AaaaAnswer(AAnswer):
@@ -203,10 +200,7 @@ class NsAnswer(Answer):
         self.target = self.ensure("Target", str)
 
     def __str__(self):
-        return "{}  {}".format(
-            Answer.__str__(self),
-            self.target
-        )
+        return "{}  {}".format(Answer.__str__(self), self.target)
 
 
 class CnameAnswer(NsAnswer):
@@ -322,7 +316,7 @@ class TxtAnswer(Answer):
                         self.data.append(s)
 
     def __str__(self):
-        return "{}  {} {} {} {}".format(Answer.__str__(self), self.data_string)
+        return "{}  {}".format(Answer.__str__(self), self.data_string)
 
     @property
     def data_string(self):
