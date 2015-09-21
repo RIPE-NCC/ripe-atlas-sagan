@@ -1,5 +1,7 @@
 # Changelog
 
+* 1.1.1
+    * Fixed a string representation bug found by @iortiz: https://github.com/RIPE-NCC/ripe-atlas-tools/issues/1
 * 1.1.0
     * **Breaking Change**: the `Authority` and `Additional` classes were
       removed, replaced with the appropriate answer types.  For the most part,
