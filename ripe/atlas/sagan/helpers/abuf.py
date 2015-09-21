@@ -46,7 +46,7 @@ class AbufParser(object):
             res = cls._do_query(buf, offset, error)
             if res is None:
                 e = ('additional', offset,
-                     '_do_query failed, additional record {}'.format(i))
+                     '_do_query failed, additional record {0}'.format(i))
                 error.append(e)
                 dnsres['ERROR'] = error
                 return dnsres
@@ -60,7 +60,7 @@ class AbufParser(object):
             res = cls._do_rr(buf, offset, error)
             if res is None:
                 e = ('additional', offset,
-                     '_do_rr failed, additional record {}'.format(i))
+                     '_do_rr failed, additional record {0}'.format(i))
                 error.append(e)
                 dnsres['ERROR'] = error
                 return dnsres
@@ -207,7 +207,7 @@ class AbufParser(object):
         strng = buf[offset:offset + reqlen]
         if len(strng) != reqlen:
             e = ("_do_query", offset,
-                 'offset out of range: buf size = {}'.format(len(buf)))
+                 'offset out of range: buf size = {0}'.format(len(buf)))
             error.append(e)
             return None
         res = struct.unpack(fmt, strng)
@@ -281,7 +281,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rdata_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -317,7 +317,7 @@ class AbufParser(object):
                 reqlen = struct.calcsize(fmt)
                 if reqlen > len(rdata):
                     e = ("_do_rr", rdata_offset,
-                         'rdata too small: size = {}'.format(len(rdata)))
+                         'rdata too small: size = {0}'.format(len(rdata)))
                     error.append(e)
                     return None
                 rr['Address'] = '.'.join(
@@ -349,7 +349,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rdata_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -381,7 +381,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rr_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -397,7 +397,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rdata_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -417,7 +417,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rdata_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -446,7 +446,7 @@ class AbufParser(object):
                     e = (
                         "_do_rr",
                         rdata_offset,
-                        'offset out of range: rdata size = {}'.format(
+                        'offset out of range: rdata size = {0}'.format(
                             len(rdata)
                         )
                     )
@@ -479,7 +479,7 @@ class AbufParser(object):
                             e = (
                                 "_do_rr",
                                 rdata_offset,
-                                'offset out of range: rdata size = {}'.format(
+                                'offset out of range: rdata size = {0}'.format(
                                     len(rdata)
                                 )
                             )
@@ -543,7 +543,7 @@ class AbufParser(object):
                     e = (
                         "_do_name",
                         poffset,
-                        'offset out of range: buf size = {}'.format(len(buf))
+                        'offset out of range: buf size = {0}'.format(len(buf))
                     )
                     error.append(e)
                     return None

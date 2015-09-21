@@ -186,7 +186,7 @@ class AAnswer(Answer):
         self.address = self.ensure("Address", str)
 
     def __str__(self):
-        return "{}  {}".format(Answer.__str__(self), self.address)
+        return "{0}  {1}".format(Answer.__str__(self), self.address)
 
 
 class AaaaAnswer(AAnswer):
@@ -200,7 +200,7 @@ class NsAnswer(Answer):
         self.target = self.ensure("Target", str)
 
     def __str__(self):
-        return "{}  {}".format(Answer.__str__(self), self.target)
+        return "{0}  {1}".format(Answer.__str__(self), self.target)
 
 
 class CnameAnswer(NsAnswer):
@@ -215,7 +215,7 @@ class MxAnswer(Answer):
         self.mail_exchanger = self.ensure("MailExchanger", str)
 
     def __str__(self):
-        return "{}  {} {}".format(
+        return "{0}  {1} {2}".format(
             Answer.__str__(self),
             self.preference,
             self.mail_exchanger
@@ -235,7 +235,7 @@ class SoaAnswer(Answer):
         self.minimum = self.ensure("NegativeTtl", int)
 
     def __str__(self):
-        return "{}  {} {} {} {} {} {} {}".format(
+        return "{0}  {1} {2} {3} {4} {5} {6} {7}".format(
             Answer.__str__(self),
             self.mname,
             self.rname,
@@ -273,7 +273,7 @@ class DsAnswer(Answer):
         self.delegation_key = self.ensure("DelegationKey", str)
 
     def __str__(self):
-        return "{}  {} {} {} {}".format(
+        return "{0}  {1} {2} {3} {4}".format(
             Answer.__str__(self),
             self.tag,
             self.algorithm,
@@ -292,7 +292,7 @@ class DnskeyAnswer(Answer):
         self.key = self.ensure("Key", str)
 
     def __str__(self):
-        return "{}  {} {} {} {}".format(
+        return "{0}  {1} {2} {3} {4}".format(
             Answer.__str__(self),
             self.flags,
             self.algorithm,
@@ -316,7 +316,7 @@ class TxtAnswer(Answer):
                         self.data.append(s)
 
     def __str__(self):
-        return "{}  {}".format(Answer.__str__(self), self.data_string)
+        return "{0}  {1}".format(Answer.__str__(self), self.data_string)
 
     @property
     def data_string(self):
@@ -347,7 +347,7 @@ class RRSigAnswer(Answer):
         inception = datetime.fromtimestamp(
             self.signature_inception, tz=UTC).strftime(formatter)
 
-        return "{}  {} {} {} {} {} {} {} {} {}".format(
+        return "{0}  {1} {2} {3} {4} {5} {6} {7} {8} {9}".format(
             Answer.__str__(self),
             self.type_covered,
             self.algorithm,
@@ -367,7 +367,7 @@ class NsecAnswer(Answer):
     """
 
     def __str__(self):
-        return "{}  ---- Not fully supported ----".format(Answer.__str__(self))
+        return "{0}  ---- Not fully supported ----".format(Answer.__str__(self))
 
 
 class Message(ParsingDict):
