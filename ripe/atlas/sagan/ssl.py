@@ -15,6 +15,7 @@ except ImportError:
 
 from .base import Result, ResultParseError, ParsingDict
 
+
 class Certificate(ParsingDict):
 
     TIME_FORMAT = "%Y%m%d%H%M%SZ"
