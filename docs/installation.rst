@@ -83,3 +83,13 @@ to use sagan to say, parse traceroute or DNS results, then you can tell the
 installer to skip building ``pyOpenSSL`` by doing the following::
 
      $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
+
+If you *do* care about SSL and have to use a Mac, then `this issue`_ will likely
+be of assistance.  Essentially, you will need to uninstall Xcode (if it's
+installed already), then attempt to use ``gcc``.  This will trigger the OS to
+ask if you want to install the Xcode compilation tools.  Click ``install``, and
+when that's finished, install Sagan with this command:
+
+    $ CFLAGS="-I/usr/include" pip install ripe.atlas.sagan
+
+.. _this issue: https://github.com/RIPE-NCC/ripe.atlas.sagan/issues/52
