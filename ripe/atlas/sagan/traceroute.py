@@ -95,7 +95,7 @@ class Hop(ParsingDict):
         if self.packets:
             rtts = sorted([p.rtt for p in self.packets if p and p.rtt])
             if rtts:
-                self.median_rtt = rtts[int(len(rtts) / 2)]
+                self.median_rtt = Result.calculate_median(rtts)
 
     def __str__(self):
         return self.index
@@ -122,7 +122,7 @@ class TracerouteResult(Result):
 
         self.hops = []
         self.total_hops = 0
-        self.last_rtt = None
+        self.last_median_rtt = None
         self._parse_hops(**kwargs)  # Sets hops, last_rtt, and total_hops
 
         # Used by a few response tests below
@@ -130,10 +130,17 @@ class TracerouteResult(Result):
         self._last_hop_responded = None
 
     @property
+    def last_rtt(self):
+        logging.warning(
+            '"last_rtt" is deprecated and will be removed in future versions. '
+            'Instead, use "last_median_rtt".')
+        return self.last_median_rtt
+
+    @property
     def target_responded(self):
         logging.warning(
-            "The target_responded property is deprecated and will be removed "
-            "in future versions.  Instead, use destination_ip_responded."
+            'The "target_responded" property is deprecated and will be removed '
+            'in future versions.  Instead, use "destination_ip_responded".'
         )
         return self.destination_ip_responded
 
@@ -196,7 +203,7 @@ class TracerouteResult(Result):
             hop = Hop(hop, **kwargs)
 
             if hop.median_rtt:
-                self.last_rtt = hop.median_rtt
+                self.last_median_rtt = hop.median_rtt
 
             self.hops.append(hop)
             self.total_hops += 1
