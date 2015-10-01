@@ -402,6 +402,13 @@ class Message(ParsingDict):
         if "HEADER" in self.raw_data:
             self.header = Header(self.raw_data["HEADER"], **kwargs)
 
+            # This is a tricky one, since you can't know that the response is an
+            # error until *after* the abuf is parsed, and it won't be parsed
+            # until you attempt to access it.
+            code = self.header.return_code
+            if not code or code.upper() != "NOERROR":
+                self._handle_error('The response did not contain "NOERROR"')
+
         self.edns0 = None
         self.questions = []
         self.answers = []
@@ -550,23 +557,29 @@ class Response(ParsingDict):
         Lazy read-only accessor for the (a|q)buf.
         The qbuf Message object is cached for subsequent requests.
         """
+
         kind = "{prefix}buf".format(prefix=prefix)
         private_name = "_" + kind
         buf = getattr(self, private_name)
+
         if buf:
             return buf
+
         try:
             buf_string = self.raw_data["result"][kind]
         except KeyError:
             buf_string = self.ensure(kind, str)
         if buf_string:
-            setattr(self, private_name, Message(
+            message = Message(
                 buf_string,
                 self.raw_data,
                 parse_buf=self._parse_buf,
                 on_error=self._on_error,
                 on_malformation=self._on_malformation
-            ))
+            )
+            if message.is_error:
+                self._handle_error(message.error_message)
+            setattr(self, private_name, message)
         return getattr(self, private_name)
 
 

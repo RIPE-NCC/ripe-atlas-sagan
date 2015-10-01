@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* 1.1.2
+    * Changed the name of ``TracerouteResult.rtt_median`` to ``TracerouteResult.last_rtt_median``.
+    * Modified the ``DnsResult`` class to allow the "bubbling up" of error statuses.
 * 1.1.1
     * Fixed a string representation bug found by @iortiz: https://github.com/RIPE-NCC/ripe-atlas-tools/issues/1
 * 1.1.0
