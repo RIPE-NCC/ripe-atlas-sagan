@@ -153,8 +153,8 @@ class Result(ParsingDict):
         for key in ("timestamp", "msm_id", "prb_id", "fw", "type"):
             if key not in self.raw_data:
                 raise ResultParseError(
-                    "This does not look like a RIPE Atlas measurement: {raw_data}".format(
-                        raw_data=self.raw_data
+                    "This doesn't look like a RIPE Atlas measurement: {}".format(
+                        self.raw_data
                     )
                 )
 
