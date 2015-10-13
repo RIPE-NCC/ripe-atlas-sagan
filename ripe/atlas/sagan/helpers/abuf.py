@@ -4,10 +4,9 @@ import base64
 import codecs
 import struct
 
-
 class AbufParser(object):
 
-    DNS_CTYPE= "UTF=8"
+    DNS_CTYPE= "ASCII"
 
     @classmethod
     def parse(cls, buf, options=None):
@@ -139,6 +138,34 @@ class AbufParser(object):
                 32769: 'DLV'}.get(rdatatype,rdatatype)
 
     @classmethod
+    def _bytes_as_hex_str(cls, b):
+        b_as_hex= codecs.getencoder('hex_codec')(b)[0]
+        b_as_hex_str= b_as_hex.decode(cls.DNS_CTYPE)
+        return b_as_hex_str
+
+    @classmethod
+    def _types_bitmap(cls, data, error):
+        bits=[]
+        o= 0
+        while o < len(data):
+            fmt = "!BB"
+            fmtsz = struct.calcsize(fmt)
+            dat= data[o:o+fmtsz]
+            if len(dat) != fmtsz:
+                e= ("_types_bitmap", o, 'offset out of range: data size = %d' % len(rdata))
+                error.append(e)
+                return None
+            block, bytes= struct.unpack(fmt, dat)
+            o += fmtsz
+            for i in range(bytes):
+                b= struct.unpack("!B", data[o+i:o+i+1])[0]
+                for j in range(8):
+                        if b & (1<< (7-j)):
+                                bits.append((block*32+i)*8+j)
+            o += bytes
+        return bits
+
+    @classmethod
     def _parse_header(cls, buf, offset, error):
 
         fmt = "!HHHHHH"
@@ -187,7 +214,12 @@ class AbufParser(object):
     @classmethod
     def _do_query(cls, buf, offset, error):
         qry           = {}
-        offset, name  = cls._do_name(buf, offset, error)
+        res = cls._do_name(buf, offset, 0, error)
+        if res is None:
+            e = ("_do_query", offset, "_do_name failed")
+            error.append(e)
+            return None
+        offset, name   = res
         qry['Qname']  = name
 
         fmt           = "!HH"
@@ -207,10 +239,7 @@ class AbufParser(object):
     def _clean_up_string(self, strng):
         result=''
         strng=bytearray(strng)
-        print(repr(strng))
         for o in strng:
-            print(repr(o))
-            print(repr(' '))
             if o < ord(' ') or o > ord('~'):
                 result += ("\\%03d" % o)
             elif o == ord('"') or o == ord('\\'):
@@ -223,7 +252,7 @@ class AbufParser(object):
     def _do_rr(cls, buf, offset, error):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
         rr             = {}
-        res = cls._do_name(buf, offset, error)
+        res = cls._do_name(buf, offset, 0, error)
         if res is None:
             e = ("_do_rr", offset, "_do_name failed")
             error.append(e)
@@ -313,58 +342,8 @@ class AbufParser(object):
                 addr          = ':'.join(("%x" % quad) for quad in struct.unpack(fmt, rdata))
                 rr['Address'] = addr
             elif rr['Type'] == 'CNAME':
-                doffset, name = cls._do_name(buf, rdata_offset, error)
+                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
                 rr['Target'] = name
-            elif rr['Type'] == 'NS':
-                doffset, name = cls._do_name(buf, rdata_offset, error)
-                rr['Target'] = name
-            elif rr['Type'] == 'MX':
-                fmt = '!H'
-                fmtsz = struct.calcsize(fmt)
-                dat= rdata[:fmtsz]
-                if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
-                    error.append(e)
-                    return None
-                rr['Preference'] = struct.unpack(fmt, dat)[0]
-                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, error)
-            elif rr['Type'] == 'SOA':
-                offset_name= cls._do_name(buf, rdata_offset, error)
-                if offset_name is None:
-                        e= ("do_rr", rdata_offset, '_do_name failed')
-                        error.append(e)
-                        return None
-                rr_offset, rr['MasterServerName'] = offset_name
-                offset_name = cls._do_name(buf, rr_offset, error)
-                if offset_name is None:
-                        e = ("do_rr", rr_offset, '_do_name failed')
-                        error.append(e)
-                        return None
-                rr_offset, rr['MaintainerName'] = offset_name
-                fmt = '!IIIII'
-                fmtsz = struct.calcsize(fmt)
-                dat= buf[rr_offset:rr_offset + fmtsz]
-                if len(dat) != fmtsz:
-                    e= ("_do_rr", rr_offset, 'offset out of range: rdata size = %d' % len(rdata))
-                    error.append(e)
-                    return None
-                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
-                        = struct.unpack(fmt, dat)
-            elif rr['Type'] == 'DS':
-
-                fmt = '!HBB'
-                fmtsz = struct.calcsize(fmt)
-                dat= rdata[:fmtsz]
-                if len(dat) != fmtsz:
-                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
-                    error.append(e)
-                    return None
-                rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
-                        struct.unpack(fmt, dat)
-                key= rdata[struct.calcsize(fmt):]
-                key_as_hex= codecs.getencoder('hex_codec')(key)[0]
-                key_as_hex_str= key_as_hex.decode(cls.DNS_CTYPE)
-                rr['DelegationKey'] = key_as_hex_str
             elif rr['Type'] == 'DNSKEY':
                 fmt = '!HBB'
                 fmtsz = struct.calcsize(fmt)
@@ -379,6 +358,104 @@ class AbufParser(object):
                 key_as_base64= base64.encodestring(key)
                 key_as_base64_str= key_as_base64.decode(cls.DNS_CTYPE)
                 rr['Key'] = ''.join(key_as_base64_str.split())
+            elif rr['Type'] == 'DS':
+
+                fmt = '!HBB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Tag'], rr['Algorithm'], rr['DigestType'] = \
+                        struct.unpack(fmt, dat)
+                key= rdata[struct.calcsize(fmt):]
+                rr['DelegationKey'] = cls._bytes_as_hex_str(key)
+            elif rr['Type'] == 'MX':
+                fmt = '!H'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Preference'] = struct.unpack(fmt, dat)[0]
+                rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset+fmtsz, 0, error)
+            elif rr['Type'] == 'NS':
+                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
+                rr['Target'] = name
+            elif rr['Type'] == 'NSEC':
+                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
+                rr['NextDomainName'] = name
+                o= doffset-rdata_offset
+                bits= cls._types_bitmap(rdata[o:rr['RDlength']], error)
+                if bits == None:
+                    e= ("_do_rr", 'failed to parse types bitmap')
+                    error.append(e)
+                    return None
+                rr['Types']= bits
+            elif rr['Type'] == 'NSEC3':
+                fmt = '!BBHB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['HashAlg'], rr['Flags'], rr['Iterations'], SaltLength = struct.unpack(fmt, dat)
+                o= fmtsz
+                salt= rdata[o:o+SaltLength]
+                rr['Salt']= cls._bytes_as_hex_str(salt)
+                o += SaltLength
+                fmt = '!B'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[o:o+fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                HashLength = struct.unpack(fmt, dat)[0]
+                o += fmtsz
+                hash= rdata[o:o+HashLength]
+                b32str= base64.b32encode(hash)
+                while b32str[-1] == '=':
+                        b32str= b32str[:-1]
+                # Note that we need extended hexadecimal instead of actual base32
+                # Just remap the input
+                hexmap={        \
+                        'A': '0', 'B': '1', 'C': '2', 'D': '3', \
+                        'E': '4', 'F': '5', 'G': '6', 'H': '7', \
+                        'I': '8', 'J': '9', 'K': 'a', 'L': 'b', \
+                        'M': 'c', 'N': 'd', 'O': 'e', 'P': 'f', \
+                        'Q': 'g', 'R': 'h', 'S': 'i', 'T': 'j', \
+                        'U': 'k', 'V': 'l', 'W': 'm', 'X': 'n', \
+                        'Y': 'o', 'Z': 'p', '2': 'q', '3': 'r', \
+                        '4': 's', '5': 't', '6': 'u', '7': 'v' }
+                b32str= ''.join([ hexmap[l] for l in b32str.decode(cls.DNS_CTYPE) ])
+                rr['Hash']= b32str
+                o += HashLength
+                bits= cls._types_bitmap(rdata[o:rr['RDlength']], error)
+                if bits == None:
+                    e= ("_do_rr", 'failed to parse types bitmap')
+                    error.append(e)
+                    return None
+                rr['Types']= bits
+            elif rr['Type'] == 'NSEC3PARAM':
+                fmt = '!BBHB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Algorithm'], rr['Flags'], rr['Iterations'], SaltLength = struct.unpack(fmt, dat)
+                o= fmtsz
+                salt= rdata[o:o+SaltLength]
+                rr['Salt']= cls._bytes_as_hex_str(salt)
+                o += SaltLength
+            elif rr['Type'] == 'PTR':
+                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
+                rr['Target'] = name
             elif rr['Type'] == 'RRSIG':
                 # https://tools.ietf.org/html/rfc4034#section-3.1
 
@@ -399,7 +476,7 @@ class AbufParser(object):
                 rr['TypeCovered'], rr['Algorithm'], rr['Labels'], rr['OriginalTTL'], rr['SignatureExpiration'], rr['SignatureInception'], rr['KeyTag'] = struct.unpack(fmt, dat)
                 rr['TypeCovered'] = cls._type_to_text( rr['TypeCovered'] )
 
-                res = cls._do_name(rdata, fmtsz, error)
+                res = cls._do_name(rdata, fmtsz, 0, error)
                 if res is None:
                     e = ("_do_rr", offset, "_do_name failed")
                     error.append(e)
@@ -410,6 +487,59 @@ class AbufParser(object):
                 sig_as_base64= base64.encodestring(sig)
                 sig_as_base64_str= sig_as_base64.decode(cls.DNS_CTYPE)
                 rr['Signature'] = ''.join(sig_as_base64_str.split())
+            elif rr['Type'] == 'SOA':
+                offset_name= cls._do_name(buf, rdata_offset, 0, error)
+                if offset_name is None:
+                        e= ("do_rr", rdata_offset, '_do_name failed')
+                        error.append(e)
+                        return None
+                rr_offset, rr['MasterServerName'] = offset_name
+                offset_name = cls._do_name(buf, rr_offset, 0, error)
+                if offset_name is None:
+                        e = ("do_rr", rr_offset, '_do_name failed')
+                        error.append(e)
+                        return None
+                rr_offset, rr['MaintainerName'] = offset_name
+                fmt = '!IIIII'
+                fmtsz = struct.calcsize(fmt)
+                dat= buf[rr_offset:rr_offset + fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rr_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
+                        = struct.unpack(fmt, dat)
+            elif rr['Type'] == 'SRV':
+                fmt = '!HHH'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                (rr['Priority'], rr['Weight'], rr['Port']) = struct.unpack(fmt, dat)
+                rr_offset, rr['Target'] = cls._do_name(buf, rdata_offset+fmtsz, 0, error)
+            elif rr['Type'] == 'SSHFP':
+                fmt = '!BB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                (rr['Algorithm'], rr['DigestType'])= struct.unpack(fmt, dat)
+                rr['Fingerprint'] = cls._bytes_as_hex_str(rdata[fmtsz:])
+            elif rr['Type'] == 'TLSA':
+                fmt = '!BBB'
+                fmtsz = struct.calcsize(fmt)
+                dat= rdata[:fmtsz]
+                if len(dat) != fmtsz:
+                    e= ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                    error.append(e)
+                    return None
+                rr['CertUsage'], rr['Selector'], rr['MatchingType']= \
+                        struct.unpack(fmt, dat)
+                rr['CertAssData'] = cls._bytes_as_hex_str(rdata[fmtsz:])
 
         if rr['Type'] == 'TXT':
             if rr['Class'] == "IN" or rr['Class'] == "CH":
@@ -439,10 +569,20 @@ class AbufParser(object):
                         rr['Data'].append(strng)
                         o += llen
 
+        if type(rr['Class']) == type(1) or type(rr['Type']) == type(1):
+            # Unknown class or type. Just add a RDATA field with hex data
+            rr['Rdata'] = cls._bytes_as_hex_str(rdata)
+
+
         return offset, rr
 
     @classmethod
-    def _do_name(cls, buf, offset, error):
+    def _do_name(cls, buf, offset, recurs, error):
+        if recurs >= 256:
+            e = ("_do_name", offset, 'too much recursion')
+            error.append(e)
+            return None
+
         name  = ''
         while True:
             fmt    = "!B"
@@ -459,7 +599,7 @@ class AbufParser(object):
                 offset += 1
                 label  = buf[offset:offset + llen]
                 offset = offset + llen
-                label_as_str= label.decode(cls.DNS_CTYPE)
+                label_as_str= cls._clean_up_string(label)
                 if name == '' or label_as_str != '':
                     name = name + label_as_str + '.'
                 if llen == 0:
@@ -474,9 +614,10 @@ class AbufParser(object):
                     return None
                 res     = struct.unpack(fmt, strng)
                 poffset = res[0] & ~0xC000
-                n= cls._do_name(buf, poffset, error)
+                n= cls._do_name(buf, poffset, recurs+1, error)
                 if n is None:
-                    e = ("_do_name", poffset, 'offset out of range: buf size = %d' % len(buf))
+                    e = ("_do_name", poffset,
+                        'bad offset %d at offset %d' % (poffset, offset))
                     error.append(e)
                     return None
                 poffset, pname = n
@@ -484,6 +625,8 @@ class AbufParser(object):
                 name    = name + pname
                 break
             else:
+                e = ("_do_name", offset, 'bad len 0x%x' % llen)
+                error.append(e)
                 return None
 
         return offset, name
