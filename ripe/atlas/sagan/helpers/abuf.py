@@ -4,6 +4,12 @@ import base64
 import codecs
 import struct
 
+def base64_encodebytes(bytes):
+        if "encodebytes" in dir(base64):
+                return base64.encodebytes(bytes)
+        else:
+                return base64.encodestring(bytes)
+
 class AbufParser(object):
 
     DNS_CTYPE= "ASCII"
@@ -355,7 +361,7 @@ class AbufParser(object):
                 rr['Flags'], rr['Protocol'], rr['Algorithm'] =\
                         struct.unpack(fmt, dat)
                 key= rdata[struct.calcsize(fmt):]
-                key_as_base64= base64.encodestring(key)
+                key_as_base64= base64_encodebytes(key)
                 key_as_base64_str= key_as_base64.decode(cls.DNS_CTYPE)
                 rr['Key'] = ''.join(key_as_base64_str.split())
             elif rr['Type'] == 'DS':
@@ -375,25 +381,25 @@ class AbufParser(object):
                 fmt    = "!B"
                 fmtsz = struct.calcsize(fmt)
                 o= 0
-		for tag in ('Cpu', 'Os'):
-			dat = rdata[o:o+fmtsz]
-			if len(dat) != fmtsz:
-			    e= ("_do_rr", rdata_offset,
-				'offset out of range: rdata size = %d' %
-				len(rdata))
-			    error.append(e)
-			    return None
-			o += fmtsz
-			slen = struct.unpack(fmt, dat)[0]
-			strng = rdata[o:o+slen]
-			if len(strng) < slen:
-			    e= ("_do_rr", rdata_offset,
-				'offset out of range: rdata size = %d' %
-				len(rdata))
-			    error.append(e)
-			    return None
-			rr[tag] = cls._clean_up_string(strng)
-			o += slen
+                for tag in ('Cpu', 'Os'):
+                     dat = rdata[o:o+fmtsz]
+                     if len(dat) != fmtsz:
+                         e= ("_do_rr", rdata_offset,
+                            'offset out of range: rdata size = %d' %
+                            len(rdata))
+                         error.append(e)
+                         return None
+                     o += fmtsz
+                     slen = struct.unpack(fmt, dat)[0]
+                     strng = rdata[o:o+slen]
+                     if len(strng) < slen:
+                         e= ("_do_rr", rdata_offset,
+                            'offset out of range: rdata size = %d' %
+                            len(rdata))
+                         error.append(e)
+                         return None
+                     rr[tag] = cls._clean_up_string(strng)
+                     o += slen
             elif rr['Type'] == 'MX':
                 fmt = '!H'
                 fmtsz = struct.calcsize(fmt)
@@ -507,7 +513,8 @@ class AbufParser(object):
                 signature_offset, rr['SignerName'] = res
 
                 sig= rdata[signature_offset:]
-                sig_as_base64= base64.encodestring(sig)
+                #sig_as_base64= base64.encodebytes(sig)
+                sig_as_base64= base64_encodebytes(sig)
                 sig_as_base64_str= sig_as_base64.decode(cls.DNS_CTYPE)
                 rr['Signature'] = ''.join(sig_as_base64_str.split())
             elif rr['Type'] == 'SOA':
