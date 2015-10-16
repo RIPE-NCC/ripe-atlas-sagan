@@ -2,14 +2,13 @@ from __future__ import absolute_import
 
 import base64
 import codecs
-import six
 import struct
 
 
 def base64_encodebytes(data):
-    if six.PY2:
-        return base64.encodestring(data)
-    return base64.encodebytes(data)
+    if hasattr(base64, "encodebytes"):
+        return base64.encodebytes(data)
+    return base64.encodestring(data)
 
 
 class AbufParser(object):
@@ -17,7 +16,7 @@ class AbufParser(object):
     DNS_CTYPE = "ASCII"
 
     @classmethod
-    def parse(cls, buf, options =None):
+    def parse(cls, buf, options=None):
         """
         According to Philip, an abuf is like a TARDIS: it's bigger on the inside
         """
@@ -244,9 +243,9 @@ class AbufParser(object):
         return offset + reqlen, qry
 
     @classmethod
-    def _clean_up_string(self, strng):
-        result =''
-        strng =bytearray(strng)
+    def _clean_up_string(cls, strng):
+        result = ''
+        strng = bytearray(strng)
         for o in strng:
             if o < ord(' ') or o > ord('~'):
                 result += ("\\%03d" % o)
@@ -280,7 +279,7 @@ class AbufParser(object):
         rr['TTL'] = res[2]
         rr['RDlength'] = res[3]
 
-        offset         += reqlen
+        offset += reqlen
 
         rdata = buf[offset:offset + rr['RDlength']]
         rdata_offset = offset
@@ -538,8 +537,7 @@ class AbufParser(object):
                     e = ("_do_rr", rr_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
-                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl']\
- = struct.unpack(fmt, dat)
+                rr['Serial'], rr['Refresh'], rr['Retry'], rr['Expire'], rr['NegativeTtl'] = struct.unpack(fmt, dat)
             elif rr['Type'] == 'SRV':
                 fmt = '!HHH'
                 fmtsz = struct.calcsize(fmt)
@@ -558,7 +556,7 @@ class AbufParser(object):
                     e = ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
                     error.append(e)
                     return None
-                (rr['Algorithm'], rr['DigestType'])= struct.unpack(fmt, dat)
+                (rr['Algorithm'], rr['DigestType']) = struct.unpack(fmt, dat)
                 rr['Fingerprint'] = cls._bytes_as_hex_str(rdata[fmtsz:])
             elif rr['Type'] == 'TLSA':
                 fmt = '!BBB'
@@ -600,10 +598,9 @@ class AbufParser(object):
                         rr['Data'].append(strng)
                         o += llen
 
-        if type(rr['Class']) == type(1) or type(rr['Type']) == type(1):
+        if isinstance(rr["Class"], int) or isinstance(rr["Type"], int):
             # Unknown class or type. Just add a RDATA field with hex data
             rr['Rdata'] = cls._bytes_as_hex_str(rdata)
-
 
         return offset, rr
 
@@ -652,7 +649,7 @@ class AbufParser(object):
                     error.append(e)
                     return None
                 poffset, pname = n
-                offset  += reqlen
+                offset += reqlen
                 name = name + pname
                 break
             else:
