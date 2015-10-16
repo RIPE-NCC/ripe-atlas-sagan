@@ -371,6 +371,29 @@ class AbufParser(object):
                         struct.unpack(fmt, dat)
                 key= rdata[struct.calcsize(fmt):]
                 rr['DelegationKey'] = cls._bytes_as_hex_str(key)
+            elif rr['Type'] == 'HINFO':
+                fmt    = "!B"
+                fmtsz = struct.calcsize(fmt)
+                o= 0
+		for tag in ('Cpu', 'Os'):
+			dat = rdata[o:o+fmtsz]
+			if len(dat) != fmtsz:
+			    e= ("_do_rr", rdata_offset,
+				'offset out of range: rdata size = %d' %
+				len(rdata))
+			    error.append(e)
+			    return None
+			o += fmtsz
+			slen = struct.unpack(fmt, dat)[0]
+			strng = rdata[o:o+slen]
+			if len(strng) < slen:
+			    e= ("_do_rr", rdata_offset,
+				'offset out of range: rdata size = %d' %
+				len(rdata))
+			    error.append(e)
+			    return None
+			rr[tag] = cls._clean_up_string(strng)
+			o += slen
             elif rr['Type'] == 'MX':
                 fmt = '!H'
                 fmtsz = struct.calcsize(fmt)
