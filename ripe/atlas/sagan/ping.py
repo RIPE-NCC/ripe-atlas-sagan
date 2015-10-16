@@ -1,5 +1,6 @@
 from .base import Result, ResultParseError, ParsingDict
 
+
 class Packet(ParsingDict):
 
     def __init__(self, data, default_ttl, default_source_address, **kwargs):
