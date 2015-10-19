@@ -428,18 +428,6 @@ def test_aaaaanswer():
     assert(result.responses[0].abuf.answers[0].klass == "IN")
     assert(result.responses[0].abuf.answers[0].rd_length == 16)
 
-
-def test_nsanswer():
-    result = Result.get('{"from":"85.69.130.41","msm_id":1687666,"fw":4610,"timestamp":1403103973,"resultset":[{"src_addr":"10.0.50.116","proto":"UDP","submax":2,"af":4,"subid":1,"result":{"abuf":"sPKBgAABAAIAAAACCGpvaG5ib25kA29yZwAAAgABwAwAAgABAAAOEAAMA25zMQJoZQNuZXQAwAwAAgABAAAOEAAFAm5zwAzAQgABAAEAAVF\/AAS5IgCVwCoAAQABAABlRgAE2NqCAg==","rt":1688.621,"NSCOUNT":0,"QDCOUNT":1,"ID":45298,"ARCOUNT":2,"ANCOUNT":2,"size":103},"time":1403103973,"dst_addr":"10.0.0.34"},{"src_addr":"10.0.50.116","proto":"UDP","submax":2,"af":4,"subid":2,"result":{"abuf":"VkGBgAABAAIAAAACCGpvaG5ib25kA29yZwAAAgABwAwAAgABAAAOEAAFAm5zwAzADAACAAEAAA4QAAwDbnMxAmhlA25ldADAKgABAAEAAVGAAAS5IgCVwDsAAQABAAKjAAAE2NqCAg==","rt":932.26,"NSCOUNT":0,"QDCOUNT":1,"ID":22081,"ARCOUNT":2,"ANCOUNT":2,"size":103},"time":1403103976,"dst_addr":"10.0.0.35"}],"prb_id":17868,"group_id":1687666,"type":"dns","msm_name":"Tdig"}')
-    assert(isinstance(result.responses[0].abuf.answers[0], NsAnswer))
-    assert(result.responses[0].abuf.answers[0].name == "johnbond.org.")
-    assert(result.responses[0].abuf.answers[0].ttl == 3600)
-    assert(result.responses[0].abuf.answers[0].type == "NS")
-    assert(result.responses[0].abuf.answers[0].klass == "IN")
-    assert(result.responses[0].abuf.answers[0].rd_length == 12)
-    assert(result.responses[0].abuf.answers[0].target == "ns1.he.net.")
-
-
 def test_cnameanswer():
     result = Result.get('{"from":"2001:410:90ff:0:a2f3:c1ff:fec4:4a01","msm_id":1687656,"timestamp":1403101065,"fw":4610,"proto":"UDP","af":6,"msm_name":"Tdig","prb_id":13330,"result":{"abuf":"n9mEAAABAAIABgACBHR0MDEEcmlwZQNuZXQAAAEAAcAMAAUAAQAAVGAABgNudHDAEcArAAEAAQAAVGAABMEAAOXAEQACAAEAAA4QABAGc25zLXBiA2lzYwNvcmcAwBEAAgABAAAOEAAMA25zMwNuaWMCZnIAwBEAAgABAAAOEAANBHNlYzEFYXBuaWPAFsARAAIAAQAADhAADgZ0aW5uaWUEYXJpbsAWwBEAAgABAAAOEAAHBHNlYzPAhsARAAIAAQAADhAADgNwcmkHYXV0aGRuc8ARwMcAAQABAAAOEAAEwQAJBcDHABwAAQAADhAAECABBnwA4AAAAAAAAAAAAAU=","rt":84.262,"NSCOUNT":6,"QDCOUNT":1,"ID":40921,"ARCOUNT":2,"ANCOUNT":2,"size":257},"result-rt":84.262,"src_addr":"2001:410:90ff:0:a2f3:c1ff:fec4:4a01","group_id":1687656,"type":"dns","dst_addr":"2001:67c:e0::5"}')
     assert(isinstance(result.responses[0].abuf.answers[0], CnameAnswer))
@@ -450,6 +438,45 @@ def test_cnameanswer():
     assert(result.responses[0].abuf.answers[0].rd_length == 6)
     assert(result.responses[0].abuf.answers[0].target == "ntp.ripe.net.")
 
+def test_dnskeyanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:500:40::1","from":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","fw":4610,"group_id":1672218,"msm_id":1672220,"msm_name":"Tdig","prb_id":15060,"proto":"TCP","result":{"ANCOUNT":7,"ARCOUNT":1,"ID":57207,"NSCOUNT":0,"QDCOUNT":1,"abuf":"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","rt":62.748,"size":1625},"result-rt":62.748,"src_addr":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","timestamp":1402768690,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], DnskeyAnswer))
+    assert(result.responses[0].abuf.answers[0].flags == 256)
+    assert(result.responses[0].abuf.answers[0].algorithm == 7)
+    assert(result.responses[0].abuf.answers[0].protocol == 3)
+    assert(result.responses[0].abuf.answers[0].key == "AwEAAX7wnIyA9rd+WWcUxE6ILCCtZWvJ9aVgG7wiNYbbQp6tPn5gTmZxR35tV2WK0bHordMGJrlTuH3u8rqBYxOM/LWHj6OAGtsE8RQQhcJCzOGpQADJggSAoSNhoJ/qiXAT6wcwPrwmVnUFLV8Sok/kEbRKnXuSqIPfSVj+j9VodpFH")
+    assert(result.responses[0].abuf.answers[0].name == "org.")
+    assert(result.responses[0].abuf.answers[0].ttl == 900)
+    assert(result.responses[0].abuf.answers[0].type == "DNSKEY")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 136)
+
+
+def test_dsanswer():
+    result = Result.get('{"from":"2607:f0b0:e:1000:6666:b3ff:fec5:21e","msm_id":1687655,"timestamp":1403100350,"fw":4610,"proto":"UDP","af":6,"msm_name":"Tdig","prb_id":17460,"result":{"abuf":"I4SEAAABAAEAAAAAB3RlY2hpbmMCbmwAACsAAcAMACsAAQAAHCAAJB+nBwJJII0cWAXwOgMwXauyVu24mdSr2nOQuqNwJtBOj\/Kqfw==","rt":99.33,"NSCOUNT":0,"QDCOUNT":1,"ID":9092,"ARCOUNT":0,"ANCOUNT":1,"size":76},"result-rt":99.33,"src_addr":"2607:f0b0:e:1000:6666:b3ff:fec5:21e","group_id":1687655,"type":"dns","dst_addr":"2001:7b8:606::85"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], DsAnswer))
+    assert(result.responses[0].abuf.answers[0].name == "techinc.nl.")
+    assert(result.responses[0].abuf.answers[0].ttl == 7200)
+    assert(result.responses[0].abuf.answers[0].type == "DS")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 36)
+    assert(result.responses[0].abuf.answers[0].tag == 8103)
+    assert(result.responses[0].abuf.answers[0].algorithm == 7)
+    assert(result.responses[0].abuf.answers[0].digest_type == 2)
+    assert(result.responses[0].abuf.answers[0].delegation_key == "49208d1c5805f03a03305dabb256edb899d4abda7390baa37026d04e8ff2aa7f")
+
+
+
+def test_hinfoanswer():
+    result = Result.get('{"af":4,"dst_addr":"192.31.231.42","from":"78.27.190.13","fw":4720,"group_id":2815158,"lts":23,"msm_id":2815158,"msm_name":"Tdig","prb_id":12534,"proto":"UDP","result":{"ANCOUNT":4,"ARCOUNT":5,"ID":24754,"NSCOUNT":4,"QDCOUNT":1,"abuf":"YLKEAAABAAQABAAFBHN0YXICY3MCdnUCbmwAAP8AAcAMAA0AAQABUYAACQNTdW4EVW5peMAMAA8AAQABUYAACwKaBnplcGh5csARwAwADwABAAFRgAAEAAHADMAMAAEAAQABUYAABMAf5yrAEQACAAEAAVGAAAYDdG9wwBHAEQACAAEAAVGAAAcEc29sb8ARwBEAAgABAAFRgAACwAzAEQACAAEAAVGAAAUCbnPAFMAMAAEAAQABUYAABMAf5yrAQgABAAEAAVGAAASCJRQKwKoAAQABAAFRgAAEgiWBBMB3AAEAAQABUYAABIIlFATAiQABAAEAAVGAAASCJRQF","rt":38.079,"size":255},"src_addr":"192.168.1.131","timestamp":1444999225,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], HinfoAnswer))
+    assert(result.responses[0].abuf.answers[0].name == "star.cs.vu.nl.")
+    assert(result.responses[0].abuf.answers[0].ttl == 86400)
+    assert(result.responses[0].abuf.answers[0].type == "HINFO")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 9)
+    assert(result.responses[0].abuf.answers[0].cpu == "Sun")
+    assert(result.responses[0].abuf.answers[0].os == "Unix")
 
 def test_mxanswer():
     result = Result.get('{"from":"2607:fcc0:3:2:220:4aff:fee0:219e","msm_id":1687652,"fw":4610,"timestamp":1403098937,"resultset":[{"src_addr":"208.70.247.155","proto":"UDP","submax":3,"af":4,"subid":1,"result":{"abuf":"KESBgAABAAIAAAAABHJpcGUDbmV0AAAPAAHADAAPAAEAAAEsAAkAyARrb2tvwAzADAAPAAEAAAEsAAkA+gRrYWthwAw=","rt":198.454,"NSCOUNT":0,"QDCOUNT":1,"ID":10308,"ARCOUNT":0,"ANCOUNT":2,"size":68},"time":1403098937,"dst_addr":"208.70.244.7"},{"src_addr":"208.70.247.155","proto":"UDP","submax":3,"af":4,"subid":2,"result":{"abuf":"emqBgAABAAIAAAAABHJpcGUDbmV0AAAPAAHADAAPAAEAAAEsAAkAyARrb2tvwAzADAAPAAEAAAEsAAkA+gRrYWthwAw=","rt":127.644,"NSCOUNT":0,"QDCOUNT":1,"ID":31338,"ARCOUNT":0,"ANCOUNT":2,"size":68},"time":1403098938,"dst_addr":"208.70.245.7"},{"src_addr":"2607:fcc0:3:2:220:4aff:fee0:219e","proto":"UDP","submax":3,"af":6,"subid":3,"time":1403098939,"error":{"timeout":5000},"dst_addr":"2001:4860:4860::8888"}],"prb_id":2793,"group_id":1687652,"type":"dns","msm_name":"Tdig"}')
@@ -461,6 +488,79 @@ def test_mxanswer():
     assert(result.responses[0].abuf.answers[0].type == "MX")
     assert(result.responses[0].abuf.answers[0].klass == "IN")
     assert(result.responses[0].abuf.answers[0].rd_length == 9)
+
+
+def test_nsanswer():
+    result = Result.get('{"from":"85.69.130.41","msm_id":1687666,"fw":4610,"timestamp":1403103973,"resultset":[{"src_addr":"10.0.50.116","proto":"UDP","submax":2,"af":4,"subid":1,"result":{"abuf":"sPKBgAABAAIAAAACCGpvaG5ib25kA29yZwAAAgABwAwAAgABAAAOEAAMA25zMQJoZQNuZXQAwAwAAgABAAAOEAAFAm5zwAzAQgABAAEAAVF\/AAS5IgCVwCoAAQABAABlRgAE2NqCAg==","rt":1688.621,"NSCOUNT":0,"QDCOUNT":1,"ID":45298,"ARCOUNT":2,"ANCOUNT":2,"size":103},"time":1403103973,"dst_addr":"10.0.0.34"},{"src_addr":"10.0.50.116","proto":"UDP","submax":2,"af":4,"subid":2,"result":{"abuf":"VkGBgAABAAIAAAACCGpvaG5ib25kA29yZwAAAgABwAwAAgABAAAOEAAFAm5zwAzADAACAAEAAA4QAAwDbnMxAmhlA25ldADAKgABAAEAAVGAAAS5IgCVwDsAAQABAAKjAAAE2NqCAg==","rt":932.26,"NSCOUNT":0,"QDCOUNT":1,"ID":22081,"ARCOUNT":2,"ANCOUNT":2,"size":103},"time":1403103976,"dst_addr":"10.0.0.35"}],"prb_id":17868,"group_id":1687666,"type":"dns","msm_name":"Tdig"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], NsAnswer))
+    assert(result.responses[0].abuf.answers[0].name == "johnbond.org.")
+    assert(result.responses[0].abuf.answers[0].ttl == 3600)
+    assert(result.responses[0].abuf.answers[0].type == "NS")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 12)
+    assert(result.responses[0].abuf.answers[0].target == "ns1.he.net.")
+
+def test_nsecanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:7fd::1","from":"2a02:1810:3505:de00:a2f3:c1ff:fec4:5ba8","fw":4720,"group_id":2815340,"lts":8,"msm_id":2815340,"msm_name":"Tdig","prb_id":11939,"proto":"UDP","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":62350,"NSCOUNT":4,"QDCOUNT":1,"abuf":"846GAwABAAAABAABCGFhcmR2YXJrAAABAAEDYWFhAAAvAAEAAVGAAA0DYWJiAAAGIAAAAAATwBoALgABAAFRgACTAC8IAQABUYBWLbNQViB2QPRCAC/+fyqSx+gLHZaTO357C33yMzG6vpgWV0neGCUWr1i9g2a0Nc9w4o739PXvpDBQfkDmS6x4msfjU1lQv47U/9jMf7mOrWvlhKXZQ8ZPphqbNfa31h1pCNHu/NzBRLTdWJfMBMWuVbVJLdD/lEi/LW8G61fPbyFZfoM/crsfAkG6AAAvAAEAAVGAAA4DYWFhAAAHIgAAAAADgAAALgABAAFRgACTAC8IAAABUYBWLbNQViB2QPRCAJe1XkAFWiDj0V50PxlG3qSVux6rLfquyrII9HA2VMCLDeetkEgdtW+N7FWoh1Rampi7rho7R32O7HIk561bzdtP5lEA415RXus4Hf8BCXKgRtRoNJsFNAbkPKnbtRzNJAFDbP0mLfC08wSi0zsWRYDxaBLwh9ru/lJjOOR82UFhAAApEAAAAIAAAAA=","rt":18.193,"size":407},"src_addr":"2a02:1810:3505:de00:a2f3:c1ff:fec4:5ba8","timestamp":1445001458,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.authority[0], NsecAnswer))
+    assert(result.responses[0].abuf.authority[0].name == "aaa.")
+    assert(result.responses[0].abuf.authority[0].ttl == 86400)
+    assert(result.responses[0].abuf.authority[0].type == "NSEC")
+    assert(result.responses[0].abuf.authority[0].klass == "IN")
+    assert(result.responses[0].abuf.authority[0].rd_length == 13)
+    assert(result.responses[0].abuf.authority[0].nextdomainname == "abb.")
+    assert(result.responses[0].abuf.authority[0].types == [2, 43, 46, 47])
+
+def test_nsec3answer():
+    result = Result.get('{"af":6,"dst_addr":"2a04:b900::1:0:0:12","from":"2a02:aa8:0:2000::10","fw":4700,"group_id":2815716,"lts":25,"msm_id":2815716,"msm_name":"Tdig","prb_id":11602,"proto":"UDP","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":43793,"NSCOUNT":8,"QDCOUNT":1,"abuf":"qxGEAwABAAAACAABCGFhcmR2YXJrBW5sbmV0Am5sAAABAAEganVsaGZmZm1ycnNrdWF2czZicjhmZW01djdkbzU4cTnAFQAyAAEAAEZQABoBAAABABSnxvPOSUe3yFdR1MH6YM87p7jtScAjAC4AAQAARlAAnAAyCAMAAEZQVkPiQVYe+EGYQwVubG5ldAJubACUzkwAhnwSePZ0EfeLqkc6iLP34HvDeGfgARozzdM3zLCJQFF4HNlifFCQR0x6ARyOx37ooBSlLGnbjnVPqSOxGvcZQ2/KXG6sKWVA7bC33okqLFuGXMIKNJra3HNnL9MTfvDOWT2zRpVHindoOcnvu708v7NpWSVchSgbg0kbhCBqYzFoMm1xZWNoOWttZ3MxdTI0bXBwNnM3MmE0YXBic8AVADIAAQAARlAAKQEAAAEAFJtOBqRGL60wKTOd/wJyipXJrPeGAA1iAYAIEAKQAAAAAAAQwRIALgABAABGUACcADIIAwAARlBWQ+JBVh74QZhDBW5sbmV0Am5sAH3nu47gh7pKKCm8CoIg7AxN/0OAXubN2oGyLE01aSsD9umicDjznilyptXzUDG7AStkQirudpV8jdJ5WmK024r1ie5thINv0RGvkTW6excf5gBeDbVCAEOlR0PESprWFfgisosvpGFz4QxGa/uXwTniJhZAicnWl3UVNu41NdIuIDZmbDFyY21vcWR0OG1nNXRwOTNwMWpxcGFlbW9pZTJrwBUAMgABAABGUAAiAQAAAQAUNxopag2Cp74L6/fYTv+/0iKL8H4ABgQAAAAAAsIQAC4AAQAARlAAnAAyCAMAAEZQVkPiQVYe+EGYQwVubG5ldAJubAAALouKU48w+kGrY6rp8atTgoocvdJysokaZsB3GOMf4tic6tuRMMWbVb9AJaiK8mn0MzAktZCN6FEY319mzB7P0fkqyHCaXOG4jnFcSj18vGm9mqIMZMoSwAHkD8djaWwHHWmoYCQ/vxBPYcspOk51d1zz0BhmIrd/rkbS2mKCdMAVAAYAAQAARlAANQJucwlubG5ldGxhYnPAGwpob3N0bWFzdGVyBG9wZW7AFXgcAjwAAHCAAAAcIAAJOoAAAEZQwBUALgABAABGUACcAAYIAgABUYBWQ+JBVh74QZhDBW5sbmV0Am5sAKPDfqXXDY0bZrsihjWsTd2XLPMpT3djq2FnqhKixso9poQJ1DNYN+u2BejNUAwWPX0xcD3itTwVCeGDTblQv5JpLUmIs0KESuC0fyy4sSJ32QwOGvh0p1g6eDXY/hKu+j7Z6isrhyMFJsyRgwFDWcvYqSeS6PSIMvdTb3vioHtKAAApEAAAAIAAAAA=","rt":37.356,"size":1019},"src_addr":"2a02:aa8:0:2000::10","timestamp":1445006271,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.authority[0], Nsec3Answer))
+    assert(result.responses[0].abuf.authority[2].name == "jc1h2mqech9kmgs1u24mpp6s72a4apbs.nlnet.nl.")
+    assert(result.responses[0].abuf.authority[2].ttl == 18000)
+    assert(result.responses[0].abuf.authority[2].type == "NSEC3")
+    assert(result.responses[0].abuf.authority[2].klass == "IN")
+    assert(result.responses[0].abuf.authority[2].rd_length == 41)
+    assert(result.responses[0].abuf.authority[2].hashalg == 1)
+    assert(result.responses[0].abuf.authority[2].flags == 0)
+    assert(result.responses[0].abuf.authority[2].interations == 1)
+    assert(result.responses[0].abuf.authority[2].salt == "")
+    assert(result.responses[0].abuf.authority[2].hash == "jd70d9265umj0a9jjnvg4skain4qpts6")
+    assert(result.responses[0].abuf.authority[2].types == [1, 2, 6, 15, 16, 28, 35, 46, 48, 51, 99])
+
+def test_nsec3paramanswer():
+    result = Result.get('{"af":4,"dst_addr":"185.49.140.12","from":"78.27.190.13","fw":4720,"group_id":2816176,"lts":14,"msm_id":2816176,"msm_name":"Tdig","prb_id":12534,"proto":"UDP","result":{"ANCOUNT":24,"ARCOUNT":1,"ID":22156,"NSCOUNT":0,"QDCOUNT":1,"abuf":"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","answers":[{"MNAME":"ns.nlnetlabs.nl.","NAME":"nlnet.nl.","RNAME":"hostmaster.open.nlnet.nl.","SERIAL":2015101500,"TTL":86400,"TYPE":"SOA"}],"rt":39.686,"size":2770},"src_addr":"192.168.1.131","timestamp":1445010704,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[20], Nsec3paramAnswer))
+    assert(result.responses[0].abuf.answers[20].name == 'nlnet.nl.')
+    assert(result.responses[0].abuf.answers[20].ttl == 3600)
+    assert(result.responses[0].abuf.answers[20].type == "NSEC3PARAM")
+    assert(result.responses[0].abuf.answers[20].klass == "IN")
+    assert(result.responses[0].abuf.answers[20].rd_length == 5)
+    assert(result.responses[0].abuf.answers[20].algorithm == 1)
+    assert(result.responses[0].abuf.answers[20].flags == 0)
+    assert(result.responses[0].abuf.answers[20].iterations == 1)
+    assert(result.responses[0].abuf.answers[20].salt == '')
+	
+def test_ptranswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:888:1044:10:2a0:c9ff:fe9f:17a9","from":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","fw":4700,"group_id":2827383,"lts":14,"msm_id":2827383,"msm_name":"Tdig","prb_id":12750,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":0,"ID":52292,"NSCOUNT":1,"QDCOUNT":1,"abuf":"zESEAAABAAEAAQAAATkBQQE3ATEBRgE5AUUBRgFGAUYBOQFDATABQQEyATABMAExATABMAE0ATQBMAExATgBOAE4ATABMQEwATABMgNpcDYEYXJwYQAADAABATkBYQE3ATEBZgE5AWUBZgFmAWYBOQFjATABYQEyATABMAExATABMAE0ATQBMAExATgBOAE4ATABMQEwATABMgNpcDYEYXJwYQAADAABAAAOEAAXB3N0ZXJlbzYCaHEGcGhpY29oA25ldADAggACAAEAAA4QAAYDbnMzwLk=","rt":34.676,"size":215},"src_addr":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","timestamp":1445246958,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], PtrAnswer))
+    assert(result.responses[0].abuf.answers[0].name == '9.a.7.1.f.9.e.f.f.f.9.c.0.a.2.0.0.1.0.0.4.4.0.1.8.8.8.0.1.0.0.2.ip6.arpa.')
+    assert(result.responses[0].abuf.answers[0].ttl == 3600)
+    assert(result.responses[0].abuf.answers[0].type == "PTR")
+    assert(result.responses[0].abuf.answers[0].klass == "IN")
+    assert(result.responses[0].abuf.answers[0].rd_length == 23)
+    assert(result.responses[0].abuf.answers[0].target == 'stereo6.hq.phicoh.net.')
+
+def test_rrsiganswer():
+    result = Result.get('{"af":4,"dst_addr":"193.0.9.5","from":"188.134.80.2","fw":4670,"group_id":1863527,"lts":164,"msm_id":1863527,"msm_name":"Tdig","prb_id":10221,"proto":"UDP","result":{"ANCOUNT":2,"ARCOUNT":1,"ID":43644,"NSCOUNT":0,"QDCOUNT":1,"abuf":"qnyEAAABAAIAAAABA3d3dwRyaXBlA25ldAAAAQABwAwAAQABAABUYAAEwQAGi8AMAC4AAQAAVGAAnAABBQMAAFRgVQF0I1TZ2RP39gRyaXBlA25ldAAKTSpMfJr47JtCHrIXQlklDB4CoLtux0tTGbfOUYCL1XBcbCU9mRj9WHd52gkyDqPYT6IFF6i56xYAxidn1/9o2Ou+X2PGTt0L/Fb+Ht1CN3exboitJq2FnIC1jKUcJIWF3VcLg5AwLkOklifPJqAeeHL98BOZ4IdNC/jDSNHbRAAAKRAAAACAAAAA","rt":15.705,"size":225},"src_addr":"10.250.10.104","timestamp":1423566533,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[1], RRSigAnswer))
+    assert(result.responses[0].abuf.answers[1].type_covered == 'A')
+    assert(result.responses[0].abuf.answers[1].algorithm == 5)
+    assert(result.responses[0].abuf.answers[1].labels == 3)
+    assert(result.responses[0].abuf.answers[1].original_ttl == 21600)
+    assert(result.responses[0].abuf.answers[1].signature_expiration == 1426158627)
+    assert(result.responses[0].abuf.answers[1].signature_inception == 1423563027)
+    assert(result.responses[0].abuf.answers[1].key_tag == 63478)
+    assert(result.responses[0].abuf.answers[1].signer_name == 'ripe.net.')
+    assert(result.responses[0].abuf.answers[1].signature == 'Ck0qTHya+OybQh6yF0JZJQweAqC7bsdLUxm3zlGAi9VwXGwlPZkY/Vh3edoJMg6j2E+iBReouesWAMYnZ9f/aNjrvl9jxk7dC/xW/h7dQjd3sW6IrSathZyAtYylHCSFhd1XC4OQMC5DpJYnzyagHnhy/fATmeCHTQv4w0jR20Q=')
 
 
 def test_soaanswer():
@@ -479,48 +579,64 @@ def test_soaanswer():
     assert(result.responses[0].abuf.answers[0].klass == "IN")
     assert(result.responses[0].abuf.answers[0].rd_length == 70)
 
-
-def test_dsanswer():
-    result = Result.get('{"from":"2607:f0b0:e:1000:6666:b3ff:fec5:21e","msm_id":1687655,"timestamp":1403100350,"fw":4610,"proto":"UDP","af":6,"msm_name":"Tdig","prb_id":17460,"result":{"abuf":"I4SEAAABAAEAAAAAB3RlY2hpbmMCbmwAACsAAcAMACsAAQAAHCAAJB+nBwJJII0cWAXwOgMwXauyVu24mdSr2nOQuqNwJtBOj\/Kqfw==","rt":99.33,"NSCOUNT":0,"QDCOUNT":1,"ID":9092,"ARCOUNT":0,"ANCOUNT":1,"size":76},"result-rt":99.33,"src_addr":"2607:f0b0:e:1000:6666:b3ff:fec5:21e","group_id":1687655,"type":"dns","dst_addr":"2001:7b8:606::85"}')
-    assert(isinstance(result.responses[0].abuf.answers[0], DsAnswer))
-    assert(result.responses[0].abuf.answers[0].name == "techinc.nl.")
-    assert(result.responses[0].abuf.answers[0].ttl == 7200)
-    assert(result.responses[0].abuf.answers[0].type == "DS")
+def test_srvanswer():
+    result = Result.get('{"af":4,"dst_addr":"5.9.91.110","from":"213.169.87.0","fw":4720,"group_id":2827808,"lts":2,"msm_id":2827808,"msm_name":"Tdig","prb_id":11712,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":2,"ID":50101,"NSCOUNT":5,"QDCOUNT":1,"abuf":"w7WEAAABAAEABQACDF94bXBwLXNlcnZlcgRfdGNwCmJ1ZGR5Y2xvdWQDY29tAAAhAAHADAAhAAEAAAEsABsABQAAFJUEeG1wcApidWRkeWNsb3VkA2NvbQDASQACAAEAAAEsAAwDbnMyAmhlA25ldADASQACAAEAAAEsAAYDbnMzwGnASQACAAEAAAEsAAYDbnMxwEnASQACAAEAAAEsAAYDbnM0wGnASQACAAEAAAEsAAYDbnM1wGnARAABAAEAAAEsAAQFCVtuwI8AAQABAAABLAAEBQlbbg==","rt":39.476,"size":217},"src_addr":"192.168.1.145","timestamp":1445257644,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], SrvAnswer))
+    assert(result.responses[0].abuf.answers[0].name == '_xmpp-server._tcp.buddycloud.com.')
+    assert(result.responses[0].abuf.answers[0].ttl == 300)
+    assert(result.responses[0].abuf.answers[0].type == "SRV")
     assert(result.responses[0].abuf.answers[0].klass == "IN")
-    assert(result.responses[0].abuf.answers[0].rd_length == 36)
-    assert(result.responses[0].abuf.answers[0].tag == 8103)
-    assert(result.responses[0].abuf.answers[0].algorithm == 7)
-    assert(result.responses[0].abuf.answers[0].digest_type == 2)
-    assert(result.responses[0].abuf.answers[0].delegation_key == "49208d1c5805f03a03305dabb256edb899d4abda7390baa37026d04e8ff2aa7f")
+    assert(result.responses[0].abuf.answers[0].rd_length == 27)
+    assert(result.responses[0].abuf.answers[0].priority == 5)
+    assert(result.responses[0].abuf.answers[0].weight == 0)
+    assert(result.responses[0].abuf.answers[0].port == 5269)
+    assert(result.responses[0].abuf.answers[0].target == 'xmpp.buddycloud.com.')
 
+def test_sshfpanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:67c:e0::5","from":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","fw":4700,"group_id":2828051,"lts":80,"msm_id":2828051,"msm_name":"Tdig","prb_id":12750,"proto":"UDP","result":{"ANCOUNT":5,"ARCOUNT":0,"ID":13066,"NSCOUNT":0,"QDCOUNT":1,"abuf":"MwqGAAABAAUAAAAABWJhbmtzBWF0bGFzBHJpcGUDbmV0AAD/AAHADAAcAAEAAFRgABAgAQZ8AugAEQAAAADBABMxwAwAAQABAABUYAAEwQATMcAMACwAAQAAVGAAFgEBXRM9wY0Cr3JqHks1Pm8TwyElyCDADAAsAAEAAFRgABYCAT5GQt0IOKjrSbJhxNhi9/IcKKtNwAwALwABAAABLAAjBGlwdjQFYmFua3MFYXRsYXMEcmlwZQNuZXQAAAZAAAAIAAs=","rt":17.846,"size":197},"src_addr":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","timestamp":1445260363,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[2], SshfpAnswer))
+    assert(result.responses[0].abuf.answers[2].name == 'banks.atlas.ripe.net.')
+    assert(result.responses[0].abuf.answers[2].ttl == 21600)
+    assert(result.responses[0].abuf.answers[2].type == "SSHFP")
+    assert(result.responses[0].abuf.answers[2].klass == "IN")
+    assert(result.responses[0].abuf.answers[2].rd_length == 22)
+    assert(result.responses[0].abuf.answers[2].algorithm == 1)
+    assert(result.responses[0].abuf.answers[2].digesttype == 1)
+    assert(result.responses[0].abuf.answers[2].fingerprint == '5d133dc18d02af726a1e4b353e6f13c32125c820')
 
-def test_dnskeyanswer():
-    result = Result.get('{"af":6,"dst_addr":"2001:500:40::1","from":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","fw":4610,"group_id":1672218,"msm_id":1672220,"msm_name":"Tdig","prb_id":15060,"proto":"TCP","result":{"ANCOUNT":7,"ARCOUNT":1,"ID":57207,"NSCOUNT":0,"QDCOUNT":1,"abuf":"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","rt":62.748,"size":1625},"result-rt":62.748,"src_addr":"2605:e000:160f:4097:6666:b3ff:feb0:cd7c","timestamp":1402768690,"type":"dns"}')
-    assert(isinstance(result.responses[0].abuf.answers[0], DnskeyAnswer))
-    assert(result.responses[0].abuf.answers[0].flags == 256)
-    assert(result.responses[0].abuf.answers[0].algorithm == 7)
-    assert(result.responses[0].abuf.answers[0].protocol == 3)
-    assert(result.responses[0].abuf.answers[0].key == "AwEAAX7wnIyA9rd+WWcUxE6ILCCtZWvJ9aVgG7wiNYbbQp6tPn5gTmZxR35tV2WK0bHordMGJrlTuH3u8rqBYxOM/LWHj6OAGtsE8RQQhcJCzOGpQADJggSAoSNhoJ/qiXAT6wcwPrwmVnUFLV8Sok/kEbRKnXuSqIPfSVj+j9VodpFH")
-    assert(result.responses[0].abuf.answers[0].name == "org.")
-    assert(result.responses[0].abuf.answers[0].ttl == 900)
-    assert(result.responses[0].abuf.answers[0].type == "DNSKEY")
+def test_tlsaanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:67c:e0::5","from":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","fw":4700,"group_id":2828271,"lts":79,"msm_id":2828271,"msm_name":"Tdig","prb_id":12750,"proto":"UDP","result":{"ANCOUNT":4,"ARCOUNT":0,"ID":36436,"NSCOUNT":1,"QDCOUNT":1,"abuf":"jlSGAAABAAQAAQAABF80NDMEX3RjcAVhdGxhcwRyaXBlA25ldAAA/wABwAwANAABAAABLAAjAQAByKo6/qz2tjWS9PH44aqDIVYC/qQykybwJ4xFm54/I+nADAAvAAEAAAEsAB8FYWRtaW4FYXRsYXMEcmlwZQNuZXQAAAcAAAAAAAMIwAwALgABAAABLACcADQFBQAAASxWTEzQViSxwPQ+BHJpcGUDbmV0AG0lz8nbHKhBeKmPGKWAJ3oeQGRQpXbD9sKH2Hv/zrU5T2uXzufSq9ZsKJwx28x28mI5zbLgDoyCAiHlctdDNJLfPMpaHpZ/fw9095jnOvj9+iYAg6YiL1V/Pv5tSRbNvwHV1vIH7lb6YMASOBeifP4B/tszDDNKN6YzD+0ib+n5wAwALgABAAABLACcAC8FBQAAASxWTEzQViSxwPQ+BHJpcGUDbmV0AFOfKo+nqvdicU0rEmuXLJcQoHlNoxmnkWATtxT+AN6X2+Fd4RLQLRiqUXwj8cOE6VHfgeG/KHT9sETwKvrzKFS3wxO16Vd0ATqhIBshGtgb73WVFADrL2TKVSMxaHuXul6sWATeP5L4E4FFI9wW+RsxFB9kuFFeXOVVHH59B5OhwUoAAgABAAAOEAAOBnRpbm5pZQRhcmluwU8=","rt":17.932,"size":494},"src_addr":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","timestamp":1445263153,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[0], TlsaAnswer))
+    assert(result.responses[0].abuf.answers[0].name == '_443._tcp.atlas.ripe.net.')
+    assert(result.responses[0].abuf.answers[0].ttl == 300)
+    assert(result.responses[0].abuf.answers[0].type == "TLSA")
     assert(result.responses[0].abuf.answers[0].klass == "IN")
-    assert(result.responses[0].abuf.answers[0].rd_length == 136)
+    assert(result.responses[0].abuf.answers[0].rd_length == 35)
+    assert(result.responses[0].abuf.answers[0].certusage == 1)
+    assert(result.responses[0].abuf.answers[0].selector == 0)
+    assert(result.responses[0].abuf.answers[0].matchingtype == 1)
+    assert(result.responses[0].abuf.answers[0].certassdata == 'c8aa3afeacf6b63592f4f1f8e1aa83215602fea4329326f0278c459b9e3f23e9')
 
+def test_txtanswer():
+    result = Result.get('{"af":4,"dst_addr":"185.49.140.12","from":"78.27.190.13","fw":4720,"group_id":2816176,"lts":14,"msm_id":2816176,"msm_name":"Tdig","prb_id":12534,"proto":"UDP","result":{"ANCOUNT":24,"ARCOUNT":1,"ID":22156,"NSCOUNT":0,"QDCOUNT":1,"abuf":"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","answers":[{"MNAME":"ns.nlnetlabs.nl.","NAME":"nlnet.nl.","RNAME":"hostmaster.open.nlnet.nl.","SERIAL":2015101500,"TTL":86400,"TYPE":"SOA"}],"rt":39.686,"size":2770},"src_addr":"192.168.1.131","timestamp":1445010704,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[10], TxtAnswer))
+    assert(result.responses[0].abuf.answers[10].name == 'nlnet.nl.')
+    assert(result.responses[0].abuf.answers[10].ttl == 86400)
+    assert(result.responses[0].abuf.answers[10].type == "TXT")
+    assert(result.responses[0].abuf.answers[10].klass == "IN")
+    assert(result.responses[0].abuf.answers[10].rd_length == 16)
+    assert(result.responses[0].abuf.answers[10].data == ['Stichting NLnet'])
 
-def test_rrsiganswer():
-    result = Result.get('{"af":4,"dst_addr":"193.0.9.5","from":"188.134.80.2","fw":4670,"group_id":1863527,"lts":164,"msm_id":1863527,"msm_name":"Tdig","prb_id":10221,"proto":"UDP","result":{"ANCOUNT":2,"ARCOUNT":1,"ID":43644,"NSCOUNT":0,"QDCOUNT":1,"abuf":"qnyEAAABAAIAAAABA3d3dwRyaXBlA25ldAAAAQABwAwAAQABAABUYAAEwQAGi8AMAC4AAQAAVGAAnAABBQMAAFRgVQF0I1TZ2RP39gRyaXBlA25ldAAKTSpMfJr47JtCHrIXQlklDB4CoLtux0tTGbfOUYCL1XBcbCU9mRj9WHd52gkyDqPYT6IFF6i56xYAxidn1/9o2Ou+X2PGTt0L/Fb+Ht1CN3exboitJq2FnIC1jKUcJIWF3VcLg5AwLkOklifPJqAeeHL98BOZ4IdNC/jDSNHbRAAAKRAAAACAAAAA","rt":15.705,"size":225},"src_addr":"10.250.10.104","timestamp":1423566533,"type":"dns"}')
-    assert(isinstance(result.responses[0].abuf.answers[1], RRSigAnswer))
-    assert(result.responses[0].abuf.answers[1].type_covered == 'A')
-    assert(result.responses[0].abuf.answers[1].algorithm == 5)
-    assert(result.responses[0].abuf.answers[1].labels == 3)
-    assert(result.responses[0].abuf.answers[1].original_ttl == 21600)
-    assert(result.responses[0].abuf.answers[1].signature_expiration == 1426158627)
-    assert(result.responses[0].abuf.answers[1].signature_inception == 1423563027)
-    assert(result.responses[0].abuf.answers[1].key_tag == 63478)
-    assert(result.responses[0].abuf.answers[1].signer_name == 'ripe.net.')
-    assert(result.responses[0].abuf.answers[1].signature == 'Ck0qTHya+OybQh6yF0JZJQweAqC7bsdLUxm3zlGAi9VwXGwlPZkY/Vh3edoJMg6j2E+iBReouesWAMYnZ9f/aNjrvl9jxk7dC/xW/h7dQjd3sW6IrSathZyAtYylHCSFhd1XC4OQMC5DpJYnzyagHnhy/fATmeCHTQv4w0jR20Q=')
-
+def test_unknownanswer():
+    result = Result.get('{"af":6,"dst_addr":"2001:888:1044:10:2a0:c9ff:fe9f:17a9","from":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","fw":4700,"group_id":2828518,"lts":17,"msm_id":2828518,"msm_name":"Tdig","prb_id":12750,"proto":"UDP","result":{"ANCOUNT":1,"ARCOUNT":0,"ID":5025,"NSCOUNT":0,"QDCOUNT":1,"abuf":"E6GGAAABAAEAAAAADHVua25vd24tdHlwZQRhaW95AmV1AAD/AAEMdW5rbm93bi10eXBlBGFpb3kCZXUA/wAAAQAADhAADEhlbGxvIFdvcmxkIQ==","rt":34.265,"size":82},"src_addr":"2001:920:6801:11:a2f3:c1ff:fec4:3fe7","timestamp":1445266555,"type":"dns"}')
+    assert(isinstance(result.responses[0].abuf.answers[10], UnknownAnswer))
+    assert(result.responses[0].abuf.answers[10].name == 'unknown-type.aioy.eu.')
+    assert(result.responses[0].abuf.answers[10].ttl == 3600)
+    assert(result.responses[0].abuf.answers[10].type == "TYPE65280")
+    assert(result.responses[0].abuf.answers[10].klass == "IN")
+    assert(result.responses[0].abuf.answers[10].rd_length == 12)
+    assert(result.responses[0].abuf.answers[10].rdata == '48656c6c6f20576f726c6421')
+    assert(result.responses[0].abuf.answers[10].data == ['Stichting NLnet'])
 
 def test_dns_lts():
     result = Result.get('{"lts":161,"from":"46.17.16.18","msm_id":1004041,"timestamp":1406560725,"fw":4650,"proto":"UDP","af":4,"msm_name":"Tdig","prb_id":778,"result":{"abuf":"vb2EAAABAAEAAAAABWFzMjUwA25ldAAAAQABwAwAAQABAAAOEAAEwpaooA==","rt":36.661,"NSCOUNT":0,"QDCOUNT":1,"ID":48573,"ARCOUNT":0,"ANCOUNT":1,"size":43},"result-rt":36.661,"src_addr":"192.168.1.12","type":"dns","dst_addr":"193.227.234.53"}')
