@@ -166,6 +166,9 @@ class Answer(ParsingDict):
         self.klass = self.ensure("Class", str)
         self.rd_length = self.ensure("RDlength", int)
 
+        # Where data goes when the abuf parser can't understand things
+        self.rdata = self.ensure("Rdata", str)
+
     @property
     def resource_data_length(self):
         return self.rd_length
@@ -361,29 +364,111 @@ class RRSigAnswer(Answer):
         )
 
 
-class NsecAnswer(Answer):
+class NotFullySupportedAnswer(Answer):
     """
-    Parsing of these types of answers out of the abuf is not yet supported.
+    We're still working on getting the proper text representations of some
+    Answer classes, so such classes will inherit from this one.
     """
 
     def __str__(self):
         return "{0}  ---- Not fully supported ----".format(Answer.__str__(self))
 
 
+class NsecAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.next_domain_name = self.ensure("NextDomainName", str)
+        self.types = self.ensure("Types", list)
+
+
+class Nsec3Answer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.hash_algorithm = self.ensure("HashAlg", int)
+        self.flags = self.ensure("Flags", int)
+        self.iterations = self.ensure("Iterations", int)
+        self.salt = self.ensure("Salt", str)
+        self.hash = self.ensure("Hash", str)
+        self.types = self.ensure("Types", list)
+
+
+class Nsec3ParamAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.algorithm = self.ensure("Algorithm", int)
+        self.flags = self.ensure("Flags", int)
+        self.iterations = self.ensure("Iterations", int)
+        self.salt = self.ensure("Salt", str)
+
+
+class PtrAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.target = self.ensure("Target", str)
+
+
+class SrvAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.priority = self.ensure("Priority", int)
+        self.weight = self.ensure("Weight", int)
+        self.port = self.ensure("Port", int)
+        self.target = self.ensure("Target", str)
+
+
+class SshfpAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.algorithm = self.ensure("Algorithm", int)
+        self.digest_type = self.ensure("DigestType", int)
+        self.fingerprint = self.ensure("Fingerprint", str)
+
+
+class TlsaAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.certificate_usage = self.ensure("CertUsage", int)
+        self.selector = self.ensure("Selector", int)
+        self.matching_type = self.ensure("MatchingType", int)
+        self.certificate_associated_data = self.ensure("CertAssData", str)
+
+
+class HinfoAnswer(NotFullySupportedAnswer):
+
+    def __init__(self, data, **kwargs):
+        Answer.__init__(self, data, **kwargs)
+        self.cpu = self.ensure("Cpu", str)
+        self.os = self.ensure("Os", str)
+
+
 class Message(ParsingDict):
 
     ANSWER_CLASSES = {
-        "A":      AAnswer,
-        "AAAA":   AaaaAnswer,
-        "NS":     NsAnswer,
-        "CNAME":  CnameAnswer,
-        "MX":     MxAnswer,
-        "SOA":    SoaAnswer,
-        "DS":     DsAnswer,
+        "A": AAnswer,
+        "AAAA": AaaaAnswer,
+        "NS": NsAnswer,
+        "CNAME": CnameAnswer,
+        "MX": MxAnswer,
+        "SOA": SoaAnswer,
+        "DS": DsAnswer,
         "DNSKEY": DnskeyAnswer,
-        "TXT":    TxtAnswer,
-        "RRSIG":  RRSigAnswer,
-        "NSEC":   NsecAnswer,
+        "TXT": TxtAnswer,
+        "RRSIG": RRSigAnswer,
+        "NSEC": NsecAnswer,
+        "NSEC3": Nsec3Answer,
+        "NSEC3PARAM": Nsec3ParamAnswer,
+        "PTR": PtrAnswer,
+        "SRV": SrvAnswer,
+        "SSHFP": SshfpAnswer,
+        "TLSA": TlsaAnswer,
+        "HINFO": HinfoAnswer
     }
 
     def __init__(self, message, response_data, parse_buf=True, **kwargs):
