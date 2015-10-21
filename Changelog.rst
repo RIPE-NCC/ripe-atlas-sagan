@@ -3,6 +3,9 @@ Changelog
 
 * 1.1.4
     * Added a ``type`` attribute to all ``Result`` subclasses
+    * Added support for a lot of new DNS answer types, including ``NSEC``,
+      ``PTR``, ``SRV``, and more.  These answers do not yet have a complete
+      string representation however.
 * 1.1.3
     * Changed the name of ``TracerouteResult.rtt_median`` to
       ``TracerouteResult.last_rtt_median``.
