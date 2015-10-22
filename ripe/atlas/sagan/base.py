@@ -32,9 +32,12 @@ class Json(object):
 
     @staticmethod
     def loads(*args, **kwargs):
-        if json.__name__ == "ujson":
-            return json.loads(*args, **kwargs)
-        return json.loads(strict=False, *args, **kwargs)
+        try:
+            if json.__name__ == "ujson":
+                return json.loads(*args, **kwargs)
+            return json.loads(strict=False, *args, **kwargs)
+        except ValueError:
+            raise ResultParseError("The JSON result could not be parsed")
 
 
 class ParsingDict(object):
