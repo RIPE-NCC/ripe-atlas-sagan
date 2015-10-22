@@ -1,9 +1,18 @@
 Changelog
 =========
 
+* 1.1.4
+    * Added a ``type`` attribute to all ``Result`` subclasses
+    * Added support for a lot of new DNS answer types, including ``NSEC``,
+      ``PTR``, ``SRV``, and more.  These answers do not yet have a complete
+      string representation however.
+* 1.1.3
+    * Changed the name of ``TracerouteResult.rtt_median`` to
+      ``TracerouteResult.last_rtt_median``.
+    * Modified the ``DnsResult`` class to allow the "bubbling up" of error
+      statuses.
 * 1.1.2
-    * Changed the name of ``TracerouteResult.rtt_median`` to ``TracerouteResult.last_rtt_median``.
-    * Modified the ``DnsResult`` class to allow the "bubbling up" of error statuses.
+    * We skipped this number for some reason :-/
 * 1.1.1
     * Fixed a string representation bug found by @iortiz: https://github.com/RIPE-NCC/ripe-atlas-tools/issues/1
 * 1.1.0

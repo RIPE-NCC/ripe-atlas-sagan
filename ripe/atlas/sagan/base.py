@@ -255,6 +255,10 @@ class Result(ParsingDict):
 
         return median
 
+    @property
+    def type(self):
+        return self.__class__.__name__.replace("Result", "").lower()
+
 
 __all__ = (
     "Result",
