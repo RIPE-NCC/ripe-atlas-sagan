@@ -1,5 +1,5 @@
-RIPE Atlas Sagan |Build Status|
-===============================
+RIPE Atlas Sagan |Build Status| |Documentation|
+===============================================
 
 A parsing library for RIPE Atlas measurement results
 
@@ -248,3 +248,6 @@ decades reaching out to the public about the wonders of the cosmos?
 .. _Sagan: https://en.wikipedia.org/wiki/Carl_Sagan
 .. |Build Status| image:: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan.png?branch=master
    :target: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan
+.. |Documentation| image:: https://readthedocs.org/projects/ripe-atlas-sagan/badge/?version=latest
+   :target: http://ripe-atlas-sagan.readthedocs.org/en/latest/?badge=latest
+   :alt: Documentation Status
