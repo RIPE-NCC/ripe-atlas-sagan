@@ -159,9 +159,9 @@ result, we can expand it.  Until then though, ``IcmpHeader`` is a very simple
 class, the majority of data living in ``objects``.
 
 For further information about this portion of a traceroute result, you should
-consult our `data structure documenttaion`_
+consult our `data structure documentation`_
 
-.. _data structure documenttaion: https://atlas.ripe.net/docs/data_struct/#v4610_traceroute
+.. _data structure documentation: https://atlas.ripe.net/docs/data_struct/#v4610_traceroute
 
 =====================  ==========  =========================================================================
 Property               Type        Explanation
@@ -228,9 +228,9 @@ raw_data               dict      The fragment of the initial JSON that pertains 
 header                 Header    See :ref:`dns-header` below
 edns0                  Edns0     See :ref:`dns-edns0` below, if any
 questions              list      A list of :ref:`dns-question` objects
-answers                list      A list of :ref:`dns-answer` objects
-authorities            list      A list of :ref:`dns-authority` objects
-additionals            list      A list of :ref:`dns-additional` objects, if any
+answers                list      A list of :ref:`dns-answer` objects, if any
+authorities            list      A list of :ref:`dns-answer` objects, if any
+additionals            list      A list of :ref:`dns-answer` objects, if any
 =====================  ========  ===================================================================================
 
 .. _dns-message-precalculatedvalues:
@@ -497,8 +497,113 @@ and ``signature`` are all concatenated with spaces.
 NsecAnswer
 ..........
 
-This answer type is not yet supported at the abuf parser level, so this class
-is limited to the properties of the parent ``Answer`` class.
+=====================  ========
+Property               Type
+=====================  ========
+next_domain_name       str
+types                  list
+=====================  ========
+
+
+.. _dns-answer-nsec3:
+
+Nsec3Answer
+...........
+
+=====================  ========
+Property               Type
+=====================  ========
+hash_algorithm         int
+flags                  int
+iterations             int
+salt                   str
+hash                   str
+types                  list
+=====================  ========
+
+
+.. _dns-answer-nsec3param:
+
+Nsec3ParamAnswer
+................
+
+=====================  ========
+Property               Type
+=====================  ========
+algorithm              int
+flags                  int
+iterations             int
+salt                   str
+=====================  ========
+
+
+.. _dns-answer-ptr:
+
+PtrAnswer
+.........
+
+=====================  ========
+Property               Type
+=====================  ========
+target                 str
+=====================  ========
+
+
+.. _dns-answer-srv:
+
+SrvAnswer
+.........
+
+=====================  ========
+Property               Type
+=====================  ========
+priority               int
+weight                 int
+port                   int
+target                 str
+=====================  ========
+
+
+.. _dns-answer-sshfp:
+
+SshfpAnswer
+...........
+
+=====================  ========
+Property               Type
+=====================  ========
+algorithm              int
+digest_type            int
+fingerprint            str
+=====================  ========
+
+
+.. _dns-answer-tlsa:
+
+TlsaAnswer
+..........
+
+===========================  ========
+Property                     Type
+===========================  ========
+certificate_usage            int
+selector                     int
+matching_type                int
+certificate_associated_data  str
+===========================  ========
+
+
+.. _dns-answer-hinfo:
+
+HinfoAnswer
+...........
+
+=====================  ========
+Property               Type
+=====================  ========
+cpu                    str
+os                     str
+=====================  ========
 
 
 .. _dns-edns0:
