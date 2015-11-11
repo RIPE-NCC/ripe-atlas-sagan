@@ -410,7 +410,7 @@ def test_qbuf():
     assert(result.responses[0].qbuf.edns0.extended_return_code == 0)
     assert(result.responses[0].qbuf.edns0.udp_size == 512)
     assert(result.responses[0].qbuf.edns0.version == 0)
-    assert(result.responses[0].qbuf.edns0.z == 255)
+    assert(result.responses[0].qbuf.edns0.z == 0)
     assert(result.responses[0].qbuf.edns0.type == "OPT")
     assert(result.responses[0].qbuf.edns0.name == ".")
     assert(len(result.responses[0].qbuf.edns0.options) == 1)
