@@ -290,12 +290,14 @@ class AbufParser(object):
             edns0 = {
                 'UDPsize':            res[1],
                 'ExtendedReturnCode': res[2] >> 24,
-                'Version':            (res[2] and 0x0f00) >> 16,
-                'Z':                  (res[2] and 0x00ff),
+                'Version':            (res[2] & 0x00ff0000) >> 16,
+                'Z':                  (res[2] & 0x007fff),
                 'Type':               'OPT',
                 'Option':             [],
                 'Name':               name,
             }
+            if res[2] & 0x8000:
+                edns0['DO']= True
 
             o = 0
             while o < len(rdata):
