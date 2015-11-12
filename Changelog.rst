@@ -1,6 +1,11 @@
 Changelog
 =========
 
+* 1.1.5
+    * We now ignore so-called "late" packets in traceroute results.  This will
+      likely be amended later as future probe firmwares are expected to make
+      better use of this value, but until then, Sagan will treat these packets
+      as invalid.
 * 1.1.4
     * Added a ``type`` attribute to all ``Result`` subclasses
     * Added support for a lot of new DNS answer types, including ``NSEC``,
