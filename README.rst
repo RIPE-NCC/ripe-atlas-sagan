@@ -117,7 +117,7 @@ Every result type has its own properties, with a few common between all types.
 
 Specifically, these attributes exist on all ``*Result`` objects:
 
--  ``created`` An arrow object (like datetime, but better) of the
+-  ``created`` An datetime object of the
    ``timestamp`` field
 -  ``measurement_id``
 -  ``probe_id``
@@ -175,7 +175,6 @@ What it requires
 As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
--  `arrow`_
 -  `pyOpenSSL`_ (Optional: see "Troubleshooting" above)
 -  `python-dateutil`_
 -  `pytz`_
@@ -231,7 +230,6 @@ But why "`Sagan`_"? The RIPE Atlas team decided to name all of its modules after
 explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
 
-.. _arrow: https://pypi.python.org/pypi/arrow
 .. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil
 .. _pytz: https://pypi.python.org/pypi/pytz
