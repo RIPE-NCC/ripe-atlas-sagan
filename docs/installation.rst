@@ -11,7 +11,6 @@ Requirements
 As you might have guessed, with all of the magic going on under the hood, there
 are a few dependencies:
 
-* `arrow`_
 * `pyOpenSSL`_
 * `python-dateutil`_
 * `pytz`_
@@ -21,7 +20,6 @@ Additionally, we recommend that you also install `ujson`_ as it will speed up
 the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
 documentation files for offline use.
 
-.. _arrow: https://pypi.python.org/pypi/arrow/
 .. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL/
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil/
 .. _pytz: https://pypi.python.org/pypi/pytz/

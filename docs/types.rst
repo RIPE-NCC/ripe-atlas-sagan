@@ -15,7 +15,7 @@ All measurement results have a few common properties.
 Property               Type      Explanation
 =====================  ========  ================================================================
 raw_data               dict      The entire measurement result, as-is from `json.loads()`
-created                arrow     The time at which this result was initiated
+created                datetime  The time at which this result was initiated
 created_timestamp      int       A Unix timestamp value for the ``created`` attribute
 measurement_id         int
 probe_id               int
@@ -26,12 +26,6 @@ is_malformed           bool      Whether the result (or related portion thereof)
 is_error               bool      Whether or not there were errors in parsing/handling this result
 error_message          str       If the result is an error, the message string is in here
 =====================  ========  ================================================================
-
-* Note that an ``arrow`` object is essentially a ``datetime`` object with some
-  additional magic.  If you're curious as to the nature of that magic, `the Arrow website`_
-  should get you started.
-
-.. _the Arrow website: http://crsmithdev.com/arrow/
 
 
 .. _ping:
