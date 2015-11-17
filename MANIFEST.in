@@ -1,4 +1,4 @@
-include Changelog.rst
+include CHANGES.rst
 include LICENSE
 include README.rst
 include MANIFEST.in

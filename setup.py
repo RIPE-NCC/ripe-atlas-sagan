@@ -21,7 +21,7 @@ if "SAGAN_WITHOUT_SSL" not in os.environ:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 readme_path = os.path.join(os.path.dirname(__file__), "README.rst")
-changelog_path = os.path.join(os.path.dirname(__file__), "Changelog.rst")
+changelog_path = os.path.join(os.path.dirname(__file__), "CHANGES.rst")
 
 # Get the long description from README.md
 with open(readme_path) as readme:
