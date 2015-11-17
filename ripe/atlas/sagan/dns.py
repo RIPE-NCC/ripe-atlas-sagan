@@ -691,23 +691,7 @@ class DnsResult(Result):
         if 0 < self.firmware < 4460:
             af = self.ensure("pf", int)
 
-        responses = []
-        part_of_set = True
-        try:
-            responses.append(self.raw_data["result"])
-            part_of_set = False
-        except KeyError:
-            pass  # We must be a resultset
-        finally:
-            try:
-                self.responses_total = int(self.raw_data["result"]["submax"])
-            except (KeyError, ValueError):
-                pass  # The value wasn't there, not much we can do about it
-
-        try:
-            responses += self.raw_data["resultset"]
-        except KeyError:
-            pass  # self.responses remains the same
+        part_of_set, responses = self.build_responses()
 
         for response in responses:
             self.responses.append(Response(
@@ -739,6 +723,43 @@ class DnsResult(Result):
                 self._handle_error("Unknown error: {msg}".format(
                     msg=self.raw_data["error"]
                 ))
+
+    def build_responses(self):
+        """
+        DNS measurement results are a little wacky.  Sometimes you get a single
+        response, other times you get a set of responses (result set).  In order
+        to establish a unified interface, we conform all results to the same
+        format: a list of response objects.
+
+        Additionally, the qbuf property is weird too.  In the case of multiple
+        responses, there's one qbuf for every response, but for single results,
+        it's not stored in the result, but rather the outer result data.  Again,
+        for the purposes of uniformity, we shoehorn the qbuf into the first (and
+        only) response in the latter case.
+        """
+
+        responses = []
+        part_of_set = True
+
+        # Account for single results
+        if "result" in self.raw_data:
+            if "qbuf" in self.raw_data:
+                if "qbuf" not in self.raw_data["result"]:
+                    self.raw_data["result"]["qbuf"] = self.raw_data.pop("qbuf")
+            responses.append(self.raw_data["result"])
+            part_of_set = False
+
+        try:
+            self.responses_total = int(self.raw_data["result"]["submax"])
+        except (KeyError, ValueError):
+            pass  # The value wasn't there, not much we can do about it
+
+        try:
+            responses += self.raw_data["resultset"]
+        except KeyError:
+            pass  # self.responses remains the same
+
+        return part_of_set, responses
 
 __all__ = (
     "DnsResult",
