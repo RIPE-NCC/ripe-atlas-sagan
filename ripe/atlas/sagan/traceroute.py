@@ -89,7 +89,8 @@ class Hop(ParsingDict):
         self.packets = []
         if "result" in self.raw_data:
             for packet in self.raw_data["result"]:
-                self.packets.append(Packet(packet, **kwargs))
+                if "late" not in packet:
+                    self.packets.append(Packet(packet, **kwargs))
 
         self.median_rtt = None
         if self.packets:
@@ -123,7 +124,7 @@ class TracerouteResult(Result):
         self.hops = []
         self.total_hops = 0
         self.last_median_rtt = None
-        self._parse_hops(**kwargs)  # Sets hops, last_rtt, and total_hops
+        self._parse_hops(**kwargs)  # Sets hops, last_median_rtt, and total_hops
 
         # Used by a few response tests below
         self._destination_ip_responded = None

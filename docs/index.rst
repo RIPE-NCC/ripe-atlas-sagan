@@ -31,13 +31,5 @@ Contents:
    installation
    use
    types
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   contributing
+   changelog

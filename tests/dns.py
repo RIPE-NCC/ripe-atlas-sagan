@@ -386,7 +386,14 @@ def test_error_timeout():
         assert(str(e) == "Timeout: 5000")
 
 
-def test_qbuf():
+def test_qbuf_single_result():
+
+    result = Result.get('{"af":6,"dst_addr":"2001:67c:e0::5","from":"2a02:2860:3:1::a","fw":4720,"group_id":2927179,"lts":30,"msm_id":2927179,"msm_name":"Tdig","prb_id":18279,"proto":"UDP","qbuf":"CcsAAAABAAAAAAABBHJpcGUDbmV0AAAcAAEAACkCAAAAgAAAAAAAAAA=","result":{"ANCOUNT":2,"ARCOUNT":1,"ID":2507,"NSCOUNT":0,"QDCOUNT":1,"abuf":"CcuEAAABAAIAAAABBHJpcGUDbmV0AAAcAAHADAAcAAEAAAEsABAgAQZ8AugAIgAAAADBAAaLwAwALgABAAABLACcABwFAgAAASxWap83VkMEJ4yCBHJpcGUDbmV0ADyhc2zuMQhsu3nU8h2qGCjw/uQM3bzqsrfbaFfSCDH3qG3pPuYJtyzkyFpI8jsUpzYjJJoy29XPeAdqXWoSsHQAD4AhVqmg0/YBctjZuIMKPs7kI3ZWjkkpVqn9kl2OT0r+Moh+gL1W/a1uIkldil0mNCi1xp/V6bRqZfCS+bL0AAApEAAAAIAAAAA=","rt":21.768,"size":233},"src_addr":"2a02:2860:3:1::a","timestamp":1447251248,"type":"dns"}')
+    assert(str(result.responses[0].qbuf) == "CcsAAAABAAAAAAABBHJpcGUDbmV0AAAcAAEAACkCAAAAgAAAAAAAAAA=")
+
+
+def test_qbuf_result_set():
+
     result = Result.get('{"from":"208.118.139.24","fw":4610,"group_id":1666151,"msm_id":1666151,"msm_name":"Tdig","prb_id":15112,"resultset":[{"af":4,"dst_addr":"8.8.8.8","proto":"TCP","qbuf":"dakBgAABAAAAAAABBTE1MTEyCjE0MDA2NjU1MjMDd3d3B3R3aXR0ZXIDY29tAAABAAEAACkCAAAAgAAABAADAAA=","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":30121,"NSCOUNT":1,"QDCOUNT":1,"rt":57.764,"size":133},"src_addr":"10.0.5.101","subid":1,"submax":2,"time":1400665523},{"af":4,"dst_addr":"8.8.4.4","proto":"TCP","qbuf":"JTEBgAABAAAAAAABBTE1MTEyCjE0MDA2NjU1MjQDd3d3B3R3aXR0ZXIDY29tAAABAAEAACkCAAAAgAAABAADAAA=","result":{"ANCOUNT":0,"ARCOUNT":1,"ID":9521,"NSCOUNT":1,"QDCOUNT":1,"rt":57.263,"size":133},"src_addr":"10.0.5.101","subid":2,"submax":2,"time":1400665524}],"timestamp":1400665523,"type":"dns"}')
     assert(result.responses[0].abuf is None)
     assert(str(result.responses[0].qbuf) == "dakBgAABAAAAAAABBTE1MTEyCjE0MDA2NjU1MjMDd3d3B3R3aXR0ZXIDY29tAAABAAEAACkCAAAAgAAABAADAAA=")
