@@ -130,7 +130,7 @@ class Edns0(ParsingDict):
         self.udp_size = self.ensure("UDPsize", int)
         self.version = self.ensure("Version", int)
         self.z = self.ensure("Z", int)
-        self.do = self.ensure("DO", False)
+        self.do = bool(self.ensure("DO", bool))
 
         self.options = []
         if "Option" in self.raw_data:

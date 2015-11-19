@@ -4,6 +4,8 @@ Changelog
 * 1.1.6
     * Fix for `Issue #56`_ a case where the ``qbuf`` value wasn't being properly
       captured.
+    * Fixed small bug that didn't accurately capture the ``DO`` property from
+      the qbuf.
 * 1.1.5
     * We now ignore so-called "late" packets in traceroute results.  This will
       likely be amended later as future probe firmwares are expected to make
