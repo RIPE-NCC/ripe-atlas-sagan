@@ -390,6 +390,7 @@ def test_qbuf_single_result():
 
     result = Result.get('{"af":6,"dst_addr":"2001:67c:e0::5","from":"2a02:2860:3:1::a","fw":4720,"group_id":2927179,"lts":30,"msm_id":2927179,"msm_name":"Tdig","prb_id":18279,"proto":"UDP","qbuf":"CcsAAAABAAAAAAABBHJpcGUDbmV0AAAcAAEAACkCAAAAgAAAAAAAAAA=","result":{"ANCOUNT":2,"ARCOUNT":1,"ID":2507,"NSCOUNT":0,"QDCOUNT":1,"abuf":"CcuEAAABAAIAAAABBHJpcGUDbmV0AAAcAAHADAAcAAEAAAEsABAgAQZ8AugAIgAAAADBAAaLwAwALgABAAABLACcABwFAgAAASxWap83VkMEJ4yCBHJpcGUDbmV0ADyhc2zuMQhsu3nU8h2qGCjw/uQM3bzqsrfbaFfSCDH3qG3pPuYJtyzkyFpI8jsUpzYjJJoy29XPeAdqXWoSsHQAD4AhVqmg0/YBctjZuIMKPs7kI3ZWjkkpVqn9kl2OT0r+Moh+gL1W/a1uIkldil0mNCi1xp/V6bRqZfCS+bL0AAApEAAAAIAAAAA=","rt":21.768,"size":233},"src_addr":"2a02:2860:3:1::a","timestamp":1447251248,"type":"dns"}')
     assert(str(result.responses[0].qbuf) == "CcsAAAABAAAAAAABBHJpcGUDbmV0AAAcAAEAACkCAAAAgAAAAAAAAAA=")
+    assert(result.responses[0].qbuf.edns0.do is True)
 
 
 def test_qbuf_result_set():
