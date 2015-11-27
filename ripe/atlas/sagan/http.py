@@ -1,5 +1,6 @@
 from .base import Result, ParsingDict
 
+
 class Response(ParsingDict):
 
     def __init__(self, data, **kwargs):
