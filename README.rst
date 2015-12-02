@@ -206,7 +206,7 @@ versions:
 Further Documentation
 ---------------------
 
-Complete documentation can always be found on `the RIPE Atlas project page`_,
+Complete documentation can always be found on `Read the Docs`_,
 and if you're not online, the project itself contains a ``docs`` directory --
 everything you should need is in there.
 
@@ -236,7 +236,7 @@ decades reaching out to the public about the wonders of the cosmos?
 .. _IPy: https://pypi.python.org/pypi/IPy/
 .. _ujson: https://pypi.python.org/pypi/ujson
 .. _sphinx: https://pypi.python.org/pypi/Sphinx
-.. _the RIPE Atlas project page: https://atlas.ripe.net/docs/sagan/
+.. _Read the Docs: http://ripe-atlas-sagan.readthedocs.org/en/latest/
 .. _Daniel Quinn: https://github.com/danielquinn
 .. _Philip Homburg: https://github.com/philiphomburg
 .. _Andreas Stirkos: https://github.com/astrikos
