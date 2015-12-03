@@ -201,7 +201,7 @@ source_address         str       An IP address represented as a string
 protocol               str       One of ``TCP``, ``UDP``
 abuf                   Message   See :ref:`dns-message` below
 qbuf                   Message   See :ref:`dns-message` below
-response_time          float     Time, in microseconds until the response was received
+response_time          float     Time, in milliseconds until the response was received
 response_id            int       The sequence number of this result within a group of results, available if the resolution was done by the probe's local resolver
 =====================  ========  ===================================================================================
 
