@@ -655,8 +655,8 @@ source_address         str       An IP address
 port                   int       The port numer
 method                 str       This should always be "SSL"
 version                str
-response_time          float     Time, in microseconds until the response was received
-time_to_connect        float     Time, in microseconds until the connection was established
+response_time          float     Time, in milliseconds until the response was received
+time_to_connect        float     Time, in milliseconds until the connection was established
 certificates           list      A list of :ref:`sslcert-certificate` objects
 is_signed              bool      Set to ``True`` if the certificate is self-signed
 checksum_chain         str       A list of all checksums for all certificates in this result, joined with the arbitrary string ``::``.  This can come in handy when you're trying to compare checksums of multiple results.
@@ -722,7 +722,7 @@ head_size              int       The total number of bytes in the head
 destination_address    str       An IP address
 source_address         str       An IP address
 code                   int       The HTTP response code
-response_time          float     Time, in microseconds until the response was received
+response_time          float     Time, in milliseconds until the response was received
 version                str       The HTTP version
 =====================  ========  ===================================================================================
 
