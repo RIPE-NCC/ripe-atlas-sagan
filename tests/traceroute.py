@@ -380,3 +380,15 @@ def test_traceroute_with_late_packets():
 
     # Newer firmwares
     # No sample available yet
+
+
+def test_last_responded_hop_with_error_packets():
+    """"
+    Case where traceroute has a single hop and all of its packets have error
+    in them.
+    """
+
+    result = Result.get({'lts': 117, 'msm_id': 3059023, 'endtime': 1449152831, 'from': '2001:470:1883:1:6666:b3ff:feb0:dcda', 'dst_name': '2001:980:1284:10:beee:7bff:fe87:9eda', 'fw': 4720, 'timestamp': 1449152831, 'proto': 'ICMP', 'paris_id': 1, 'prb_id': 14468, 'af': 6, 'result': [{'result': [{'rtt': 0.714, 'size': 96, 'from': '2001:470:1883:1::1', 'err': 'N', 'ttl': 64}, {'rtt': 0.495, 'size': 96, 'from': '2001:470:1883:1::1', 'err': 'N', 'ttl': 64}, {'rtt': 0.48, 'size': 96, 'from': '2001:470:1883:1::1', 'err': 'N', 'ttl': 64}], 'hop': 1}], 'dst_addr': '2001:980:1284:10:beee:7bff:fe87:9eda', 'src_addr': '2001:470:1883:1:6666:b3ff:feb0:dcda', 'group_id': 3059023, 'type': 'traceroute', 'msm_name': 'Traceroute', 'size': 48})
+
+    assert(len(result.hops[0].packets) == 3)
+    assert(result.last_hop_responded is False)
