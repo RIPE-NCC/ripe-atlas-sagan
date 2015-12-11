@@ -129,6 +129,7 @@ class TracerouteResult(Result):
         # Used by a few response tests below
         self._destination_ip_responded = None
         self._last_hop_responded = None
+        self._is_success = None
 
     @property
     def last_rtt(self):
@@ -175,6 +176,21 @@ class TracerouteResult(Result):
                     break
 
         return self.last_hop_responded
+
+    @property
+    def is_success(self):
+
+        if self._is_success is not None:
+            return self._is_success
+
+        self._is_success = False
+        if self.hops and self.hops[-1].packets:
+            for packet in self.hops[-1].packets:
+                if packet.rtt and not packet.is_error:
+                    self._is_success = True
+                    break
+
+        return self.is_success
 
     @property
     def end_time_timestamp(self):
