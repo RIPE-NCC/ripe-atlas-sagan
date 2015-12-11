@@ -26,7 +26,7 @@ class IcmpHeader(ParsingDict):
 
         self.version = self.ensure("version", int)
         self.rfc4884 = self.ensure("rfc4884", bool)
-        self.objects = self.ensure("obj",     list)
+        self.objects = self.ensure("obj", list)
 
 
 class Packet(ParsingDict):
