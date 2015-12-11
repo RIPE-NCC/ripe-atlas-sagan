@@ -124,12 +124,14 @@ class TracerouteResult(Result):
         self.hops = []
         self.total_hops = 0
         self.last_median_rtt = None
-        self._parse_hops(**kwargs)  # Sets hops, last_median_rtt, and total_hops
 
         # Used by a few response tests below
-        self._destination_ip_responded = None
-        self._last_hop_responded = None
-        self._is_success = None
+        self.destination_ip_responded = False
+        self.last_hop_responded = False
+        self.is_success = False
+        self.last_hop_errors = []
+
+        self._parse_hops(**kwargs)  # Sets hops, last_median_rtt, and total_hops
 
     @property
     def last_rtt(self):
@@ -146,51 +148,35 @@ class TracerouteResult(Result):
         )
         return self.destination_ip_responded
 
-    @property
-    def destination_ip_responded(self):
+    def set_destination_ip_responded(self, last_hop):
 
-        if self._destination_ip_responded is not None:
-            return self._destination_ip_responded
+        destination_address = IP(self.destination_address)
+        for packet in last_hop.packets:
+            if packet.origin and destination_address == IP(packet.origin):
+                self.destination_ip_responded = True
+                break
 
-        self._destination_ip_responded = False
-        if self.hops and self.hops[-1].packets:
-            destination_address = IP(self.destination_address)
-            for packet in self.hops[-1].packets:
-                if packet.origin and destination_address == IP(packet.origin):
-                    self._destination_ip_responded = True
-                    break
+    def set_last_hop_responded(self, last_hop):
 
-        return self.destination_ip_responded
+        for packet in last_hop.packets:
+            if packet.rtt:
+                self.last_hop_responded = True
+                break
 
-    @property
-    def last_hop_responded(self):
+    def set_is_success(self, last_hop):
 
-        if self._last_hop_responded is not None:
-            return self._last_hop_responded
+        for packet in last_hop.packets:
+            if packet.rtt and not packet.is_error:
+                self.is_success = True
+                break
 
-        self._last_hop_responded = False
-        if self.hops and self.hops[-1].packets:
-            for packet in self.hops[-1].packets:
-                if packet.rtt:
-                    self._last_hop_responded = True
-                    break
+    def set_last_hop_errors(self, last_hop):
 
-        return self.last_hop_responded
-
-    @property
-    def is_success(self):
-
-        if self._is_success is not None:
-            return self._is_success
-
-        self._is_success = False
-        if self.hops and self.hops[-1].packets:
-            for packet in self.hops[-1].packets:
-                if packet.rtt and not packet.is_error:
-                    self._is_success = True
-                    break
-
-        return self.is_success
+        for packet in last_hop.packets:
+            if packet.is_error:
+                print(dir(self))
+                self.last_hop_errors.append(packet.error_message)
+                break
 
     @property
     def end_time_timestamp(self):
@@ -215,7 +201,8 @@ class TracerouteResult(Result):
             self._handle_malformation("Legacy formats not supported")
             return
 
-        for hop in hops:
+        hops_number = len(hops)
+        for index, hop in enumerate(hops):
 
             hop = Hop(hop, **kwargs)
 
@@ -224,6 +211,13 @@ class TracerouteResult(Result):
 
             self.hops.append(hop)
             self.total_hops += 1
+
+            # If last hop set several usefull properties
+            if index + 1 == hops_number:
+                self.set_is_success(hop)
+                self.set_destination_ip_responded(hop)
+                self.set_last_hop_responded(hop)
+                self.set_last_hop_errors(hop)
 
 
 __all__ = (
