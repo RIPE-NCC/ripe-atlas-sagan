@@ -170,7 +170,7 @@ class TracerouteResult(Result):
         self._last_hop_responded = False
         if self.hops and self.hops[-1].packets:
             for packet in self.hops[-1].packets:
-                if packet.origin and not packet.is_error:
+                if packet.rtt:
                     self._last_hop_responded = True
                     break
 
