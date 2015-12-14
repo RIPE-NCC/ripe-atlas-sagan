@@ -26,7 +26,7 @@ class IcmpHeader(ParsingDict):
 
         self.version = self.ensure("version", int)
         self.rfc4884 = self.ensure("rfc4884", bool)
-        self.objects = self.ensure("obj",     list)
+        self.objects = self.ensure("obj", list)
 
 
 class Packet(ParsingDict):
@@ -124,11 +124,14 @@ class TracerouteResult(Result):
         self.hops = []
         self.total_hops = 0
         self.last_median_rtt = None
-        self._parse_hops(**kwargs)  # Sets hops, last_median_rtt, and total_hops
 
         # Used by a few response tests below
-        self._destination_ip_responded = None
-        self._last_hop_responded = None
+        self.destination_ip_responded = False
+        self.last_hop_responded = False
+        self.is_success = False
+        self.last_hop_errors = []
+
+        self._parse_hops(**kwargs)  # Sets hops, last_median_rtt, and total_hops
 
     @property
     def last_rtt(self):
@@ -145,36 +148,35 @@ class TracerouteResult(Result):
         )
         return self.destination_ip_responded
 
-    @property
-    def destination_ip_responded(self):
+    def set_destination_ip_responded(self, last_hop):
+        """Sets the flag if destination IP responded."""
+        destination_address = IP(self.destination_address)
+        for packet in last_hop.packets:
+            if packet.origin and destination_address == IP(packet.origin):
+                self.destination_ip_responded = True
+                break
 
-        if self._destination_ip_responded is not None:
-            return self._destination_ip_responded
+    def set_last_hop_responded(self, last_hop):
+        """Sets the flag if last hop responded."""
+        for packet in last_hop.packets:
+            if packet.rtt:
+                self.last_hop_responded = True
+                break
 
-        self._destination_ip_responded = False
-        if self.hops and self.hops[-1].packets:
-            destination_address = IP(self.destination_address)
-            for packet in self.hops[-1].packets:
-                if packet.origin and destination_address == IP(packet.origin):
-                    self._destination_ip_responded = True
-                    break
+    def set_is_success(self, last_hop):
+        """Sets the flag if traceroute result is successfull or not."""
+        for packet in last_hop.packets:
+            if packet.rtt and not packet.is_error:
+                self.is_success = True
+                break
+        else:
+            self.set_last_hop_errors(last_hop)
 
-        return self.destination_ip_responded
-
-    @property
-    def last_hop_responded(self):
-
-        if self._last_hop_responded is not None:
-            return self._last_hop_responded
-
-        self._last_hop_responded = False
-        if self.hops and self.hops[-1].packets:
-            for packet in self.hops[-1].packets:
-                if packet.origin:
-                    self._last_hop_responded = True
-                    break
-
-        return self.last_hop_responded
+    def set_last_hop_errors(self, last_hop):
+        """Sets the last hop's errors.."""
+        for packet in last_hop.packets:
+            if packet.is_error:
+                self.last_hop_errors.append(packet.error_message)
 
     @property
     def end_time_timestamp(self):
@@ -199,7 +201,8 @@ class TracerouteResult(Result):
             self._handle_malformation("Legacy formats not supported")
             return
 
-        for hop in hops:
+        hops_number = len(hops)
+        for index, hop in enumerate(hops):
 
             hop = Hop(hop, **kwargs)
 
@@ -208,6 +211,12 @@ class TracerouteResult(Result):
 
             self.hops.append(hop)
             self.total_hops += 1
+
+            # If last hop set several usefull properties
+            if index + 1 == hops_number:
+                self.set_destination_ip_responded(hop)
+                self.set_last_hop_responded(hop)
+                self.set_is_success(hop)
 
 
 __all__ = (
