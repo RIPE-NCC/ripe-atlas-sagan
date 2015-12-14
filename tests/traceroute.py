@@ -409,3 +409,11 @@ def test_is_success_with_error_packets():
     assert(len(result.hops[0].packets) == 3)
     assert(result.is_success is False)
     assert(result.last_hop_errors == ['Network unreachable', 'Network unreachable', 'Network unreachable'])
+
+
+def test_missing_dst_addr():
+    """"Case where traceroute misses dst_addr key."""
+
+    result = Result.get({"af": 4, "dst_name": "syndication.exoclick.com", "endtime": 1446563590, "from": "89.216.30.6", "fw": 4720, "group_id": 2906346, "lts": 80, "msm_id": 2906346, "msm_name": "Traceroute", "paris_id": 0, "prb_id": 22586, "proto": "ICMP", "result": [{"error": "name resolution failed: non-recoverable failure in name resolution (1)"}], "size": 48, "timestamp": 1446563590, "type": "traceroute"})
+    assert(result.destination_address is None)
+    assert(result.is_success is False)

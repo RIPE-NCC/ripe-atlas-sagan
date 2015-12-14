@@ -150,6 +150,9 @@ class TracerouteResult(Result):
 
     def set_destination_ip_responded(self, last_hop):
         """Sets the flag if destination IP responded."""
+        if not self.destination_address:
+            return
+
         destination_address = IP(self.destination_address)
         for packet in last_hop.packets:
             if packet.origin and destination_address == IP(packet.origin):
