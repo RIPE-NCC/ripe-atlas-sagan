@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* 1.1.8
+    * Handle case where a traceroute result might not have ``dst_addr`` field.
 * 1.1.7
     * Change condition of traceroute's ``last_hop_responded`` flag.
     * Add couple of more traceroute's properties. ``is_success`` and ``last_hop_errors``.
