@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* 1.1.7
+    * Change condition of traceroute's ``last_hop_responded`` flag.
+    * Add couple of more traceroute's properties. ``is_success`` and ``last_hop_errors``
 * 1.1.6
     * Fix for `Issue #56`_ a case where the ``qbuf`` value wasn't being properly
       captured.
