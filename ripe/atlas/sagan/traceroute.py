@@ -149,7 +149,7 @@ class TracerouteResult(Result):
         return self.destination_ip_responded
 
     def set_destination_ip_responded(self, last_hop):
-
+        """Sets the flag if destination IP responded."""
         destination_address = IP(self.destination_address)
         for packet in last_hop.packets:
             if packet.origin and destination_address == IP(packet.origin):
@@ -157,26 +157,26 @@ class TracerouteResult(Result):
                 break
 
     def set_last_hop_responded(self, last_hop):
-
+        """Sets the flag if last hop responded."""
         for packet in last_hop.packets:
             if packet.rtt:
                 self.last_hop_responded = True
                 break
 
     def set_is_success(self, last_hop):
-
+        """Sets the flag if traceroute result is successfull or not."""
         for packet in last_hop.packets:
             if packet.rtt and not packet.is_error:
                 self.is_success = True
                 break
+        else:
+            self.set_last_hop_errors(last_hop)
 
     def set_last_hop_errors(self, last_hop):
-
+        """Sets the last hop's errors.."""
         for packet in last_hop.packets:
             if packet.is_error:
-                print(dir(self))
                 self.last_hop_errors.append(packet.error_message)
-                break
 
     @property
     def end_time_timestamp(self):
@@ -214,10 +214,9 @@ class TracerouteResult(Result):
 
             # If last hop set several usefull properties
             if index + 1 == hops_number:
-                self.set_is_success(hop)
                 self.set_destination_ip_responded(hop)
                 self.set_last_hop_responded(hop)
-                self.set_last_hop_errors(hop)
+                self.set_is_success(hop)
 
 
 __all__ = (

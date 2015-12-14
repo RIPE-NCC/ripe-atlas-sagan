@@ -408,3 +408,4 @@ def test_is_success_with_error_packets():
 
     assert(len(result.hops[0].packets) == 3)
     assert(result.is_success is False)
+    assert(result.last_hop_errors == ['Network unreachable', 'Network unreachable', 'Network unreachable'])
