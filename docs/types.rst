@@ -96,9 +96,11 @@ protocol                  str       One of ``ICMP``, ``TCP``, ``UDP``
 hops                      list      A list of :ref:`traceroute-hop` objects
 total_hops                int       The total number of hops
 ip_path                   list      A list of dicts containing the IPs at each hop. This is just for convenience as all of these values are accessible via the :ref:`traceroute-hop` and :ref:`traceroute-packet` objects.
-last_rtt                  float     The RTT from the last successful hop
+last_median_rtt           float     The median value of all RTTs from the last successful hop
 destination_ip_responded  bool      Set to ``True`` if the last hop was a response from the destination IP
 last_hop_responded        bool      Set to ``True`` if the last hop was a response at all
+is_success                bool      Set to ``True`` if the traceroute finished successfully
+last_hop_errors           list      A list of last hop's errors
 ========================  ========  ===================================================================================
 
 
@@ -114,6 +116,7 @@ Property               Type   Explanation
 =====================  =====  ================================================================
 index                  int    The hop number, starting with 1
 packets                list   A list of tracroute :ref:`traceroute-packet` objects
+median_rtt             float  The median value of all RTTs of the hop
 =====================  =====  ================================================================
 
 
