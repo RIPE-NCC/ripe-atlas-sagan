@@ -213,9 +213,6 @@ class TracerouteResult(Result):
 
             hop = Hop(hop, **kwargs)
 
-            if hop.median_rtt:
-                self.last_median_rtt = hop.median_rtt
-
             self.hops.append(hop)
             self.total_hops += 1
 
@@ -224,6 +221,9 @@ class TracerouteResult(Result):
                 self.set_destination_ip_responded(hop)
                 self.set_last_hop_responded(hop)
                 self.set_is_success(hop)
+
+                if hop.median_rtt:
+                    self.last_median_rtt = hop.median_rtt
 
 
 __all__ = (
