@@ -176,7 +176,11 @@ class TracerouteResult(Result):
             self.set_last_hop_errors(last_hop)
 
     def set_last_hop_errors(self, last_hop):
-        """Sets the last hop's errors.."""
+        """Sets the last hop's errors."""
+        if last_hop.is_error:
+            self.last_hop_errors.append(last_hop.error_message)
+            return
+
         for packet in last_hop.packets:
             if packet.is_error:
                 self.last_hop_errors.append(packet.error_message)
