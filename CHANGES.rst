@@ -2,7 +2,8 @@ Changelog
 =========
 
 * 1.1.9
-    * Updated the `parse_abuf` script to support Python3.
+    * Removed the `parse_abuf` script because no one was using it and its
+      Python3 support was suspect anyway.
 * 1.1.8
     * Handle case where a traceroute result might not have ``dst_addr`` field.
 * 1.1.7
