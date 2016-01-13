@@ -51,9 +51,6 @@ with open(readme_path) as readme:
                 "doc": ["sphinx"]
             },
             test_suite="nose.collector",
-            scripts=[
-                "scripts/parse_abuf"
-            ],
             classifiers=[
                 "Operating System :: POSIX",
                 "Operating System :: Unix",
