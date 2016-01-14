@@ -83,9 +83,9 @@ There may be a case where you have code that's just expected to parse a result
 string, without knowing ahead of time what type of result it is.  For this we
 make use of the parent ``Result`` class' ``get()`` method::
 
-    from ripe.atlas.sagan import PingResult
+    from ripe.atlas.sagan import Result
 
-    my_result = PingResult('this is where your big JSON blob goes')
+    my_result = Result.get('this is where your big JSON blob goes')
 
     my_result.af
     # Returns 6
