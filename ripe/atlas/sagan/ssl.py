@@ -190,7 +190,7 @@ class Alert(ParsingDict):
 
         self.level = self.ensure("level", int)
         self.description = self.ensure("decription", int)
-        if not self.description:
+        if self.description is None:
             self.description = self.ensure("description", int)
 
 
