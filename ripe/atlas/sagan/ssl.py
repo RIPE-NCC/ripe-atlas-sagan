@@ -253,6 +253,7 @@ class SslResult(Result):
 
         if "alert" in self.raw_data:
             self.alert = Alert(self.raw_data["alert"], **kwargs)
+            self._handle_error(self.alert.description_string)
 
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
