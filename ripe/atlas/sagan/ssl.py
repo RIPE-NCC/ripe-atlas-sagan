@@ -180,6 +180,20 @@ class Certificate(ParsingDict):
         return dictionary[key].decode("UTF-8")
 
 
+class Alert(ParsingDict):
+
+    def __init__(self, data, **kwargs):
+
+        ParsingDict.__init__(self, **kwargs)
+
+        self.raw_data = data
+
+        self.level = self.ensure("level", int)
+        self.description = self.ensure("decription", int)
+        if not self.description:
+            self.description = self.ensure("description", int)
+
+
 class SslResult(Result):
 
     def __init__(self, data, **kwargs):
@@ -196,12 +210,16 @@ class SslResult(Result):
         self.response_time = self.ensure("rt", float)
         self.time_to_connect = self.ensure("ttc", float)
 
-        self.certificates = []
-        self.is_self_signed = False
-
         # Older versions used named ports
         if self.port is None and self.raw_data.get("dst_port") == "https":
             self.port = 443
+
+        self.alert = None
+        self.certificates = []
+        self.is_self_signed = False
+
+        if "alert" in self.raw_data:
+            self.alert = Alert(self.raw_data["alert"], **kwargs)
 
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
