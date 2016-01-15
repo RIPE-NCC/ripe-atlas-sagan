@@ -180,6 +180,53 @@ class Certificate(ParsingDict):
         return dictionary[key].decode("UTF-8")
 
 
+class Alert(ParsingDict):
+
+    # Taken from https://tools.ietf.org/html/rfc5246#section-7.2
+    DESCRIPTION_MAP = {
+        0: "close_notify",
+        10: "unexpected_message",
+        20: "bad_record_mac",
+        21: "decryption_failed_RESERVED",
+        22: "record_overflow",
+        30: "decompression_failure",
+        40: "handshake_failure",
+        41: "no_certificate_RESERVED",
+        42: "bad_certificate",
+        43: "unsupported_certificate",
+        44: "certificate_revoked",
+        45: "certificate_expired",
+        46: "certificate_unknown",
+        47: "illegal_parameter",
+        48: "unknown_ca",
+        49: "access_denied",
+        50: "decode_error",
+        51: "decrypt_error",
+        60: "export_restriction_RESERVED",
+        70: "protocol_version",
+        71: "insufficient_security",
+        80: "internal_error",
+        90: "user_canceled",
+        100: "no_renegotiation",
+        110: "unsupported_extension",
+    }
+
+    def __init__(self, data, **kwargs):
+
+        ParsingDict.__init__(self, **kwargs)
+
+        self.raw_data = data
+
+        self.level = self.ensure("level", int)
+        self.description = self.ensure("decription", int)
+        if self.description is None:
+            self.description = self.ensure("description", int)
+
+    @property
+    def description_string(self):
+        return self.DESCRIPTION_MAP.get(self.description, "Unknown")
+
+
 class SslResult(Result):
 
     def __init__(self, data, **kwargs):
@@ -196,12 +243,17 @@ class SslResult(Result):
         self.response_time = self.ensure("rt", float)
         self.time_to_connect = self.ensure("ttc", float)
 
-        self.certificates = []
-        self.is_self_signed = False
-
         # Older versions used named ports
         if self.port is None and self.raw_data.get("dst_port") == "https":
             self.port = 443
+
+        self.alert = None
+        self.certificates = []
+        self.is_self_signed = False
+
+        if "alert" in self.raw_data:
+            self.alert = Alert(self.raw_data["alert"], **kwargs)
+            self._handle_error(self.alert.description_string)
 
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
