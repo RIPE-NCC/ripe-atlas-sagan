@@ -1,6 +1,8 @@
 Changelog
 =========
-
+* 1.1.10
+    * Added a `parse_all_hops` kwarg to the Traceroute class to tell Sagan to stop parsing Hops and Packets once we have all of the last hop statistics (default=True)
+    * Remove dependency on IPy: we were using it for IPv6 canonicalization, but all IPv6 addresses in results should be in canonical form to start with.
 * 1.1.9
     * Removed the `parse_abuf` script because no one was using it and its
       Python3 support was suspect anyway.
