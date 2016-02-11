@@ -16,7 +16,6 @@
 import logging
 
 from calendar import timegm
-from IPy import IP
 
 from .base import Result, ParsingDict
 
@@ -102,16 +101,15 @@ class Hop(ParsingDict):
             self._handle_error(error)
 
         self.packets = []
+        packet_rtts = []
         if "result" in self.raw_data:
-            for packet in self.raw_data["result"]:
-                if "late" not in packet:
-                    self.packets.append(Packet(packet, **kwargs))
-
-        self.median_rtt = None
-        if self.packets:
-            rtts = sorted([p.rtt for p in self.packets if p and p.rtt])
-            if rtts:
-                self.median_rtt = Result.calculate_median(rtts)
+            for raw_packet in self.raw_data["result"]:
+                if "late" not in raw_packet:
+                    packet = Packet(raw_packet, **kwargs)
+                    if packet.rtt:
+                        packet_rtts.append(packet.rtt)
+                    self.packets.append(packet)
+        self.median_rtt = Result.calculate_median(packet_rtts)
 
     def __str__(self):
         return self.index
@@ -168,9 +166,9 @@ class TracerouteResult(Result):
         if not self.destination_address:
             return
 
-        destination_address = IP(self.destination_address)
         for packet in last_hop.packets:
-            if packet.origin and destination_address == IP(packet.origin):
+            if packet.origin and \
+                    self.destination_address == packet.origin:
                 self.destination_ip_responded = True
                 break
 
@@ -214,7 +212,7 @@ class TracerouteResult(Result):
             r.append([packet.origin for packet in hop.packets])
         return r
 
-    def _parse_hops(self, **kwargs):
+    def _parse_hops(self, parse_all_hops=True, **kwargs):
 
         try:
             hops = self.raw_data["result"]
@@ -223,22 +221,30 @@ class TracerouteResult(Result):
             self._handle_malformation("Legacy formats not supported")
             return
 
-        hops_number = len(hops)
-        for index, hop in enumerate(hops):
+        num_hops = len(hops)
+        # Go through the hops in reverse so that if
+        # parse_all_hops is False we can stop processing as
+        # soon as possible.
+        for index, raw_hop in reversed(list(enumerate(hops))):
 
-            hop = Hop(hop, **kwargs)
+            hop = Hop(raw_hop, **kwargs)
 
-            if hop.median_rtt:
-                self.last_median_rtt = hop.median_rtt
-
-            self.hops.append(hop)
-            self.total_hops += 1
-
-            # If last hop set several usefull properties
-            if index + 1 == hops_number:
+            # If last hop set several useful attributes
+            if index + 1 == num_hops:
                 self.set_destination_ip_responded(hop)
                 self.set_last_hop_responded(hop)
                 self.set_is_success(hop)
+                # We always store the last hop
+                self.hops.insert(0, hop)
+            elif parse_all_hops:
+                self.hops.insert(0, hop)
+
+            if hop.median_rtt and not self.last_median_rtt:
+                self.last_median_rtt = hop.median_rtt
+                if not parse_all_hops:
+                    # Now that we have the last RTT we can stop
+                    break
+        self.total_hops = num_hops
 
 
 __all__ = (

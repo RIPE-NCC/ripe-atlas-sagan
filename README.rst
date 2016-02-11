@@ -178,7 +178,6 @@ are a few dependencies:
 -  `pyOpenSSL`_ (Optional: see "Troubleshooting" above)
 -  `python-dateutil`_
 -  `pytz`_
--  `IPy`_
 
 Additionally, we recommend that you also install `ujson`_ as it will speed up
 the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
@@ -233,7 +232,6 @@ decades reaching out to the public about the wonders of the cosmos?
 .. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil
 .. _pytz: https://pypi.python.org/pypi/pytz
-.. _IPy: https://pypi.python.org/pypi/IPy/
 .. _ujson: https://pypi.python.org/pypi/ujson
 .. _sphinx: https://pypi.python.org/pypi/Sphinx
 .. _Read the Docs: http://ripe-atlas-sagan.readthedocs.org/en/latest/

@@ -93,7 +93,7 @@ end_time_timestamp        int       A Unix timestamp for the ``end_time`` attrib
 paris_id                  int
 size                      int       The packet size
 protocol                  str       One of ``ICMP``, ``TCP``, ``UDP``
-hops                      list      A list of :ref:`traceroute-hop` objects
+hops                      list      A list of :ref:`traceroute-hop` objects. If the ``parse_all_hops`` parameter is ``False``, this will only contain the last hop.
 total_hops                int       The total number of hops
 ip_path                   list      A list of dicts containing the IPs at each hop. This is just for convenience as all of these values are accessible via the :ref:`traceroute-hop` and :ref:`traceroute-packet` objects.
 last_median_rtt           float     The median value of all RTTs from the last successful hop
@@ -102,6 +102,14 @@ last_hop_responded        bool      Set to ``True`` if the last hop was a respon
 is_success                bool      Set to ``True`` if the traceroute finished successfully
 last_hop_errors           list      A list of last hop's errors
 ========================  ========  ===================================================================================
+
+It is also possible to supply the following parameter to control parsing of Traceroute results:
+
+============== ==== ======= ===========
+Parameter      Type Default Explanation
+============== ==== ======= ===========
+parse_all_hops bool True    Set to ``False`` to stop parsing ``Hop`` objects after the ``last_*`` properties (see above) have been set. This will cause ``hops`` to only contain the last ``Hop``.
+============== ==== ======= ===========
 
 
 .. _traceroute-hop:
