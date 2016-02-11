@@ -108,7 +108,7 @@ It is also possible to supply the following parameter to control parsing of Trac
 ============== ==== ======= ===========
 Parameter      Type Default Explanation
 ============== ==== ======= ===========
-parse_all_hops bool True    Set to ``False`` to stop parsing ``Hop`` objects after ``last_median_rtt``, ``destination_ip_responded``, ``last_hop_responded``, ``is_success`` and ``last_hop_errors`` have been set. This will cause ``hops`` to only contain the last ``Hop``.
+parse_all_hops bool True    Set to ``False`` to stop parsing ``Hop`` objects after the ``last_*`` properties (see above) have been set. This will cause ``hops`` to only contain the last ``Hop``.
 ============== ==== ======= ===========
 
 
