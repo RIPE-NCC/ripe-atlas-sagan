@@ -55,6 +55,27 @@ class Json(object):
             raise ResultParseError("The JSON result could not be parsed")
 
 
+class ParsingDictMetaclass(type):
+    """
+    Metaclass for the ParsingDict class that works out which
+    attributes should not be returned as part of ParsingDict.keys()
+
+    It is cheaper to do this here at class creation time
+    rather than for every parsed instance. In particular, calling
+    getattr() *and* callable() for every key is expensive.
+    """
+    def __new__(mcs, name, bases, dict):
+        new_cls = type.__new__(mcs, name, bases, dict)
+        new_cls._excluded_from_keys = set(
+            k for k in dir(new_cls) if
+            # Exclude constants
+            k.upper() == k or
+            # Exclude classmethods/instancemethods/staticmethods
+            callable(getattr(new_cls, k))
+        )
+        return new_cls
+
+
 class ParsingDict(object):
     """
     A handy container for methods we use for validation in the various result
@@ -63,7 +84,6 @@ class ParsingDict(object):
     Note that Python 2.x and 3.x handle the creation of dictionary-like objects
     differently.  If we write it this way, it works for both.
     """
-
     ACTION_IGNORE = 1
     ACTION_WARN = 2
     ACTION_FAIL = 3
@@ -79,6 +99,8 @@ class ParsingDict(object):
         "TCP":  PROTOCOL_TCP,
         "T":    PROTOCOL_TCP,
     }
+
+    __metaclass__ = ParsingDictMetaclass
 
     def __init__(self, **kwargs):
 
@@ -103,7 +125,14 @@ class ParsingDict(object):
         setattr(self, key, item)
 
     def keys(self):
-        return [p for p in dir(self) if self._is_property_name(p)]
+        """
+        Get the public-facing keys for this ParsingDict.
+        """
+        return [
+            k for k in dir(self) if
+            k not in self._excluded_from_keys and
+            not k.startswith("_")
+        ]
 
     def ensure(self, key, kind, default=None):
         try:
@@ -143,14 +172,6 @@ class ParsingDict(object):
             logging.warning(message)
         self.is_error = True
         self.error_message = message
-
-    def _is_property_name(self, p):
-        if not p.startswith("_"):
-            if p not in ("keys",):
-                if not p.upper() == p:
-                    if not callable(getattr(self, p)):
-                        return True
-        return False
 
 
 class Result(ParsingDict):
