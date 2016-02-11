@@ -8,7 +8,6 @@ name = "ripe.atlas.sagan"
 install_requires = [
     "python-dateutil",
     "pytz",
-    "IPy",
 ]
 
 tests_require = ["nose"]

@@ -14,7 +14,6 @@ are a few dependencies:
 * `pyOpenSSL`_
 * `python-dateutil`_
 * `pytz`_
-* `IPy`_
 
 Additionally, we recommend that you also install `ujson`_ as it will speed up
 the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
@@ -23,7 +22,6 @@ documentation files for offline use.
 .. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL/
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil/
 .. _pytz: https://pypi.python.org/pypi/pytz/
-.. _IPy: https://pypi.python.org/pypi/IPy/
 .. _ujson: https://pypi.python.org/pypi/ujson/
 .. _sphinx: https://pypi.python.org/pypi/Sphinx/
 
