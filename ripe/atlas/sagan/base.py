@@ -19,7 +19,7 @@ import pytz
 from calendar import timegm
 from datetime import datetime
 
-from .helpers.compatibility import string
+from .helpers.compatibility import string, with_metaclass
 
 # Try to use ujson if it's available
 try:
@@ -76,7 +76,7 @@ class ParsingDictMetaclass(type):
         return new_cls
 
 
-class ParsingDict(object):
+class ParsingDict(with_metaclass(ParsingDictMetaclass, object)):
     """
     A handy container for methods we use for validation in the various result
     classes.
@@ -99,8 +99,6 @@ class ParsingDict(object):
         "TCP":  PROTOCOL_TCP,
         "T":    PROTOCOL_TCP,
     }
-
-    __metaclass__ = ParsingDictMetaclass
 
     def __init__(self, **kwargs):
 
