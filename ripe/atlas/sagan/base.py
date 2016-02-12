@@ -89,6 +89,11 @@ class ParsingDict(object):
         self._on_malformation = kwargs.pop("on_malformation", self.ACTION_WARN)
         self.is_malformed = False
 
+    def __nonzero__(self):
+        # If we don't define this, Python ends up calling keys()
+        # via __len__()  whenever we evaluate the object as a bool.
+        return True
+
     def __len__(self):
         return len(self.keys())
 
