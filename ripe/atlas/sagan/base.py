@@ -252,6 +252,9 @@ class Result(ParsingDict):
         elif kind == "ntp":
             from .ntp import NtpResult
             return NtpResult(raw_data, **kwargs)
+        elif kind == "wifi":
+            from .wifi import WiFiResult
+            return WiFiResult(raw_data, **kwargs)
 
         raise ResultParseError("Unknown type value was found in the JSON input")
 
