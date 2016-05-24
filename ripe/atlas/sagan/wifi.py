@@ -28,7 +28,7 @@ class WPASupplicant(ParsingDict):
         self.group_cipher = data.get("group_cipher")
         self.wpa_supplicant_id = data.get("id")
         self.ip_address = data.get("ip_address")
-        self.key_mgmt = data.get("key_mgmt")
+        self.key_management = data.get("key_mgmt")
         self.mode = data.get("mode")
         self.pairwise_cipher = data.get("pairwise_cipher")
         self.ssid = data.get("ssid")

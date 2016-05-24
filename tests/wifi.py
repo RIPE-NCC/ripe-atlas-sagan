@@ -35,7 +35,7 @@ def test_wifi():
             "group_cipher": "CCMP",
             "id": "0",
             "ip_address": "193.0.10.126",
-            "key_mgmt": "WPA2-PSK",
+            "key_management": "WPA2-PSK",
             "mode": "station",
             "pairwise_cipher": "CCMP",
             "ssid": "guestnet",
@@ -55,7 +55,7 @@ def test_wifi():
     assert(result.wpa_supplicant.group_cipher == "CCMP")
     assert(result.wpa_supplicant.wpa_supplicant_id == "0")
     assert(result.wpa_supplicant.ip_address == "193.0.10.126")
-    assert(result.wpa_supplicant.key_mgmt == "WPA2-PSK")
+    assert(result.wpa_supplicant.key_management == "WPA2-PSK")
     assert(result.wpa_supplicant.mode == "station")
     assert(result.wpa_supplicant.pairwise_cipher == "CCMP")
     assert(result.wpa_supplicant.ssid == "guestnet")
@@ -90,7 +90,7 @@ def test_wifi_error():
     assert(result.wpa_supplicant.group_cipher is None)
     assert(result.wpa_supplicant.wpa_supplicant_id is None)
     assert(result.wpa_supplicant.ip_address is None)
-    assert(result.wpa_supplicant.key_mgmt is None)
+    assert(result.wpa_supplicant.key_management is None)
     assert(result.wpa_supplicant.mode is None)
     assert(result.wpa_supplicant.pairwise_cipher is None)
     assert(result.wpa_supplicant.ssid is None)
