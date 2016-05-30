@@ -35,7 +35,7 @@ def test_wifi():
             "group_cipher": "CCMP",
             "id": "0",
             "ip_address": "193.0.10.126",
-            "key_management": "WPA2-PSK",
+            "key_mgmt": "WPA2-PSK",
             "mode": "station",
             "pairwise_cipher": "CCMP",
             "ssid": "guestnet",
