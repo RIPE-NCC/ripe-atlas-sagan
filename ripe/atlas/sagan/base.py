@@ -189,6 +189,8 @@ class Result(ParsingDict):
         self.firmware = self.ensure("fw", int)
         self.origin = self.ensure("from", str)
         self.seconds_since_sync = self.ensure("lts", int)
+        self.group_id = self.ensure("group_id", int)
+        self.bundle = self.ensure("bundle", int)
 
         # Handle the weird case where fw=0 and we don't know what to expect
         if self.firmware == 0:

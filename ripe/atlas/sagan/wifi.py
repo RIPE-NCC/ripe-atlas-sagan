@@ -44,8 +44,6 @@ class WiFiResult(Result):
 
         Result.__init__(self, data, **kwargs)
 
-        self.bundle = self.ensure("bundle", int)
-        self.group_id = self.ensure("group_id", int)
         self.wpa_supplicant = WPASupplicant(
             data["wpa_supplicant"], **kwargs
         )
