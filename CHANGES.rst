@@ -1,5 +1,7 @@
 Changelog
 =========
+* 1.1.11
+    * Added first version of WiFi results    
 * 1.1.10
     * Added a `parse_all_hops` kwarg to the Traceroute class to tell Sagan to stop parsing Hops and Packets once we have all of the last hop statistics (default=True)
     * Remove dependency on IPy: we were using it for IPv6 canonicalization, but all IPv6 addresses in results should be in canonical form to start with.
