@@ -19,3 +19,4 @@ from .dns import *
 from .ssl import *
 from .http import *
 from .ntp import *
+from .wifi import *
