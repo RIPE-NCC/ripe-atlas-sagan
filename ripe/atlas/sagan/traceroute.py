@@ -112,7 +112,7 @@ class Hop(ParsingDict):
         self.median_rtt = Result.calculate_median(packet_rtts)
 
     def __str__(self):
-        return self.index
+        return str(self.index)
 
 
 class TracerouteResult(Result):
