@@ -1,5 +1,8 @@
 Changelog
 =========
+* next release
+    * Replaced pyOpenSSL with cryptography
+    * Added parsing of subjectAltName X509 extension
 * 1.1.11
     * Added first version of WiFi results    
 * 1.1.10
