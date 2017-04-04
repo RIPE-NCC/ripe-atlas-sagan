@@ -32,6 +32,12 @@ except ImportError:
 from .base import Result, ResultParseError, ParsingDict
 
 
+OID_COUNTRY = "2.5.4.6"
+OID_ORG = "2.5.4.10"
+OID_COMMON_NAME = "2.5.4.3"
+EXT_SAN = "subjectAltName"
+
+
 class Certificate(ParsingDict):
 
     def __init__(self, data, **kwargs):
@@ -57,7 +63,7 @@ class Certificate(ParsingDict):
 
         self.extensions = {}
 
-        cert = x509.load_pem_x509_certificate(data.encode('ascii'), openssl.backend)
+        cert = x509.load_pem_x509_certificate(data.encode("ascii"), openssl.backend)
 
         if cert:
             self.checksum_md5 = self._colonify(cert.fingerprint(hashes.MD5()))
@@ -81,15 +87,15 @@ class Certificate(ParsingDict):
 
     def _add_extensions(self, cert):
         for ext in cert.extensions:
-            if ext.oid._name == 'subjectAltName':
-                self.extensions['subjectAltName'] = []
+            if ext.oid._name == EXT_SAN:
+                self.extensions[EXT_SAN] = []
                 for san in ext.value:
-                    self.extensions['subjectAltName'].append(san.value)
+                    self.extensions[EXT_SAN].append(san.value)
 
     @staticmethod
     def _colonify(bytes):
-        hex = codecs.getencoder('hex_codec')(bytes)[0].decode('ascii').upper()
-        return ':'.join(a+b for a,b in zip(hex[::2], hex[1::2]))
+        hex = codecs.getencoder("hex_codec")(bytes)[0].decode("ascii").upper()
+        return ":".join(a+b for a,b in zip(hex[::2], hex[1::2]))
 
     @staticmethod
     def _parse_x509_name(name):
@@ -97,11 +103,11 @@ class Certificate(ParsingDict):
         o = None
         c = None
         for attr in name:
-            if attr.oid.dotted_string == '2.5.4.6': # country
+            if attr.oid.dotted_string == OID_COUNTRY:
                 c = attr.value
-            elif attr.oid.dotted_string == '2.5.4.10': # organisation
+            elif attr.oid.dotted_string == OID_ORG:
                 o = attr.value
-            elif attr.oid.dotted_string == '2.5.4.3': # common name
+            elif attr.oid.dotted_string == OID_COMMON_NAME:
                 cn = attr.value
         return cn, o, c
 

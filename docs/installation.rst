@@ -79,6 +79,8 @@ to use sagan to say, parse traceroute or DNS results, then you can do the follow
 
      $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
 
+More information can also be found `here`_.
+
 If you *do* care about SSL and have to use a Mac, then `this issue`_ will likely
 be of assistance.  Essentially, you will need to uninstall Xcode (if it's
 installed already), then attempt to use ``gcc``.  This will trigger the OS to
@@ -87,4 +89,5 @@ when that's finished, install Sagan with this command:
 
     $ CFLAGS="-I/usr/include" pip install ripe.atlas.sagan
 
+.. _here: https://cryptography.io/en/latest/installation/
 .. _this issue: https://github.com/RIPE-NCC/ripe.atlas.sagan/issues/52
