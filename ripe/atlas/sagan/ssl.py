@@ -15,28 +15,30 @@
 
 import logging
 import pytz
-import re
+import codecs
 
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 try:
-    import OpenSSL
+    from cryptography import x509
+    from cryptography.hazmat.backends import openssl
+    from cryptography.hazmat.primitives import hashes
 except ImportError:
     logging.warning(
-        "pyOpenSSL is not installed, without it you cannot parse SSL "
+        "cryptography module is not installed, without it you cannot parse SSL "
         "certificate measurement results"
     )
 
 from .base import Result, ResultParseError, ParsingDict
 
 
-class Certificate(ParsingDict):
+OID_COUNTRY = "2.5.4.6"
+OID_ORG = "2.5.4.10"
+OID_COMMON_NAME = "2.5.4.3"
+EXT_SAN = "subjectAltName"
 
-    TIME_FORMAT = "%Y%m%d%H%M%SZ"
-    TIME_REGEX = re.compile(
-        "(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\+|\-)(\d\d)(\d\d)"
-    )
+
+class Certificate(ParsingDict):
 
     def __init__(self, data, **kwargs):
 
@@ -49,6 +51,7 @@ class Certificate(ParsingDict):
         self.issuer_cn = None
         self.issuer_o = None
         self.issuer_c = None
+
         self.valid_from = None
         self.valid_until = None
 
@@ -58,32 +61,59 @@ class Certificate(ParsingDict):
 
         self.has_expired = None
 
-        # Clean up the certificate data and use OpenSSL to parse it
-        x509 = OpenSSL.crypto.load_certificate(
-            OpenSSL.crypto.FILETYPE_PEM,
-            data.replace("\\/", "/").replace("\n\n", "\n")
-        )
-        subject = dict(x509.get_subject().get_components())
-        issuer = dict(x509.get_issuer().get_components())
+        self.extensions = {}
 
-        if x509 and subject and issuer:
+        cert = x509.load_pem_x509_certificate(data.encode("ascii"), openssl.backend)
 
-            self.subject_cn = self._string_from_dict_or_none(subject, b"CN")
-            self.subject_o = self._string_from_dict_or_none(subject, b"O")
-            self.subject_c = self._string_from_dict_or_none(subject, b"C")
-            self.issuer_cn = self._string_from_dict_or_none(issuer, b"CN")
-            self.issuer_o = self._string_from_dict_or_none(issuer, b"O")
-            self.issuer_c = self._string_from_dict_or_none(issuer, b"C")
+        if cert:
+            self.checksum_md5 = self._colonify(cert.fingerprint(hashes.MD5()))
+            self.checksum_sha1 = self._colonify(cert.fingerprint(hashes.SHA1()))
+            self.checksum_sha256 = self._colonify(cert.fingerprint(hashes.SHA256()))
 
-            self.checksum_md5 = x509.digest("md5").decode()
-            self.checksum_sha1 = x509.digest("sha1").decode()
-            self.checksum_sha256 = x509.digest("sha256").decode()
+            self.valid_from = pytz.utc.localize(cert.not_valid_before)
+            self.valid_until = pytz.utc.localize(cert.not_valid_after)
 
-            self.has_expired = bool(x509.has_expired())
+            self.has_expired = self._has_expired()
 
-            self.valid_from = None
-            self.valid_until = None
-            self._process_validation_times(x509)
+            self._add_extensions(cert)
+
+        if cert and cert.subject:
+            self.subject_cn, self.subject_o, self.subject_c = \
+                self._parse_x509_name(cert.subject)
+
+        if cert and cert.issuer:
+            self.issuer_cn, self.issuer_o, self.issuer_c = \
+                self._parse_x509_name(cert.issuer)
+
+    def _add_extensions(self, cert):
+        for ext in cert.extensions:
+            if ext.oid._name == EXT_SAN:
+                self.extensions[EXT_SAN] = []
+                for san in ext.value:
+                    self.extensions[EXT_SAN].append(san.value)
+
+    @staticmethod
+    def _colonify(bytes):
+        hex = codecs.getencoder("hex_codec")(bytes)[0].decode("ascii").upper()
+        return ":".join(a+b for a,b in zip(hex[::2], hex[1::2]))
+
+    @staticmethod
+    def _parse_x509_name(name):
+        cn = None
+        o = None
+        c = None
+        for attr in name:
+            if attr.oid.dotted_string == OID_COUNTRY:
+                c = attr.value
+            elif attr.oid.dotted_string == OID_ORG:
+                o = attr.value
+            elif attr.oid.dotted_string == OID_COMMON_NAME:
+                cn = attr.value
+        return cn, o, c
+
+    def _has_expired(self):
+        now = pytz.utc.localize(datetime.utcnow())
+        return self.valid_from <= now <= self.valid_until
 
     @property
     def cn(self):
@@ -112,72 +142,6 @@ class Certificate(ParsingDict):
     @property
     def checksum(self):
         return self.checksum_sha256
-
-    def _process_validation_times(self, x509):
-        """
-        PyOpenSSL uses a kooky date format that *usually* parses out quite
-        easily but on the off chance that it's not in UTC, a lot of work needs
-        to be done.
-        """
-
-        valid_from = x509.get_notBefore()
-        valid_until = x509.get_notAfter()
-
-        try:
-            self.valid_from = pytz.UTC.localize(datetime.strptime(
-                valid_from.decode(),
-                self.TIME_FORMAT
-            ))
-        except ValueError:
-            self.valid_from = self._process_nonstandard_time(valid_from)
-
-        try:
-            self.valid_until = pytz.UTC.localize(datetime.strptime(
-                valid_until.decode(),
-                self.TIME_FORMAT
-            ))
-        except ValueError:
-            self.valid_until = self._process_nonstandard_time(valid_until)
-
-    def _process_nonstandard_time(self, string):
-        """
-        In addition to `YYYYMMDDhhmmssZ`, PyOpenSSL can also use timestamps
-        in `YYYYMMDDhhmmss+hhmm` or `YYYYMMDDhhmmss-hhmm`.
-        """
-
-        match = re.match(self.TIME_REGEX, string)
-
-        if not match:
-            raise ResultParseError(
-                "Unrecognised time format: {s}".format(s=string)
-            )
-
-        r = datetime(
-            int(match.group(1)),
-            int(match.group(2)),
-            int(match.group(3)),
-            int(match.group(4)),
-            int(match.group(5)),
-            int(match.group(6)),
-            0,
-            pytz.UTC
-        )
-        delta = relativedelta(
-            hours=int(match.group(8)),
-            minutes=int(match.group(9))
-        )
-        if match.group(7) == "-":
-            return r - delta
-        return r + delta
-
-    @staticmethod
-    def _string_from_dict_or_none(dictionary, key):
-        """
-        Created to make nice with the Python3 problem.
-        """
-        if key not in dictionary:
-            return None
-        return dictionary[key].decode("UTF-8")
 
 
 class Alert(ParsingDict):

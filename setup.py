@@ -12,9 +12,8 @@ install_requires = [
 
 tests_require = ["nose"]
 
-# pyOpenSSL support is flaky on some systems (I'm looking at you Apple)
 if "SAGAN_WITHOUT_SSL" not in os.environ:
-    install_requires.append("pyOpenSSL")
+    install_requires.append("cryptography")
 
 # Allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))

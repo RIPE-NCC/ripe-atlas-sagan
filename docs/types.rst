@@ -696,6 +696,7 @@ checksum_md5           str       The md5 checksum
 checksum_sha1          str       The sha1 checksum
 checksum_sha256        str       The sha256 checksum
 has_expired            bool      Set to ``True`` if the certificate is no longer valid
+extensions             dict      Parsed extensions. For now it can only be subjectAltName, which is a list of names contained in the SAN extension, if that exists.
 =====================  ========  ===================================================================================
 
 

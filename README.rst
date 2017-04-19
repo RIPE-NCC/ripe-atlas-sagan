@@ -36,8 +36,7 @@ Troubleshooting
 
 Some setups (like MacOS) have trouble with building the dependencies required
 for reading SSL certificates. If you don't care about SSL stuff and only want to
-use sagan to say, parse traceroute or DNS results, then you can tell the
-installer to skip building ``pyOpenSSL`` by doing the following:
+use sagan to say, parse traceroute or DNS results, then you can do the following:
 
 .. code:: bash
 
@@ -175,9 +174,10 @@ What it requires
 As you might have guessed, with all of this magic going on under the hood, there
 are a few dependencies:
 
--  `pyOpenSSL`_ (Optional: see "Troubleshooting" above)
+-  `cryptography`_ (Optional: see "Troubleshooting" above)
 -  `python-dateutil`_
 -  `pytz`_
+-  `IPy`_
 
 Additionally, we recommend that you also install `ujson`_ as it will speed up
 the JSON-decoding step considerably, and `sphinx`_ if you intend to build the
@@ -229,9 +229,9 @@ But why "`Sagan`_"? The RIPE Atlas team decided to name all of its modules after
 explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
 
-.. _pyOpenSSL: https://pypi.python.org/pypi/pyOpenSSL
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil
 .. _pytz: https://pypi.python.org/pypi/pytz
+.. _IPy: https://pypi.python.org/pypi/IPy/
 .. _ujson: https://pypi.python.org/pypi/ujson
 .. _sphinx: https://pypi.python.org/pypi/Sphinx
 .. _Read the Docs: http://ripe-atlas-sagan.readthedocs.org/en/latest/
