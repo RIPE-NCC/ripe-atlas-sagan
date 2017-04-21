@@ -1,6 +1,6 @@
 Changelog
 =========
-* next release
+* 1.2
     * Replaced pyOpenSSL with cryptography
     * Added parsing of subjectAltName X509 extension
 * 1.1.11
