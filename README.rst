@@ -230,6 +230,7 @@ explorers, and what better name for a parser than that of the man who spent
 decades reaching out to the public about the wonders of the cosmos?
 
 .. _python-dateutil: https://pypi.python.org/pypi/python-dateutil
+.. _cryptography: https://pypi.python.org/pypi/cryptography
 .. _pytz: https://pypi.python.org/pypi/pytz
 .. _IPy: https://pypi.python.org/pypi/IPy/
 .. _ujson: https://pypi.python.org/pypi/ujson
