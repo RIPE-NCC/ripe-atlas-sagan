@@ -208,6 +208,9 @@ class Result(ParsingDict):
         if "err" in self.raw_data:
             self._handle_error(self.raw_data["err"])
 
+        if "error" in self.raw_data:
+            self._handle_error(self.raw_data["error"])
+
     def __repr__(self):
         return "Measurement #{measurement}, Probe #{probe}".format(
             measurement=self.measurement_id,
