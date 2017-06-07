@@ -207,6 +207,9 @@ class SslResult(Result):
         self.response_time = self.ensure("rt", float)
         self.time_to_connect = self.ensure("ttc", float)
 
+        if "error" in self.raw_data:
+            self._handle_error(self.raw_data["error"])
+
         # Older versions used named ports
         if self.port is None and self.raw_data.get("dst_port") == "https":
             self.port = 443

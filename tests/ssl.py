@@ -392,3 +392,7 @@ def test_san_extension():
     ext = result.certificates[0].extensions
     assert(ext and len(ext['subjectAltName'])==54)
 
+def test_ssl_error():
+    result = Result.get('{"dst_name": "example.com","dst_port": "443","error": "address not allowed","from":"10.1.1.1","fw": 4760,"group_id": 1234567,"lts": 10,"msm_id": 1234567,"msm_name": "SSLCert","prb_id": 9999,"timestamp": 1495451999,"type": "sslcert"}')
+    assert(result.is_error is True)
+    assert(result.error_message == "address not allowed")
