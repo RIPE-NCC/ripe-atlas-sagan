@@ -21,6 +21,7 @@ from datetime import datetime
 
 try:
     from cryptography import x509
+    from cryptography.x509.oid import NameOID
     from cryptography.hazmat.backends import openssl
     from cryptography.hazmat.primitives import hashes
 except ImportError:
@@ -29,7 +30,8 @@ except ImportError:
         "certificate measurement results"
     )
 
-from .base import Result, ResultParseError, ParsingDict
+from .base import Result, ParsingDict
+from .helpers.compatibility import string
 
 
 OID_COUNTRY = "2.5.4.6"
@@ -85,17 +87,46 @@ class Certificate(ParsingDict):
             self.issuer_cn, self.issuer_o, self.issuer_c = \
                 self._parse_x509_name(cert.issuer)
 
+    # OID name lookup of the common abbreviations
+    # In reality probably only CN will be used
+    _oid_names = {
+        NameOID.COMMON_NAME: "CN",
+        NameOID.ORGANIZATION_NAME: "O",
+        NameOID.ORGANIZATIONAL_UNIT_NAME: "OU",
+        NameOID.COUNTRY_NAME: "C",
+        NameOID.STATE_OR_PROVINCE_NAME: "S",
+        NameOID.LOCALITY_NAME: "L",
+    }
+
+    def _get_oid_name(self, oid):
+        return self._oid_names.get(oid, oid.dotted_string)
+
     def _add_extensions(self, cert):
         for ext in cert.extensions:
             if ext.oid._name == EXT_SAN:
                 self.extensions[EXT_SAN] = []
                 for san in ext.value:
-                    self.extensions[EXT_SAN].append(san.value)
+                    if isinstance(san.value, string):
+                        # Pass on simple string SAN values
+                        value = san.value
+                        self.extensions[EXT_SAN].append(value)
+                    elif isinstance(san.value, x509.Name):
+                        # In theory there there could be >1 RDN here...
+                        for rdn in san.value.rdns:
+                            # Build a /-separated string from the x509 name
+                            value = "".join(
+                                "/{}={}".format(
+                                    self._get_oid_name(attr.oid),
+                                    attr.value,
+                                )
+                                for attr in rdn
+                            )
+                            self.extensions[EXT_SAN].append(value)
 
     @staticmethod
     def _colonify(bytes):
         hex = codecs.getencoder("hex_codec")(bytes)[0].decode("ascii").upper()
-        return ":".join(a+b for a,b in zip(hex[::2], hex[1::2]))
+        return ":".join(a+b for a, b in zip(hex[::2], hex[1::2]))
 
     @staticmethod
     def _parse_x509_name(name):
