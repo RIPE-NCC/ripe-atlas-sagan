@@ -1,5 +1,7 @@
 Changelog
 =========
+* 1.2.1
+    * Add support for non-DNS names in subjectAltName extensions 
 * 1.2
     * Replaced pyOpenSSL with cryptography
     * Added parsing of subjectAltName X509 extension
