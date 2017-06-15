@@ -98,27 +98,39 @@ class Certificate(ParsingDict):
     def _get_oid_name(self, oid):
         return self._oid_names.get(oid, oid.dotted_string)
 
+    def _name_attribute_to_string(self, name):
+        """
+        Build a /-separated string from an x509.Name.
+        """
+        return "".join(
+            "/{}={}".format(
+                self._get_oid_name(attr.oid),
+                attr.value,
+            )
+            for attr in name
+        )
+
+    def _get_subject_alternative_names(self, ext):
+        """
+        Return a list of Subject Alternative Name values for the given x509
+        extension object.
+        """
+        values = []
+        for san in ext.value:
+            if isinstance(san.value, string):
+                # Pass on simple string SAN values
+                values.append(san.value)
+            elif isinstance(san.value, x509.Name):
+                # In theory there there could be >1 RDN here...
+                values.extend(
+                    self._name_attribute_to_string(rdn) for rdn in san.value.rdns
+                )
+        return values
+
     def _add_extensions(self, cert):
         for ext in cert.extensions:
             if ext.oid._name == EXT_SAN:
-                self.extensions[EXT_SAN] = []
-                for san in ext.value:
-                    if isinstance(san.value, string):
-                        # Pass on simple string SAN values
-                        value = san.value
-                        self.extensions[EXT_SAN].append(value)
-                    elif isinstance(san.value, x509.Name):
-                        # In theory there there could be >1 RDN here...
-                        for rdn in san.value.rdns:
-                            # Build a /-separated string from the x509 name
-                            value = "".join(
-                                "/{}={}".format(
-                                    self._get_oid_name(attr.oid),
-                                    attr.value,
-                                )
-                                for attr in rdn
-                            )
-                            self.extensions[EXT_SAN].append(value)
+                self.extensions[EXT_SAN] = self._get_subject_alternative_names(ext)
 
     @staticmethod
     def _colonify(bytes):
