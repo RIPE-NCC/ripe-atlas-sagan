@@ -34,9 +34,6 @@ from .base import Result, ParsingDict
 from .helpers.compatibility import string
 
 
-OID_COUNTRY = "2.5.4.6"
-OID_ORG = "2.5.4.10"
-OID_COMMON_NAME = "2.5.4.3"
 EXT_SAN = "subjectAltName"
 
 
@@ -134,11 +131,11 @@ class Certificate(ParsingDict):
         o = None
         c = None
         for attr in name:
-            if attr.oid.dotted_string == OID_COUNTRY:
+            if attr.oid == NameOID.COUNTRY_NAME:
                 c = attr.value
-            elif attr.oid.dotted_string == OID_ORG:
+            elif attr.oid == NameOID.ORGANIZATION_NAME:
                 o = attr.value
-            elif attr.oid.dotted_string == OID_COMMON_NAME:
+            elif attr.oid == NameOID.COMMON_NAME:
                 cn = attr.value
         return cn, o, c
 
