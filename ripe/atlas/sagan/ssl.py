@@ -265,9 +265,13 @@ class SslResult(Result):
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
             for certificate in self.raw_data["cert"]:
-                self.certificates.append(Certificate(certificate, **kwargs))
+                try:
+                    self.certificates.append(Certificate(certificate, **kwargs))
+                except Exception as exc:
+                    self._handle_error(str(exc))
+                    continue
 
-            if len(self.raw_data["cert"]) == 1:
+            if len(self.certificates) == 1:
                 certificate = self.certificates[0]
                 if certificate.subject_cn == certificate.issuer_cn:
                     self.is_self_signed = True
