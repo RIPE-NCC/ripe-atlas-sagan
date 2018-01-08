@@ -180,7 +180,7 @@ class TracerouteResult(Result):
                 break
 
     def set_is_success(self, last_hop):
-        """Sets the flag if traceroute result is successfull or not."""
+        """Sets the flag if traceroute result is successful or not."""
         for packet in last_hop.packets:
             if packet.rtt and not packet.is_error:
                 self.is_success = True
