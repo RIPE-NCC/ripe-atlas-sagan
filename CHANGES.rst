@@ -1,5 +1,7 @@
 Changelog
 =========
+* 1.2.2
+    * Catch problems parsing SSL certificates
 * 1.2.1
     * Add support for non-DNS names in subjectAltName extensions 
 * 1.2
