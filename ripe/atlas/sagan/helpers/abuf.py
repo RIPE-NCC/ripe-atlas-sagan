@@ -427,7 +427,12 @@ class AbufParser(object):
                 rr['Preference'] = struct.unpack(fmt, dat)[0]
                 rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset + fmtsz, 0, error)
             elif rr['Type'] == 'NS':
-                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
+                res = cls._do_name(buf, rdata_offset, 0, error)
+                if res is None:
+                    e = ("_do_rr", offset, "_do_name failed")
+                    error.append(e)
+                    return None
+                doffset, name = res
                 rr['Target'] = name
             elif rr['Type'] == 'NSEC':
                 doffset, name = cls._do_name(buf, rdata_offset, 0, error)
