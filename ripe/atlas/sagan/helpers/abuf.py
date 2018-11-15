@@ -77,7 +77,7 @@ class AbufParser(object):
                 else:
                     dnsres['QuestionSection'].append(qry)
         for i in range(hdr['ANCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -90,7 +90,7 @@ class AbufParser(object):
                 else:
                     dnsres['AnswerSection'].append(rr)
         for i in range(hdr['NSCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -103,7 +103,7 @@ class AbufParser(object):
                 else:
                     dnsres['AuthoritySection'].append(rr)
         for i in range(hdr['ARCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -119,6 +119,7 @@ class AbufParser(object):
                     dnsres['AdditionalSection'].append(rr)
                 else:
                     dnsres['AdditionalSection'] = [rr]
+        hdr['ReturnCode'] = cls._rcode_to_text(hdr['ReturnCode'])
 
         if offset < len(buf):
             e = ('end', offset, 'trailing garbage, buf size = %d' % len(buf))
@@ -143,7 +144,7 @@ class AbufParser(object):
         return {0: 'NOERROR', 1: 'FORMERR', 2: 'SERVFAIL', 3: 'NXDOMAIN',
                 4: 'NOTIMP',  5: 'REFUSED', 6: 'YXDOMAIN', 7: 'YXRRSET',
                 8: 'NXRRSET', 9: 'NOTAUTH', 10: 'NOTZONE',
-                16: 'BADVERS'}.get(rcode, rcode)
+                16: 'BADVERS', 23: 'BADCOOKIE'}.get(rcode, rcode)
 
     @staticmethod
     def _type_to_text(rdatatype):
@@ -225,7 +226,7 @@ class AbufParser(object):
         hdr['Z'] = (res[1] & z_mask) >> z_shift
         hdr['AD'] = bool(res[1] & ad)
         hdr['CD'] = bool(res[1] & cd)
-        hdr['ReturnCode'] = cls._rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
+        hdr['ReturnCode'] = ((res[1] & rcode_mask) >> rcode_shift)
         hdr['QDCOUNT'] = res[2]
         hdr['ANCOUNT'] = res[3]
         hdr['NSCOUNT'] = res[4]
@@ -271,7 +272,7 @@ class AbufParser(object):
         return result
 
     @classmethod
-    def _do_rr(cls, buf, offset, error):
+    def _do_rr(cls, buf, offset, error, hdr):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
         rr = {}
         res = cls._do_name(buf, offset, 0, error)
@@ -313,6 +314,12 @@ class AbufParser(object):
             }
             if res[2] & 0x8000:
                 edns0['DO']= True
+
+            if edns0['ExtendedReturnCode'] != 0:
+                # Compute new ReturnCode
+                extended_rcode_shift = 4
+                hdr['ReturnCode'] |= \
+                        edns0['ExtendedReturnCode'] << extended_rcode_shift
 
             o = 0
             while o < len(rdata):
