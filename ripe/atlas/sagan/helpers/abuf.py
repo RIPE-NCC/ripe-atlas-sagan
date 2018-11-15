@@ -274,6 +274,10 @@ class AbufParser(object):
     @classmethod
     def _do_rr(cls, buf, offset, error, hdr):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
+        edns0_opt_cookies = 10
+        ClientCookieLenght = 8
+        ServerCookieMinLength = 8
+        ServerCookieMaxLength = 32
         rr = {}
         res = cls._do_name(buf, offset, 0, error)
         if res is None:
@@ -341,6 +345,17 @@ class AbufParser(object):
                     nsid = rdata[o:o + opt['OptionLength']]
                     nsid_as_str = nsid.decode(cls.DNS_CTYPE)
                     opt[opt['OptionName']] = nsid_as_str
+                if opt['OptionCode'] == edns0_opt_cookies:
+                    opt['OptionName'] = 'Cookies'
+                    if opt['OptionLength'] >= ClientCookieLenght:
+                        opt['ClientCookie'] = cls._bytes_as_hex_str( \
+                            rdata[o:o + ClientCookieLenght])
+                    if ServerCookieMinLength <= \
+                        opt['OptionLength']-ClientCookieLenght <= \
+                        ServerCookieMaxLength:
+                        opt['ServerCookie'] = cls._bytes_as_hex_str( \
+                            rdata[o+ClientCookieLenght : \
+                            o+opt['OptionLength']])
 
                 o = o + opt['OptionLength']
                 edns0['Option'].append(opt)
