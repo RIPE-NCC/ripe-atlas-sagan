@@ -274,6 +274,7 @@ class AbufParser(object):
     @classmethod
     def _do_rr(cls, buf, offset, error, hdr):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
+        edns0_opt_client_subnet = 8
         edns0_opt_cookies = 10
         ClientCookieLenght = 8
         ServerCookieMinLength = 8
@@ -345,6 +346,36 @@ class AbufParser(object):
                     nsid = rdata[o:o + opt['OptionLength']]
                     nsid_as_str = nsid.decode(cls.DNS_CTYPE)
                     opt[opt['OptionName']] = nsid_as_str
+                if opt['OptionCode'] == edns0_opt_client_subnet:
+                    opt['OptionName'] = 'ClientSubnet'
+                    fmt = "!HBB"
+                    reqlen = struct.calcsize(fmt)
+                    dat = rdata[o:o + reqlen]
+                    if reqlen > len(dat):
+                        e = ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                        error.append(e)
+                        return None
+                    res = struct.unpack(fmt, dat)
+                    opt['Family'] = {1: 'IPv4', 2: 'IPv6'}.get(res[0], res[0])
+                    opt['SourcePrefixLength'] = res[1]
+                    opt['ScopePrefixLength'] = res[2]
+                    prefixlen= (res[1]+7)/8
+                    prefix= rdata[o+reqlen:o+opt['OptionLength']]
+                    if len(prefix) != prefixlen:
+                        e = ("_do_rr", rdata_offset, 'wrong prefix length: rdata size = %d, required %d' % (len(prefix), prefixlen))
+                        error.append(e)
+                        return None
+                    if res[0] == 1:
+                        # IPv4
+                        prefix += b'\0' * (4-prefixlen)
+                        opt['Prefix'] = '.'.join(str(byte) \
+                            for byte in struct.unpack("BBBB", prefix))
+                    elif res[0] == 2:
+                        # IPv6
+                        prefix += b'\0' * (16-prefixlen)
+                        fmt = "!HHHHHHHH"
+                        opt['Prefix'] = ':'.join(("%x" % quad) \
+                                for quad in struct.unpack(fmt, prefix))
                 if opt['OptionCode'] == edns0_opt_cookies:
                     opt['OptionName'] = 'Cookies'
                     if opt['OptionLength'] >= ClientCookieLenght:
