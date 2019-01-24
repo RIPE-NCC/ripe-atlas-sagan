@@ -1,5 +1,7 @@
 Changelog
 =========
+* 1.3.0
+    * abuf.py: error handling for NS records, extended rcode, cookies and client subnets
 * 1.2.2
     * Catch problems parsing SSL certificates
 * 1.2.1
