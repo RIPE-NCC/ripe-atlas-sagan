@@ -21,6 +21,7 @@ from datetime import datetime
 
 try:
     from cryptography import x509
+    from cryptography.x509.oid import NameOID
     from cryptography.hazmat.backends import openssl
     from cryptography.hazmat.primitives import hashes
 except ImportError:
@@ -29,12 +30,10 @@ except ImportError:
         "certificate measurement results"
     )
 
-from .base import Result, ResultParseError, ParsingDict
+from .base import Result, ParsingDict
+from .helpers.compatibility import string
 
 
-OID_COUNTRY = "2.5.4.6"
-OID_ORG = "2.5.4.10"
-OID_COMMON_NAME = "2.5.4.3"
 EXT_SAN = "subjectAltName"
 
 
@@ -85,17 +84,58 @@ class Certificate(ParsingDict):
             self.issuer_cn, self.issuer_o, self.issuer_c = \
                 self._parse_x509_name(cert.issuer)
 
+    # OID name lookup of the common abbreviations
+    # In reality probably only CN will be used
+    _oid_names = {
+        NameOID.COMMON_NAME: "CN",
+        NameOID.ORGANIZATION_NAME: "O",
+        NameOID.ORGANIZATIONAL_UNIT_NAME: "OU",
+        NameOID.COUNTRY_NAME: "C",
+        NameOID.STATE_OR_PROVINCE_NAME: "S",
+        NameOID.LOCALITY_NAME: "L",
+    }
+
+    def _get_oid_name(self, oid):
+        return self._oid_names.get(oid, oid.dotted_string)
+
+    def _name_attribute_to_string(self, name):
+        """
+        Build a /-separated string from an x509.Name.
+        """
+        return "".join(
+            "/{}={}".format(
+                self._get_oid_name(attr.oid),
+                attr.value,
+            )
+            for attr in name
+        )
+
+    def _get_subject_alternative_names(self, ext):
+        """
+        Return a list of Subject Alternative Name values for the given x509
+        extension object.
+        """
+        values = []
+        for san in ext.value:
+            if isinstance(san.value, string):
+                # Pass on simple string SAN values
+                values.append(san.value)
+            elif isinstance(san.value, x509.Name):
+                # In theory there there could be >1 RDN here...
+                values.extend(
+                    self._name_attribute_to_string(rdn) for rdn in san.value.rdns
+                )
+        return values
+
     def _add_extensions(self, cert):
         for ext in cert.extensions:
             if ext.oid._name == EXT_SAN:
-                self.extensions[EXT_SAN] = []
-                for san in ext.value:
-                    self.extensions[EXT_SAN].append(san.value)
+                self.extensions[EXT_SAN] = self._get_subject_alternative_names(ext)
 
     @staticmethod
     def _colonify(bytes):
         hex = codecs.getencoder("hex_codec")(bytes)[0].decode("ascii").upper()
-        return ":".join(a+b for a,b in zip(hex[::2], hex[1::2]))
+        return ":".join(a+b for a, b in zip(hex[::2], hex[1::2]))
 
     @staticmethod
     def _parse_x509_name(name):
@@ -103,11 +143,11 @@ class Certificate(ParsingDict):
         o = None
         c = None
         for attr in name:
-            if attr.oid.dotted_string == OID_COUNTRY:
+            if attr.oid == NameOID.COUNTRY_NAME:
                 c = attr.value
-            elif attr.oid.dotted_string == OID_ORG:
+            elif attr.oid == NameOID.ORGANIZATION_NAME:
                 o = attr.value
-            elif attr.oid.dotted_string == OID_COMMON_NAME:
+            elif attr.oid == NameOID.COMMON_NAME:
                 cn = attr.value
         return cn, o, c
 
@@ -225,9 +265,13 @@ class SslResult(Result):
         if "cert" in self.raw_data and isinstance(self.raw_data["cert"], list):
 
             for certificate in self.raw_data["cert"]:
-                self.certificates.append(Certificate(certificate, **kwargs))
+                try:
+                    self.certificates.append(Certificate(certificate, **kwargs))
+                except Exception as exc:
+                    self._handle_error(str(exc))
+                    continue
 
-            if len(self.raw_data["cert"]) == 1:
+            if len(self.certificates) == 1:
                 certificate = self.certificates[0]
                 if certificate.subject_cn == certificate.issuer_cn:
                     self.is_self_signed = True

@@ -1,5 +1,11 @@
 Changelog
 =========
+* 1.3.0
+    * abuf.py: error handling for NS records, extended rcode, cookies and client subnets
+* 1.2.2
+    * Catch problems parsing SSL certificates
+* 1.2.1
+    * Add support for non-DNS names in subjectAltName extensions 
 * 1.2
     * Replaced pyOpenSSL with cryptography
     * Added parsing of subjectAltName X509 extension

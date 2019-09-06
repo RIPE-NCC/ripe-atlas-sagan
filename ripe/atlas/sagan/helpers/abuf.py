@@ -77,7 +77,7 @@ class AbufParser(object):
                 else:
                     dnsres['QuestionSection'].append(qry)
         for i in range(hdr['ANCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -90,7 +90,7 @@ class AbufParser(object):
                 else:
                     dnsres['AnswerSection'].append(rr)
         for i in range(hdr['NSCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -103,7 +103,7 @@ class AbufParser(object):
                 else:
                     dnsres['AuthoritySection'].append(rr)
         for i in range(hdr['ARCOUNT']):
-            res = cls._do_rr(buf, offset, error)
+            res = cls._do_rr(buf, offset, error, hdr)
             if res is None:
                 e = ('additional', offset, ('_do_rr failed, additional record %d' % i))
                 error.append(e)
@@ -119,6 +119,7 @@ class AbufParser(object):
                     dnsres['AdditionalSection'].append(rr)
                 else:
                     dnsres['AdditionalSection'] = [rr]
+        hdr['ReturnCode'] = cls._rcode_to_text(hdr['ReturnCode'])
 
         if offset < len(buf):
             e = ('end', offset, 'trailing garbage, buf size = %d' % len(buf))
@@ -143,7 +144,7 @@ class AbufParser(object):
         return {0: 'NOERROR', 1: 'FORMERR', 2: 'SERVFAIL', 3: 'NXDOMAIN',
                 4: 'NOTIMP',  5: 'REFUSED', 6: 'YXDOMAIN', 7: 'YXRRSET',
                 8: 'NXRRSET', 9: 'NOTAUTH', 10: 'NOTZONE',
-                16: 'BADVERS'}.get(rcode, rcode)
+                16: 'BADVERS', 23: 'BADCOOKIE'}.get(rcode, rcode)
 
     @staticmethod
     def _type_to_text(rdatatype):
@@ -225,7 +226,7 @@ class AbufParser(object):
         hdr['Z'] = (res[1] & z_mask) >> z_shift
         hdr['AD'] = bool(res[1] & ad)
         hdr['CD'] = bool(res[1] & cd)
-        hdr['ReturnCode'] = cls._rcode_to_text((res[1] & rcode_mask) >> rcode_shift)
+        hdr['ReturnCode'] = ((res[1] & rcode_mask) >> rcode_shift)
         hdr['QDCOUNT'] = res[2]
         hdr['ANCOUNT'] = res[3]
         hdr['NSCOUNT'] = res[4]
@@ -271,8 +272,13 @@ class AbufParser(object):
         return result
 
     @classmethod
-    def _do_rr(cls, buf, offset, error):
+    def _do_rr(cls, buf, offset, error, hdr):
         edns0_opt_nsid = 3  # this is also hardcoded in dns.edns.py
+        edns0_opt_client_subnet = 8
+        edns0_opt_cookies = 10
+        ClientCookieLenght = 8
+        ServerCookieMinLength = 8
+        ServerCookieMaxLength = 32
         rr = {}
         res = cls._do_name(buf, offset, 0, error)
         if res is None:
@@ -314,6 +320,12 @@ class AbufParser(object):
             if res[2] & 0x8000:
                 edns0['DO']= True
 
+            if edns0['ExtendedReturnCode'] != 0:
+                # Compute new ReturnCode
+                extended_rcode_shift = 4
+                hdr['ReturnCode'] |= \
+                        edns0['ExtendedReturnCode'] << extended_rcode_shift
+
             o = 0
             while o < len(rdata):
                 fmt = "!HH"
@@ -334,6 +346,47 @@ class AbufParser(object):
                     nsid = rdata[o:o + opt['OptionLength']]
                     nsid_as_str = nsid.decode(cls.DNS_CTYPE)
                     opt[opt['OptionName']] = nsid_as_str
+                if opt['OptionCode'] == edns0_opt_client_subnet:
+                    opt['OptionName'] = 'ClientSubnet'
+                    fmt = "!HBB"
+                    reqlen = struct.calcsize(fmt)
+                    dat = rdata[o:o + reqlen]
+                    if reqlen > len(dat):
+                        e = ("_do_rr", rdata_offset, 'offset out of range: rdata size = %d' % len(rdata))
+                        error.append(e)
+                        return None
+                    res = struct.unpack(fmt, dat)
+                    opt['Family'] = {1: 'IPv4', 2: 'IPv6'}.get(res[0], res[0])
+                    opt['SourcePrefixLength'] = res[1]
+                    opt['ScopePrefixLength'] = res[2]
+                    prefixlen= (res[1]+7)/8
+                    prefix= rdata[o+reqlen:o+opt['OptionLength']]
+                    if len(prefix) != prefixlen:
+                        e = ("_do_rr", rdata_offset, 'wrong prefix length: rdata size = %d, required %d' % (len(prefix), prefixlen))
+                        error.append(e)
+                        return None
+                    if res[0] == 1:
+                        # IPv4
+                        prefix += b'\0' * (4-prefixlen)
+                        opt['Prefix'] = '.'.join(str(byte) \
+                            for byte in struct.unpack("BBBB", prefix))
+                    elif res[0] == 2:
+                        # IPv6
+                        prefix += b'\0' * (16-prefixlen)
+                        fmt = "!HHHHHHHH"
+                        opt['Prefix'] = ':'.join(("%x" % quad) \
+                                for quad in struct.unpack(fmt, prefix))
+                if opt['OptionCode'] == edns0_opt_cookies:
+                    opt['OptionName'] = 'Cookies'
+                    if opt['OptionLength'] >= ClientCookieLenght:
+                        opt['ClientCookie'] = cls._bytes_as_hex_str( \
+                            rdata[o:o + ClientCookieLenght])
+                    if ServerCookieMinLength <= \
+                        opt['OptionLength']-ClientCookieLenght <= \
+                        ServerCookieMaxLength:
+                        opt['ServerCookie'] = cls._bytes_as_hex_str( \
+                            rdata[o+ClientCookieLenght : \
+                            o+opt['OptionLength']])
 
                 o = o + opt['OptionLength']
                 edns0['Option'].append(opt)
@@ -427,7 +480,12 @@ class AbufParser(object):
                 rr['Preference'] = struct.unpack(fmt, dat)[0]
                 rr_offset, rr['MailExchanger'] = cls._do_name(buf, rdata_offset + fmtsz, 0, error)
             elif rr['Type'] == 'NS':
-                doffset, name = cls._do_name(buf, rdata_offset, 0, error)
+                res = cls._do_name(buf, rdata_offset, 0, error)
+                if res is None:
+                    e = ("_do_rr", offset, "_do_name failed")
+                    error.append(e)
+                    return None
+                doffset, name = res
                 rr['Target'] = name
             elif rr['Type'] == 'NSEC':
                 doffset, name = cls._do_name(buf, rdata_offset, 0, error)
