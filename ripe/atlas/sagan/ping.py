@@ -85,7 +85,7 @@ class PingResult(Result):
         self.rtt_median = None  # Redefined in self._set_rtt_median()
         self.packets = []
 
-        if self.rtt_average < 0:
+        if self.rtt_average is None or self.rtt_average < 0:
             self.rtt_average = self.rtt_min = self.rtt_max = None
 
         if 0 < self.firmware < 4460:
