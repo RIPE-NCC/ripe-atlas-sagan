@@ -1,5 +1,8 @@
 Changelog
 =========
+* 1.3.1
+    * Ping edge case fix
+    * Add py37 testing
 * 1.3.0
     * abuf.py: error handling for NS records, extended rcode, cookies and client subnets
 * 1.2.2
