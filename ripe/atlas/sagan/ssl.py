@@ -25,7 +25,7 @@ try:
     from cryptography.hazmat.backends import openssl
     from cryptography.hazmat.primitives import hashes
 except ImportError:
-    logging.warning(
+    logging.getLogger(__name__).warning(
         "cryptography module is not installed, without it you cannot parse SSL "
         "certificate measurement results"
     )

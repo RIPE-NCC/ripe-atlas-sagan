@@ -20,6 +20,9 @@ from calendar import timegm
 from .base import Result, ParsingDict
 
 
+log = logging.getLogger(__name__)
+
+
 class IcmpHeader(ParsingDict):
     """
     But why did we stop here?  Why not go all the way and define subclasses for
@@ -148,14 +151,14 @@ class TracerouteResult(Result):
 
     @property
     def last_rtt(self):
-        logging.warning(
+        log.warning(
             '"last_rtt" is deprecated and will be removed in future versions. '
             'Instead, use "last_median_rtt".')
         return self.last_median_rtt
 
     @property
     def target_responded(self):
-        logging.warning(
+        log.warning(
             'The "target_responded" property is deprecated and will be removed '
             'in future versions.  Instead, use "destination_ip_responded".'
         )
