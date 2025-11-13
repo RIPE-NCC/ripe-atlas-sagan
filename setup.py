@@ -1,5 +1,5 @@
+import os
 from os.path import abspath, dirname, join
-from os import environ
 from setuptools import setup
 
 __version__ = None
@@ -11,10 +11,11 @@ install_requires = [
     "pytz",
 ]
 
-tests_require = ["nose"]
-
-if "SAGAN_WITHOUT_SSL" not in environ:
+if "SAGAN_WITHOUT_SSL" not in os.environ:
     install_requires.append("cryptography")
+
+# Allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 # Get proper long description for package
 current_dir = dirname(abspath(__file__))
@@ -38,12 +39,10 @@ setup(
     maintainer="The RIPE Atlas Team",
     maintainer_email="atlas@ripe.net",
     install_requires=install_requires,
-    tests_require=tests_require,
     extras_require={
         "fast": ["ujson"],
         "doc": ["sphinx"]
     },
-    test_suite="nose.collector",
     classifiers=[
         "Operating System :: POSIX",
         "Operating System :: Unix",
