@@ -28,6 +28,9 @@ except ImportError:
     import json
 
 
+log = logging.getLogger(__name__)
+
+
 class ResultParseError(Exception):
     pass
 
@@ -138,14 +141,14 @@ class ParsingDict(object):
         if self._on_malformation == self.ACTION_FAIL:
             raise ResultParseError(message)
         elif self._on_malformation == self.ACTION_WARN:
-            logging.warning(message)
+            log.warning(message)
         self.is_malformed = True
 
     def _handle_error(self, message):
         if self._on_error == self.ACTION_FAIL:
             raise ResultError(message)
         elif self._on_error == self.ACTION_WARN:
-            logging.warning(message)
+            log.warning(message)
         self.is_error = True
         self.error_message = message
 
