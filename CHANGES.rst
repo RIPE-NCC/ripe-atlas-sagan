@@ -1,5 +1,9 @@
 Changelog
 =========
+* 2.0.0
+    * Official supported Python versions changed to 3.10, 3.11, 3.12 and 3.13
+    * Removed test on invalid country codes in SSL certs, in line with the behaviour of the cryptography library
+    * Reinstated integration with readthedocs.io
 * 1.3.1
     * Ping edge case fix
     * Add py37 testing

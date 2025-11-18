@@ -9,10 +9,8 @@ name = "ripe.atlas.sagan"
 install_requires = [
     "python-dateutil",
     "pytz",
+    "cryptography",
 ]
-
-if "SAGAN_WITHOUT_SSL" not in os.environ:
-    install_requires.append("cryptography")
 
 # Allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
