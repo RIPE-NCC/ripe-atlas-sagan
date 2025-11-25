@@ -1,5 +1,7 @@
-RIPE Atlas Sagan |Build Status| |Documentation|
+RIPE Atlas Sagan
 ===============================================
+
+|Documentation| |PYPI Version| |Python Versions| 
 
 A parsing library for RIPE Atlas measurement results
 
@@ -232,8 +234,9 @@ decades reaching out to the public about the wonders of the cosmos?
 .. _John Bond: https://github.com/b4ldr
 .. _Pier Carlo Chiodi: https://github.com/pierky
 .. _Sagan: https://en.wikipedia.org/wiki/Carl_Sagan
-.. |Build Status| image:: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan.png?branch=master
-   :target: https://travis-ci.org/RIPE-NCC/ripe.atlas.sagan
 .. |Documentation| image:: https://readthedocs.org/projects/ripe-atlas-sagan/badge/?version=latest
    :target: http://ripe-atlas-sagan.readthedocs.org/en/latest/?badge=latest
    :alt: Documentation Status
+.. |PYPI Version| image:: https://img.shields.io/pypi/v/ripe.atlas.sagan.svg
+   :target: https://pypi.org/project/ripe.atlas.sagan/
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/ripe.atlas.sagan.svg
