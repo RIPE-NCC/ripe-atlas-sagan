@@ -31,17 +31,6 @@ Better yet, make sure you get ujson and sphinx installed with it:
 
     $ pip install ripe.atlas.sagan[fast,doc]
 
-Troubleshooting
-~~~~~~~~~~~~~~~
-
-Some setups (like MacOS) have trouble with building the dependencies required
-for reading SSL certificates. If you don't care about SSL stuff and only want to
-use sagan to say, parse traceroute or DNS results, then you can do the following:
-
-.. code:: bash
-
-    $ SAGAN_WITHOUT_SSL=1 pip install ripe.atlas.sagan
-
 Quickstart: How To Use It
 -------------------------
 
