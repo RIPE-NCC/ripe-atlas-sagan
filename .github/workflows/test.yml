@@ -7,7 +7,7 @@ on:
   push:
     branches: [ '*' ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ master ]
 
 jobs:
   test:
